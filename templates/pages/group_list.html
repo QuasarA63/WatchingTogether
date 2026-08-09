@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Группы — Смотрим вместе{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-people"></i> Группы</h2>
+    {% if user.is_authenticated %}
+        <a href="{% url 'group_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Создать группу
+        </a>
+    {% endif %}
+</div>
+
+<!-- Поиск -->
+<form method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Поиск групп..." value="{{ search }}">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+    </div>
+</form>
+
+{% if groups_page %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for group in groups_page %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'group_detail' group.pk %}" class="text-decoration-none">
+                                {{ group.name }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted">{{ group.description|truncatewords:15 }}</p>
+                    </div>
+                    <div class="card-footer text-muted small">
+                        <i class="bi bi-people-fill"></i> {{ group.members.count }} участн.
+                        &middot; {{ group.created_at|date:"d.m.Y" }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if groups_page.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if groups_page.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ groups_page.previous_page_number }}{% if search %}&q={{ search }}{% endif %}">&laquo;</a>
+                    </li>
+                {% endif %}
+                {% for num in groups_page.paginator.page_range %}
+                    <li class="page-item {% if groups_page.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if groups_page.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ groups_page.next_page_number }}{% if search %}&q={{ search }}{% endif %}">&raquo;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Группы не найдены.
+        {% if user.is_authenticated %}
+            <a href="{% url 'group_create' %}">Создайте первую группу!</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

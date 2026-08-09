@@ -19,7 +19,10 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     
     # Web pages (Django Templates)
-    # path('', include('apps.core.urls')),
+    path('', include('apps.core.urls')),
+    path('groups/', include('apps.groups.urls')),
+    path('content/', include('apps.content.urls')),
+    path('reviews/', include('apps.reviews.urls')),
 ]
 
 if settings.DEBUG:

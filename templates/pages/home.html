@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Главная — Смотрим вместе{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="p-5 mb-4 bg-dark text-white rounded-3">
+            <div class="container-fluid py-3">
+                <h1 class="display-5 fw-bold">
+                    <i class="bi bi-camera-reels"></i> Смотрим вместе
+                </h1>
+                <p class="col-md-8 fs-5">
+                    Обменивайтесь мнениями о фильмах, сериалах и музыке с друзьями.
+                    Создавайте группы, оставляйте отзывы и оценки.
+                </p>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="bi bi-person-plus"></i> Регистрация
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">Вход</a>
+                {% else %}
+                    <a href="{% url 'content_list' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="bi bi-collection-play"></i> Каталог контента
+                    </a>
+                    <a href="{% url 'group_list' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-people"></i> Группы
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Последние отзывы -->
+    <div class="col-md-7">
+        <h3 class="mb-3"><i class="bi bi-chat-square-text"></i> Последние отзывы</h3>
+        {% if latest_reviews %}
+            {% for review in latest_reviews %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <a href="{% url 'review_detail' review.pk %}" class="text-decoration-none">
+                                        {% if review.title %}{{ review.title }}{% else %}Отзыв на «{{ review.content_item.title }}»{% endif %}
+                                    </a>
+                                </h5>
+                                <p class="text-muted small mb-2">
+                                    <i class="bi bi-person"></i> {{ review.user.username }}
+                                    &middot;
+                                    <a href="{% url 'content_detail' review.content_item.pk %}" class="text-decoration-none">
+                                        <i class="bi bi-film"></i> {{ review.content_item.title }}
+                                    </a>
+                                    {% if review.group %}
+                                        &middot; <i class="bi bi-people"></i> {{ review.group.name }}
+                                    {% endif %}
+                                    &middot; {{ review.created_at|date:"d.m.Y H:i" }}
+                                </p>
+                            </div>
+                            <span class="badge bg-primary fs-6">{{ review.rating }}/10</span>
+                        </div>
+                        <p class="card-text">{{ review.text|truncatewords:30 }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Пока нет отзывов. Будьте первым!
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Популярный контент -->
+    <div class="col-md-5">
+        <h3 class="mb-3"><i class="bi bi-collection-play"></i> Недавно добавленное</h3>
+        {% if popular_content %}
+            <div class="list-group">
+                {% for item in popular_content %}
+                    <a href="{% url 'content_detail' item.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ item.title }}</h6>
+                            {% if item.year %}<small class="text-muted">{{ item.year }}</small>{% endif %}
+                        </div>
+                        <small class="text-muted">
+                            <i class="bi bi-tag"></i> {{ item.category.name }}
+                        </small>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Контент пока не добавлен.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.title }} — Смотрим вместе{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2>{{ item.title }}</h2>
+        {% if item.original_title and item.original_title != item.title %}
+            <p class="text-muted fs-5">{{ item.original_title }}</p>
+        {% endif %}
+
+        <p class="text-muted">
+            <i class="bi bi-tag"></i> {{ item.category.name }}
+            {% if item.year %}&middot; <i class="bi bi-calendar"></i> {{ item.year }}{% endif %}
+        </p>
+
+        {% if item.avg_rating %}
+            <div class="mb-3">
+                <span class="badge bg-primary fs-5">
+                    <i class="bi bi-star-fill"></i> {{ item.avg_rating|floatformat:1 }}/10
+                </span>
+                <span class="text-muted">({{ item.reviews_count }} отзыв{{ item.reviews_count|pluralize:"ов,а,ов" }})</span>
+            </div>
+        {% endif %}
+
+        {% if item.description %}
+            <p>{{ item.description }}</p>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            {% if user_review %}
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i> Вы уже оставили отзыв.
+                    <a href="{% url 'review_detail' user_review.pk %}">Посмотреть</a>
+                    <a href="{% url 'review_edit' user_review.pk %}" class="ms-2">Редактировать</a>
+                </div>
+            {% else %}
+                <a href="{% url 'review_create' item.pk %}" class="btn btn-primary mb-3">
+                    <i class="bi bi-pencil-square"></i> Написать отзыв
+                </a>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">
+                <a href="{% url 'login' %}">Войдите</a>, чтобы оставить отзыв.
+            </div>
+        {% endif %}
+
+        <hr>
+
+        <h4 class="mb-3"><i class="bi bi-chat-square-text"></i> Отзывы</h4>
+        {% if reviews_page %}
+            {% for review in reviews_page %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="card-title mb-1">
+                                    <a href="{% url 'review_detail' review.pk %}" class="text-decoration-none">
+                                        {% if review.title %}{{ review.title }}{% else %}Отзыв{% endif %}
+                                    </a>
+                                </h6>
+                                <p class="text-muted small mb-2">
+                                    <i class="bi bi-person"></i> {{ review.user.username }}
+                                    {% if review.group %}
+                                        &middot; <i class="bi bi-people"></i> {{ review.group.name }}
+                                    {% endif %}
+                                    &middot; {{ review.created_at|date:"d.m.Y H:i" }}
+                                </p>
+                            </div>
+                            <span class="badge bg-primary">{{ review.rating }}/10</span>
+                        </div>
+                        <p class="card-text">{{ review.text|truncatewords:40 }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if reviews_page.has_other_pages %}
+                <nav>
+                    <ul class="pagination">
+                        {% if reviews_page.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ reviews_page.previous_page_number }}">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for num in reviews_page.paginator.page_range %}
+                            <li class="page-item {% if reviews_page.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if reviews_page.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ reviews_page.next_page_number }}">&raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Пока нет отзывов. Будьте первым!
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

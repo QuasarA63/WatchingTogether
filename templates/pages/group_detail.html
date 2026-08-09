@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{{ group.name }} — Смотрим вместе{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h2><i class="bi bi-people"></i> {{ group.name }}</h2>
+                {% if group.is_private %}
+                    <span class="badge bg-warning text-dark"><i class="bi bi-lock"></i> Приватная</span>
+                {% endif %}
+            </div>
+            {% if user.is_authenticated %}
+                {% if is_member %}
+                    <a href="{% url 'group_leave' group.pk %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-box-arrow-left"></i> Покинуть
+                    </a>
+                {% else %}
+                    <a href="{% url 'group_join' group.pk %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle"></i> Вступить
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        {% if group.description %}
+            <p class="lead">{{ group.description }}</p>
+        {% endif %}
+
+        <p class="text-muted">
+            <i class="bi bi-person"></i> Владелец: {{ group.owner.username }}
+            &middot; <i class="bi bi-people-fill"></i> {{ members_count }} участн.
+            &middot; <i class="bi bi-calendar"></i> Создана {{ group.created_at|date:"d.m.Y" }}
+        </p>
+
+        <hr>
+
+        <h4 class="mb-3"><i class="bi bi-chat-square-text"></i> Отзывы группы</h4>
+        {% if reviews_page %}
+            {% for review in reviews_page %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <a href="{% url 'review_detail' review.pk %}" class="text-decoration-none">
+                                        {% if review.title %}{{ review.title }}{% else %}Отзыв на «{{ review.content_item.title }}»{% endif %}
+                                    </a>
+                                </h5>
+                                <p class="text-muted small mb-2">
+                                    <i class="bi bi-person"></i> {{ review.user.username }}
+                                    &middot;
+                                    <a href="{% url 'content_detail' review.content_item.pk %}" class="text-decoration-none">
+                                        {{ review.content_item.title }}
+                                    </a>
+                                    &middot; {{ review.created_at|date:"d.m.Y H:i" }}
+                                </p>
+                            </div>
+                            <span class="badge bg-primary fs-6">{{ review.rating }}/10</span>
+                        </div>
+                        <p class="card-text">{{ review.text|truncatewords:30 }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if reviews_page.has_other_pages %}
+                <nav>
+                    <ul class="pagination">
+                        {% if reviews_page.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ reviews_page.previous_page_number }}">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for num in reviews_page.paginator.page_range %}
+                            <li class="page-item {% if reviews_page.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if reviews_page.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ reviews_page.next_page_number }}">&raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> В этой группе пока нет отзывов.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -109,6 +109,11 @@ else:
 # Custom user model
 AUTH_USER_MODEL = 'users.User'
 
+# Auth redirects
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

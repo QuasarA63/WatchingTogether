@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Каталог — Смотрим вместе{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-collection-play"></i> Каталог контента</h2>
+
+<!-- Фильтры -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="q" class="form-control" placeholder="Поиск..." value="{{ search }}">
+            <select name="category" class="form-select" style="max-width: 200px;">
+                <option value="">Все категории</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+</div>
+
+{% if items_page %}
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        {% for item in items_page %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <a href="{% url 'content_detail' item.pk %}" class="text-decoration-none">
+                                {{ item.title }}
+                            </a>
+                        </h6>
+                        {% if item.original_title and item.original_title != item.title %}
+                            <p class="text-muted small mb-1">{{ item.original_title }}</p>
+                        {% endif %}
+                        <p class="text-muted small mb-1">
+                            <i class="bi bi-tag"></i> {{ item.category.name }}
+                            {% if item.year %}&middot; {{ item.year }}{% endif %}
+                        </p>
+                        {% if item.avg_rating %}
+                            <span class="badge bg-primary">
+                                <i class="bi bi-star-fill"></i> {{ item.avg_rating|floatformat:1 }}
+                            </span>
+                            <small class="text-muted">({{ item.reviews_count }} отз.)</small>
+                        {% else %}
+                            <small class="text-muted">Нет оценок</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if items_page.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if items_page.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ items_page.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">&laquo;</a>
+                    </li>
+                {% endif %}
+                {% for num in items_page.paginator.page_range %}
+                    <li class="page-item {% if items_page.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if items_page.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ items_page.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">&raquo;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Контент не найден.
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+# .htaccess для beget.ru
+# Перенаправление всех запросов на Passenger
+
+PassengerEnabled On
+PassengerAppRoot /home/username/wt.larimaritgroup.ru
+PassengerBaseURI /
+PassengerPython /home/username/wt.larimaritgroup.ru/venv/bin/python
+
+# Статические файлы обслуживаются напрямую Apache
+Alias /static /home/username/wt.larimaritgroup.ru/staticfiles
+Alias /media /home/username/wt.larimaritgroup.ru/media
+
+<Directory /home/username/wt.larimaritgroup.ru/staticfiles>
+    Require all granted
+</Directory>
+
+<Directory /home/username/wt.larimaritgroup.ru/media>
+    Require all granted
+</Directory>

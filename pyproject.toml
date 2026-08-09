@@ -1,0 +1,57 @@
+[tool.poetry]
+name = "watching-together"
+version = "0.1.0"
+description = "Web-приложение для обмена мнениями в группах о просмотренных фильмах, сериалах, музыке"
+authors = ["LARIMAR IT Group"]
+readme = "README.md"
+packages = [{include = "apps"}, {include = "config"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^6.0"
+djangorestframework = "^3.15"
+djangorestframework-simplejwt = "^5.4"
+drf-spectacular = "^0.28"
+mysqlclient = "^2.2"
+pillow = "^11.0"
+python-decouple = "^3.8"
+django-cors-headers = "^4.6"
+
+[tool.poetry.group.dev.dependencies]
+django-debug-toolbar = "^5.0"
+django-extensions = "^4.0"
+ipython = "^8.30"
+pytest = "^8.3"
+pytest-django = "^4.9"
+factory-boy = "^3.3"
+black = "^24.10"
+flake8 = "^7.1"
+isort = "^5.13"
+
+[tool.poetry.group.prod.dependencies]
+gunicorn = "^23.0"
+whitenoise = "^6.8"
+sentry-sdk = "^2.19"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  migrations
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = ["migrations"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.development"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]

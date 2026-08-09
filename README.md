@@ -4,19 +4,20 @@ Web-приложение для обмена мнениями в группах 
 
 ## Технологии
 
-- **Backend:** Django 4.2+ / Django REST Framework
-- **Database:** MySQL 8.0+
+- **Backend:** Django 6.0 / Django REST Framework
+- **Database:** SQLite (dev) / MySQL 8.0+ (production)
 - **Authentication:** JWT (djangorestframework-simplejwt)
 - **API Documentation:** drf-spectacular (Swagger)
 - **Frontend:** Django Templates + Bootstrap 5 (MVP)
+- **Package Manager:** Poetry
 
 ## Установка и запуск
 
 ### Требования
 
 - Python 3.10+
-- MySQL 8.0+
-- Virtual environment
+- Poetry
+- MySQL 8.0+ (только для production)
 
 ### Установка
 
@@ -26,17 +27,14 @@ git clone <repository-url>
 cd WatchingTogether
 ```
 
-2. Создать виртуальное окружение:
+2. Установить зависимости через Poetry:
 ```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# или
-venv\Scripts\activate  # Windows
+poetry install
 ```
 
-3. Установить зависимости:
+3. Активировать виртуальное окружение:
 ```bash
-pip install -r requirements/development.txt
+poetry shell
 ```
 
 4. Создать файл `.env` на основе `.env.example`:
@@ -94,7 +92,7 @@ watching_together/
 ├── templates/          # Django Templates
 ├── static/             # Статические файлы
 ├── media/              # Загружаемые файлы
-└── requirements/       # Зависимости
+└── pyproject.toml      # Зависимости Poetry
 ```
 
 ## API Documentation

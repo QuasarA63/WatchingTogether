@@ -7,11 +7,12 @@
 ## Технологический стек
 
 ### Backend
-- **Framework:** Django 4.2+ / Django REST Framework 3.14+
-- **Database:** MySQL 8.0+
+- **Framework:** Django 6.0 / Django REST Framework 3.15+
+- **Database:** SQLite (dev) / MySQL 8.0+ (production)
 - **Authentication:** JWT (djangorestframework-simplejwt)
 - **API Documentation:** drf-spectacular (Swagger/OpenAPI)
 - **Templates:** Django Templates (MVP), позже SPA
+- **Package Manager:** Poetry
 
 ### Frontend (MVP)
 - Django Templates + Bootstrap 5
@@ -83,10 +84,7 @@ watching_together/
 │   ├── js/
 │   └── images/
 ├── media/                 # Загружаемые файлы
-├── requirements/          # Зависимости
-│   ├── base.txt
-│   ├── development.txt
-│   └── production.txt
+├── pyproject.toml         # Зависимости Poetry
 ├── .env.example           # Пример переменных окружения
 ├── .gitignore
 ├── manage.py

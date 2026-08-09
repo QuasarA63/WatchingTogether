@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -46,6 +46,15 @@ def register_view(request):
         form = RegisterForm()
 
     return render(request, 'pages/register.html', {'form': form})
+
+
+def logout_view(request):
+    """
+    Выход из системы (GET и POST).
+    """
+    logout(request)
+    messages.info(request, 'Вы вышли из системы.')
+    return redirect('home')
 
 
 @login_required

@@ -15,14 +15,20 @@ def migrate_genres_from_metadata(apps, schema_editor):
             name = name.strip()
             if not name:
                 continue
-            slug = slugify(name)
-            if not slug:
-                # Для названий без латиницы/кириллицы slugify может дать пустую строку
-                slug = f'genre-{Genre.objects.count() + 1}'
-            genre, _ = Genre.objects.get_or_create(
-                slug=slug,
-                defaults={'name': name},
-            )
+            # Сначала ищем по имени (уникальное поле)
+            genre = Genre.objects.filter(name=name).first()
+            if genre is None:
+                slug = slugify(name)
+                if not slug:
+                    # Для названий без латиницы/кириллицы slugify может дать пустую строку
+                    slug = f'genre-{Genre.objects.count() + 1}'
+                # Проверяем уникальность slug
+                base_slug = slug
+                counter = 1
+                while Genre.objects.filter(slug=slug).exists():
+                    slug = f'{base_slug}-{counter}'
+                    counter += 1
+                genre = Genre.objects.create(name=name, slug=slug)
             item.genres.add(genre)
 
 

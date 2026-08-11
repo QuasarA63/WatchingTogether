@@ -94,5 +94,5 @@ class UserContentItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserContentItem
-        fields = ['id', 'content_item', 'content_item_id', 'status', 'status_display', 'comment', 'created_at', 'updated_at']
+        fields = ['id', 'content_item', 'content_item_id', 'status', 'status_display', 'personal_rating', 'comment', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']

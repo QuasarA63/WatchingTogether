@@ -195,6 +195,7 @@ class UserContentItem(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='content_items')
     content_item = models.ForeignKey(ContentItem, on_delete=models.CASCADE, related_name='user_entries')
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PLANNED)
+    personal_rating = models.PositiveSmallIntegerField(null=True, blank=True, choices=[(i, i) for i in range(1, 6)])  # 1-5 звёзд
     comment = models.TextField(blank=True)  # Личный комментарий
 
     class Meta:

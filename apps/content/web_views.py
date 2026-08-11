@@ -301,13 +301,21 @@ def my_content_edit_comment(request, pk):
 def my_content_edit_status(request, pk):
     """
     Изменение статуса просмотра объекта (POST).
+    При статусе «Посмотрел» сохраняет личную оценку.
     """
     entry = get_object_or_404(UserContentItem, pk=pk, user=request.user)
     if request.method == 'POST':
         new_status = request.POST.get('status', '')
         if new_status in dict(UserContentItem.Status.choices):
             entry.status = new_status
-            entry.save(update_fields=['status', 'updated_at'])
+            # При статусе «Посмотрел» сохраняем личную оценку
+            if new_status == UserContentItem.Status.COMPLETED:
+                personal_rating = request.POST.get('personal_rating', '')
+                if personal_rating and personal_rating.isdigit():
+                    rating = int(personal_rating)
+                    if 1 <= rating <= 5:
+                        entry.personal_rating = rating
+            entry.save(update_fields=['status', 'personal_rating', 'updated_at'])
             messages.success(request, f'Статус изменён на «{entry.get_status_display()}».')
     return redirect('my_content_list')
 

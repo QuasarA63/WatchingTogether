@@ -174,6 +174,13 @@ class UserContentItem(TimeStampedModel):
         default=Status.PLANNED,
         verbose_name='Статус просмотра'
     )
+    personal_rating = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        choices=[(i, i) for i in range(1, 6)],
+        verbose_name='Личная оценка',
+        help_text='Оценка от 1 до 5 звёзд'
+    )
     comment = models.TextField(
         blank=True,
         verbose_name='Личный комментарий'

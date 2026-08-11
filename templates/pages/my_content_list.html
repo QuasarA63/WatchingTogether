@@ -93,6 +93,12 @@
                                                 {% endif %}
                                                 {{ entry.get_status_display }}
                                             </span>
+                                            <!-- Личная оценка -->
+                                            {% if entry.personal_rating %}
+                                                <span class="badge bg-success" title="Моя оценка">
+                                                    {% for i in "12345"|slice:entry.personal_rating %}<i class="bi bi-star-fill"></i>{% endfor %}
+                                                </span>
+                                            {% endif %}
                                             {% if item.external_rating %}
                                                 <span class="badge bg-warning text-dark" title="Рейтинг Кинопоиска">
                                                     <i class="bi bi-star-fill"></i> {{ item.external_rating }}
@@ -142,15 +148,28 @@
                                     <!-- Действия -->
                                     <div class="d-flex gap-2 flex-wrap align-items-center">
                                         <!-- Изменение статуса -->
-                                        <form method="post" action="{% url 'my_content_edit_status' entry.pk %}" class="d-flex gap-1 align-items-center">
+                                        <form method="post" action="{% url 'my_content_edit_status' entry.pk %}" class="d-flex gap-2 align-items-center flex-wrap" id="status-form-{{ entry.pk }}">
                                             {% csrf_token %}
-                                            <select name="status" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                                            <select name="status" class="form-select form-select-sm" style="width: auto;" onchange="toggleRating({{ entry.pk }}, this.value)">
                                                 {% for value, label in status_choices %}
                                                     <option value="{{ value }}" {% if entry.status == value %}selected{% endif %}>
                                                         {{ label }}
                                                     </option>
                                                 {% endfor %}
                                             </select>
+                                            <!-- Выбор оценки (показывается при «Посмотрел») -->
+                                            <div id="rating-{{ entry.pk }}" class="rating-stars {% if entry.status != 'completed' %}d-none{% endif %}">
+                                                <input type="hidden" name="personal_rating" id="rating-input-{{ entry.pk }}" value="{{ entry.personal_rating|default:'' }}">
+                                                {% for i in "12345" %}
+                                                    <i class="bi bi-star{% if entry.personal_rating and forloop.counter <= entry.personal_rating %}-fill{% endif %} rating-star"
+                                                       data-value="{{ forloop.counter }}"
+                                                       onclick="setRating({{ entry.pk }}, {{ forloop.counter }})"
+                                                       style="cursor: pointer; font-size: 1.2rem; color: #ffc107;"></i>
+                                                {% endfor %}
+                                                <button type="submit" class="btn btn-sm btn-success ms-2" title="Сохранить">
+                                                    <i class="bi bi-check"></i>
+                                                </button>
+                                            </div>
                                         </form>
 
                                         <!-- Редактирование комментария -->
@@ -216,4 +235,36 @@
         {% endif %}
     </div>
 {% endif %}
+
+<script>
+// Показать/скрыть выбор оценки при смене статуса
+function toggleRating(entryId, status) {
+    const ratingDiv = document.getElementById('rating-' + entryId);
+    if (status === 'completed') {
+        ratingDiv.classList.remove('d-none');
+        // Не отправляем форму сразу — ждём выбора оценки
+    } else {
+        ratingDiv.classList.add('d-none');
+        // Для других статусов отправляем форму сразу
+        document.getElementById('status-form-' + entryId).submit();
+    }
+}
+
+// Установить оценку (звёзды)
+function setRating(entryId, value) {
+    const input = document.getElementById('rating-input-' + entryId);
+    input.value = value;
+    // Обновляем отображение звёзд
+    const stars = document.querySelectorAll('#rating-' + entryId + ' .rating-star');
+    stars.forEach((star, index) => {
+        if (index < value) {
+            star.classList.remove('bi-star');
+            star.classList.add('bi-star-fill');
+        } else {
+            star.classList.remove('bi-star-fill');
+            star.classList.add('bi-star');
+        }
+    });
+}
+</script>
 {% endblock %}

@@ -56,14 +56,22 @@
                                 {% endfor %}
                             </p>
                         {% endif %}
-                        {% if item.avg_rating %}
-                            <span class="badge bg-primary">
-                                <i class="bi bi-star-fill"></i> {{ item.avg_rating|floatformat:1 }}
-                            </span>
-                            <small class="text-muted">({{ item.reviews_count }} отз.)</small>
-                        {% else %}
-                            <small class="text-muted">Нет оценок</small>
-                        {% endif %}
+                        <div class="d-flex gap-2 align-items-center flex-wrap">
+                            {% if item.external_rating %}
+                                <span class="badge bg-warning text-dark" title="Рейтинг Кинопоиска">
+                                    <i class="bi bi-star-fill"></i> {{ item.external_rating }}
+                                </span>
+                            {% endif %}
+                            {% if item.avg_rating %}
+                                <span class="badge bg-primary" title="Оценка пользователей">
+                                    <i class="bi bi-people-fill"></i> {{ item.avg_rating|floatformat:1 }}
+                                </span>
+                                <small class="text-muted">({{ item.reviews_count }})</small>
+                            {% endif %}
+                            {% if not item.external_rating and not item.avg_rating %}
+                                <small class="text-muted">Нет оценок</small>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

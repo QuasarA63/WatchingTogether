@@ -19,9 +19,9 @@
 
 <!-- Фильтры -->
 <div class="row mb-4">
-    <div class="col-md-8">
-        <form method="get" class="d-flex gap-2">
-            <select name="category" class="form-select" style="max-width: 180px;" onchange="this.form.submit()">
+    <div class="col-md-10">
+        <form method="get" class="d-flex gap-2 flex-wrap">
+            <select name="category" class="form-select" style="max-width: 160px;" onchange="this.form.submit()">
                 <option value="">Все типы</option>
                 {% for cat in categories %}
                     <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>
@@ -29,7 +29,7 @@
                     </option>
                 {% endfor %}
             </select>
-            <select name="genre" class="form-select" style="max-width: 180px;" onchange="this.form.submit()">
+            <select name="genre" class="form-select" style="max-width: 160px;" onchange="this.form.submit()">
                 <option value="">Все жанры</option>
                 {% for genre in genres %}
                     <option value="{{ genre.slug }}" {% if current_genre == genre.slug %}selected{% endif %}>
@@ -37,7 +37,15 @@
                     </option>
                 {% endfor %}
             </select>
-            {% if current_category or current_genre %}
+            <select name="status" class="form-select" style="max-width: 160px;" onchange="this.form.submit()">
+                <option value="">Все статусы</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if current_category or current_genre or current_status %}
                 <a href="{% url 'my_content_list' %}" class="btn btn-outline-secondary" title="Сбросить фильтры">
                     <i class="bi bi-x-lg"></i>
                 </a>
@@ -47,65 +55,128 @@
 </div>
 
 {% if entries_page %}
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row row-cols-1 g-4">
         {% for entry in entries_page %}
             {% with item=entry.content_item %}
                 <div class="col">
-                    <div class="card h-100">
-                        {% if item.metadata.poster_url %}
-                            <div class="text-center bg-light">
-                                <img src="{{ item.metadata.poster_url }}" alt="{{ item.title }}"
-                                     style="max-height: 300px; max-width: 100%; object-fit: contain;">
-                            </div>
-                        {% endif %}
-                        <div class="card-body">
-                            <h6 class="card-title">
-                                <a href="{% url 'content_detail' item.pk %}" class="text-decoration-none">
-                                    {{ item.title }}
-                                </a>
-                            </h6>
-                            <p class="text-muted small mb-2">
-                                <i class="bi bi-tag"></i> {{ item.category.name }}
-                                {% if item.year %}&middot; {{ item.year }}{% endif %}
-                            </p>
-                            {% if item.genres.all %}
-                                <p class="mb-2">
-                                    {% for genre in item.genres.all %}
-                                        <span class="badge bg-secondary">{{ genre.name }}</span>
-                                    {% endfor %}
-                                </p>
-                            {% endif %}
-
-                            <!-- Личный комментарий -->
-                            <div class="mb-2">
-                                {% if entry.comment %}
-                                    <p class="card-text small fst-italic">«{{ entry.comment }}»</p>
+                    <div class="card">
+                        <div class="row g-0">
+                            <!-- Картинка слева -->
+                            <div class="col-md-3 col-lg-2">
+                                {% if item.metadata.poster_url %}
+                                    <img src="{{ item.metadata.poster_url }}" alt="{{ item.title }}"
+                                         class="img-fluid rounded-start h-100"
+                                         style="object-fit: cover; max-height: 250px;">
                                 {% else %}
-                                    <p class="card-text small text-muted fst-italic">Нет комментария</p>
+                                    <div class="bg-light d-flex align-items-center justify-content-center h-100 rounded-start"
+                                         style="min-height: 200px;">
+                                        <i class="bi bi-film fs-1 text-muted"></i>
+                                    </div>
                                 {% endif %}
                             </div>
+                            <!-- Свойства справа -->
+                            <div class="col-md-9 col-lg-10">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-0">
+                                            <a href="{% url 'content_detail' item.pk %}" class="text-decoration-none">
+                                                {{ item.title }}
+                                            </a>
+                                        </h5>
+                                        <div class="d-flex gap-2 align-items-center">
+                                            <!-- Статус просмотра -->
+                                            <span class="badge bg-info">
+                                                {% if entry.status == 'planned' %}<i class="bi bi-bookmark"></i>
+                                                {% elif entry.status == 'watching' %}<i class="bi bi-play-circle"></i>
+                                                {% elif entry.status == 'on_hold' %}<i class="bi bi-pause-circle"></i>
+                                                {% elif entry.status == 'completed' %}<i class="bi bi-check-circle"></i>
+                                                {% endif %}
+                                                {{ entry.get_status_display }}
+                                            </span>
+                                            {% if item.external_rating %}
+                                                <span class="badge bg-warning text-dark" title="Рейтинг Кинопоиска">
+                                                    <i class="bi bi-star-fill"></i> {{ item.external_rating }}
+                                                </span>
+                                            {% endif %}
+                                            {% if item.average_rating %}
+                                                <span class="badge bg-primary" title="Оценка пользователей">
+                                                    <i class="bi bi-people-fill"></i> {{ item.average_rating }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% if item.original_title and item.original_title != item.title %}
+                                        <p class="text-muted small mb-1">{{ item.original_title }}</p>
+                                    {% endif %}
+                                    <p class="text-muted small mb-2">
+                                        <i class="bi bi-tag"></i> {{ item.category.name }}
+                                        {% if item.year %}&middot; <i class="bi bi-calendar"></i> {{ item.year }}{% endif %}
+                                    </p>
+                                    {% if item.genres.all %}
+                                        <p class="mb-2">
+                                            {% for genre in item.genres.all %}
+                                                <span class="badge bg-secondary">{{ genre.name }}</span>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
 
-                            <!-- Редактирование комментария -->
-                            <details class="mb-2">
-                                <summary class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-pencil"></i> Комментарий
-                                </summary>
-                                <form method="post" action="{% url 'my_content_edit_comment' entry.pk %}" class="mt-2">
-                                    {% csrf_token %}
-                                    <textarea name="comment" class="form-control form-control-sm mb-2"
-                                              rows="2" placeholder="Ваш личный комментарий...">{{ entry.comment }}</textarea>
-                                    <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
-                                </form>
-                            </details>
+                                    <!-- Описание (раскрывающееся) -->
+                                    {% if item.description %}
+                                        <details class="mb-2">
+                                            <summary class="text-primary" style="cursor: pointer;">
+                                                <i class="bi bi-chevron-down"></i> Описание
+                                            </summary>
+                                            <p class="card-text small mt-2">{{ item.description }}</p>
+                                        </details>
+                                    {% endif %}
 
-                            <!-- Удаление -->
-                            <form method="post" action="{% url 'my_content_remove' entry.pk %}"
-                                  onsubmit="return confirm('Удалить «{{ item.title }}» из ваших объектов?');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i> Удалить
-                                </button>
-                            </form>
+                                    <!-- Личный комментарий -->
+                                    <div class="mb-2">
+                                        {% if entry.comment %}
+                                            <p class="card-text small fst-italic mb-1">«{{ entry.comment }}»</p>
+                                        {% else %}
+                                            <p class="card-text small text-muted fst-italic mb-1">Нет комментария</p>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Действия -->
+                                    <div class="d-flex gap-2 flex-wrap align-items-center">
+                                        <!-- Изменение статуса -->
+                                        <form method="post" action="{% url 'my_content_edit_status' entry.pk %}" class="d-flex gap-1 align-items-center">
+                                            {% csrf_token %}
+                                            <select name="status" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                                                {% for value, label in status_choices %}
+                                                    <option value="{{ value }}" {% if entry.status == value %}selected{% endif %}>
+                                                        {{ label }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </form>
+
+                                        <!-- Редактирование комментария -->
+                                        <details>
+                                            <summary class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-pencil"></i> Комментарий
+                                            </summary>
+                                            <form method="post" action="{% url 'my_content_edit_comment' entry.pk %}" class="mt-2">
+                                                {% csrf_token %}
+                                                <textarea name="comment" class="form-control form-control-sm mb-2"
+                                                          rows="2" placeholder="Ваш личный комментарий...">{{ entry.comment }}</textarea>
+                                                <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                                            </form>
+                                        </details>
+
+                                        <!-- Удаление -->
+                                        <form method="post" action="{% url 'my_content_remove' entry.pk %}"
+                                              onsubmit="return confirm('Удалить «{{ item.title }}» из ваших объектов?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i> Удалить
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

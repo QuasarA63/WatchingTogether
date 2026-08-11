@@ -104,6 +104,9 @@ class UserContentItemViewSet(viewsets.ModelViewSet):
         genre = self.request.query_params.get('genre')
         if genre:
             queryset = queryset.filter(content_item__genres__slug=genre)
+        status_filter = self.request.query_params.get('status')
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
         return queryset.distinct()
 
     def perform_create(self, serializer):

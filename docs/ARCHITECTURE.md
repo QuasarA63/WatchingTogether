@@ -168,8 +168,14 @@ class ContentItem(TimeStampedModel):
     year = models.PositiveIntegerField(null=True, blank=True)
     poster = models.ImageField(upload_to='posters/', blank=True)
     external_id = models.CharField(max_length=100, blank=True)  # ID из внешних API (Kinopoisk, TMDB)
+    external_rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)  # Рейтинг Кинопоиска
     metadata = models.JSONField(default=dict, blank=True)  # Дополнительные данные
     is_active = models.BooleanField(default=True)  # Мягкое удаление
+
+    @property
+    def average_rating(self):
+        """Средняя оценка по отзывам пользователей"""
+        ...
 
     class Meta:
         indexes = [
@@ -178,9 +184,17 @@ class ContentItem(TimeStampedModel):
         ]
 
 class UserContentItem(TimeStampedModel):
-    """Личный объект пользователя с комментарием"""
+    """Личный объект пользователя с комментарием и статусом просмотра"""
+
+    class Status(models.TextChoices):
+        PLANNED = 'planned', 'В планах'
+        WATCHING = 'watching', 'Смотрю'
+        ON_HOLD = 'on_hold', 'Отложил'
+        COMPLETED = 'completed', 'Посмотрел'
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='content_items')
     content_item = models.ForeignKey(ContentItem, on_delete=models.CASCADE, related_name='user_entries')
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PLANNED)
     comment = models.TextField(blank=True)  # Личный комментарий
 
     class Meta:
@@ -262,10 +276,10 @@ GET    /api/v1/content/{id}/reviews/   # Отзывы на контент
 
 ### Личные объекты пользователя
 ```
-GET    /api/v1/my-content/             # Мои объекты (фильтры: ?category=slug, ?genre=slug)
-POST   /api/v1/my-content/             # Добавить объект к себе (content_item_id, comment)
+GET    /api/v1/my-content/             # Мои объекты (фильтры: ?category=slug, ?genre=slug, ?status=planned|watching|on_hold|completed)
+POST   /api/v1/my-content/             # Добавить объект к себе (content_item_id, status, comment)
 GET    /api/v1/my-content/{id}/        # Детали личного объекта
-PATCH  /api/v1/my-content/{id}/        # Обновить личный комментарий
+PATCH  /api/v1/my-content/{id}/        # Обновить статус/комментарий
 DELETE /api/v1/my-content/{id}/        # Удалить из моих (мягкое удаление ContentItem)
 ```
 
@@ -289,10 +303,10 @@ GET    /api/v1/reviews/{id}/comments/  # Комментарии к отзыву
 - `/profile/` — Профиль пользователя
 - `/groups/` — Список групп
 - `/groups/{id}/` — Страница группы
-- `/content/` — Каталог контента (фильтры по категории и жанру)
-- `/content/{id}/` — Страница контента с отзывами (отображение жанров)
-- `/content/my/` — Мои объекты (личный список с фильтрами по категории и жанру)
-- `/content/my/search/` — Поиск и добавление объектов из TMDB
+- `/content/` — Каталог контента (фильтры по категории и жанру, рейтинги)
+- `/content/{id}/` — Страница контента с отзывами (жанры, рейтинги Кинопоиска и пользователей)
+- `/content/my/` — Мои объекты (фильтры по категории, жанру, статусу; карточки с постером слева)
+- `/content/my/search/` — Поиск и добавление объектов из Кинопоиска
 - `/reviews/{id}/` — Детальный отзыв с комментариями
 
 ## Развертывание на beget.ru

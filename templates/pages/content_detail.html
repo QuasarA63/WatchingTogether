@@ -23,14 +23,25 @@
             </div>
         {% endif %}
 
-        {% if item.avg_rating %}
-            <div class="mb-3">
-                <span class="badge bg-primary fs-5">
-                    <i class="bi bi-star-fill"></i> {{ item.avg_rating|floatformat:1 }}/10
-                </span>
-                <span class="text-muted">({{ item.reviews_count }} отзыв{{ item.reviews_count|pluralize:"ов,а,ов" }})</span>
-            </div>
-        {% endif %}
+        <!-- Рейтинги -->
+        <div class="mb-3 d-flex gap-3 flex-wrap">
+            {% if item.external_rating %}
+                <div>
+                    <span class="badge bg-warning text-dark fs-5">
+                        <i class="bi bi-star-fill"></i> {{ item.external_rating }}/10
+                    </span>
+                    <small class="text-muted d-block">Кинопоиск</small>
+                </div>
+            {% endif %}
+            {% if item.avg_rating %}
+                <div>
+                    <span class="badge bg-primary fs-5">
+                        <i class="bi bi-people-fill"></i> {{ item.avg_rating|floatformat:1 }}/10
+                    </span>
+                    <small class="text-muted d-block">{{ item.reviews_count }} отзыв{{ item.reviews_count|pluralize:"ов,а,ов" }}</small>
+                </div>
+            {% endif %}
+        </div>
 
         {% if item.description %}
             <p>{{ item.description }}</p>

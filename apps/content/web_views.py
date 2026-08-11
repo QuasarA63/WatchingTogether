@@ -8,6 +8,30 @@ from .models import Category, Genre, ContentItem, UserContentItem
 from . import services
 
 
+# Транслитерация кириллицы для slug
+TRANSLIT_MAP = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+    'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+    'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+    'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
+    'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+}
+
+
+def transliterate(text):
+    """Транслитерация кириллицы в латиницу."""
+    return ''.join(TRANSLIT_MAP.get(c, c) for c in text.lower())
+
+
+def make_slug(name):
+    """Создать slug из названия с поддержкой кириллицы."""
+    slug = slugify(name)
+    if not slug:
+        # Для кириллицы используем транслитерацию
+        slug = slugify(transliterate(name))
+    return slug or f'genre-{Genre.objects.count() + 1}'
+
+
 def content_list(request):
     """
     Каталог контента с фильтрами по категории, жанру и поиском.
@@ -83,7 +107,7 @@ def content_detail(request, pk):
 def my_content_list(request):
     """
     Вкладка «Мои объекты»: список объектов пользователя
-    с фильтром по категории, жанру и личными комментариями.
+    с фильтрами по категории, жанру, статусу и личными комментариями.
     """
     entries = UserContentItem.objects.filter(
         user=request.user,
@@ -100,6 +124,10 @@ def my_content_list(request):
     if genre_slug:
         entries = entries.filter(content_item__genres__slug=genre_slug)
 
+    status_filter = request.GET.get('status', '')
+    if status_filter:
+        entries = entries.filter(status=status_filter)
+
     entries = entries.order_by('-created_at').distinct()
 
     paginator = Paginator(entries, 12)
@@ -108,13 +136,16 @@ def my_content_list(request):
 
     categories = Category.objects.all()
     genres = Genre.objects.all()
+    status_choices = UserContentItem.Status.choices
 
     context = {
         'entries_page': entries_page,
         'categories': categories,
         'genres': genres,
+        'status_choices': status_choices,
         'current_category': category_slug,
         'current_genre': genre_slug,
+        'current_status': status_filter,
         'search_configured': services.is_configured(),
     }
     return render(request, 'pages/my_content_list.html', context)
@@ -165,9 +196,7 @@ def _get_or_create_genres(genre_names):
         # Сначала ищем по имени (уникальное поле)
         genre = Genre.objects.filter(name=name).first()
         if genre is None:
-            slug = slugify(name)
-            if not slug:
-                slug = f'genre-{Genre.objects.count() + 1}'
+            slug = make_slug(name)
             # Проверяем уникальность slug
             base_slug = slug
             counter = 1
@@ -220,6 +249,7 @@ def my_content_add(request):
             description=details['overview'],
             year=details['year'],
             external_id=details['external_id'],
+            external_rating=details['rating'],
             metadata={
                 'source': 'kinopoisk',
                 'media_type': media_type,
@@ -264,6 +294,21 @@ def my_content_edit_comment(request, pk):
         entry.comment = request.POST.get('comment', '').strip()
         entry.save(update_fields=['comment', 'updated_at'])
         messages.success(request, 'Комментарий обновлён.')
+    return redirect('my_content_list')
+
+
+@login_required
+def my_content_edit_status(request, pk):
+    """
+    Изменение статуса просмотра объекта (POST).
+    """
+    entry = get_object_or_404(UserContentItem, pk=pk, user=request.user)
+    if request.method == 'POST':
+        new_status = request.POST.get('status', '')
+        if new_status in dict(UserContentItem.Status.choices):
+            entry.status = new_status
+            entry.save(update_fields=['status', 'updated_at'])
+            messages.success(request, f'Статус изменён на «{entry.get_status_display()}».')
     return redirect('my_content_list')
 
 

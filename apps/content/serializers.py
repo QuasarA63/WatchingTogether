@@ -46,26 +46,19 @@ class ContentItemSerializer(serializers.ModelSerializer):
         required=False
     )
     reviews_count = serializers.SerializerMethodField()
-    average_rating = serializers.SerializerMethodField()
 
     class Meta:
         model = ContentItem
         fields = [
             'id', 'category', 'category_name', 'title', 'original_title',
             'description', 'year', 'poster', 'external_id', 'metadata',
-            'genres', 'genre_ids',
+            'external_rating', 'genres', 'genre_ids',
             'reviews_count', 'average_rating', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_reviews_count(self, obj):
         return obj.reviews.count()
-
-    def get_average_rating(self, obj):
-        reviews = obj.reviews.all()
-        if not reviews:
-            return None
-        return round(sum(r.rating for r in reviews) / len(reviews), 1)
 
 
 class ContentItemCreateSerializer(serializers.ModelSerializer):
@@ -83,7 +76,7 @@ class ContentItemCreateSerializer(serializers.ModelSerializer):
         model = ContentItem
         fields = [
             'category', 'title', 'original_title', 'description',
-            'year', 'poster', 'external_id', 'metadata', 'genre_ids'
+            'year', 'poster', 'external_id', 'metadata', 'external_rating', 'genre_ids'
         ]
 
 
@@ -97,8 +90,9 @@ class UserContentItemSerializer(serializers.ModelSerializer):
         source='content_item',
         write_only=True
     )
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
 
     class Meta:
         model = UserContentItem
-        fields = ['id', 'content_item', 'content_item_id', 'comment', 'created_at', 'updated_at']
+        fields = ['id', 'content_item', 'content_item_id', 'status', 'status_display', 'comment', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']

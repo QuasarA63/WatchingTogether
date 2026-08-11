@@ -7,6 +7,7 @@ urlpatterns = [
     path('my/search/', web_views.my_content_search, name='my_content_search'),
     path('my/add/', web_views.my_content_add, name='my_content_add'),
     path('my/<int:pk>/comment/', web_views.my_content_edit_comment, name='my_content_edit_comment'),
+    path('my/<int:pk>/status/', web_views.my_content_edit_status, name='my_content_edit_status'),
     path('my/<int:pk>/remove/', web_views.my_content_remove, name='my_content_remove'),
     path('<int:pk>/', web_views.content_detail, name='content_detail'),
 ]

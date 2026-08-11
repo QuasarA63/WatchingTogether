@@ -20,7 +20,7 @@ class GenreAdmin(admin.ModelAdmin):
 
 @admin.register(ContentItem)
 class ContentItemAdmin(admin.ModelAdmin):
-    list_display = ['title', 'category', 'year', 'external_id', 'is_active', 'created_at']
+    list_display = ['title', 'category', 'year', 'external_rating', 'external_id', 'is_active', 'created_at']
     list_filter = ['category', 'genres', 'is_active', 'year', 'created_at']
     search_fields = ['title', 'original_title', 'description', 'external_id']
     raw_id_fields = ['category']
@@ -35,7 +35,7 @@ class ContentItemAdmin(admin.ModelAdmin):
             'fields': ('poster',)
         }),
         ('Внешние данные', {
-            'fields': ('external_id', 'metadata'),
+            'fields': ('external_id', 'external_rating', 'metadata'),
             'classes': ('collapse',)
         }),
         ('Статус', {
@@ -46,8 +46,8 @@ class ContentItemAdmin(admin.ModelAdmin):
 
 @admin.register(UserContentItem)
 class UserContentItemAdmin(admin.ModelAdmin):
-    list_display = ['user', 'content_item', 'created_at']
-    list_filter = ['created_at']
+    list_display = ['user', 'content_item', 'status', 'created_at']
+    list_filter = ['status', 'created_at']
     search_fields = ['user__username', 'content_item__title', 'comment']
     raw_id_fields = ['user', 'content_item']
     ordering = ['-created_at']

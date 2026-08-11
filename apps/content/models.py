@@ -109,6 +109,14 @@ class ContentItem(TimeStampedModel):
         verbose_name='Метаданные',
         help_text='Дополнительные данные в формате JSON'
     )
+    external_rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        verbose_name='Внешний рейтинг',
+        help_text='Рейтинг из внешних источников (Кинопоиск, TMDB)'
+    )
     is_active = models.BooleanField(
         default=True,
         verbose_name='Активен',
@@ -127,12 +135,27 @@ class ContentItem(TimeStampedModel):
     def __str__(self):
         return f'{self.title} ({self.year})' if self.year else self.title
 
+    @property
+    def average_rating(self):
+        """Средняя оценка по отзывам пользователей."""
+        reviews = self.reviews.all()
+        if not reviews:
+            return None
+        return round(sum(r.rating for r in reviews) / len(reviews), 1)
+
 
 class UserContentItem(TimeStampedModel):
     """
     Личный объект пользователя: привязка элемента контента
-    к пользователю с личным комментарием.
+    к пользователю с личным комментарием и статусом просмотра.
     """
+
+    class Status(models.TextChoices):
+        PLANNED = 'planned', 'В планах'
+        WATCHING = 'watching', 'Смотрю'
+        ON_HOLD = 'on_hold', 'Отложил'
+        COMPLETED = 'completed', 'Посмотрел'
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -144,6 +167,12 @@ class UserContentItem(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name='user_entries',
         verbose_name='Элемент контента'
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PLANNED,
+        verbose_name='Статус просмотра'
     )
     comment = models.TextField(
         blank=True,

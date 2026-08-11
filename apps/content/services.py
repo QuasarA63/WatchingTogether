@@ -94,20 +94,28 @@ def search(query, category_slug=None):
 
     Возвращает список словарей с нормализованными полями:
     external_id, media_type, title, original_title, year, overview, poster_url.
-    """
-    params = {'page': 1, 'limit': 10, 'query': query}
 
-    kp_type = CATEGORY_SLUG_TO_TYPE.get(category_slug) if category_slug else None
-    if kp_type:
-        params['type'] = kp_type
+    Примечание: endpoint /movie/search не поддерживает фильтр по типу
+    на стороне API, поэтому фильтрация по категории выполняется здесь.
+    """
+    params = {'page': 1, 'limit': 20, 'query': query}
 
     data = _get('/v1.4/movie/search', params)
+
+    # Какой media_type соответствует выбранной категории
+    wanted_media_type = None
+    if category_slug and category_slug in CATEGORY_SLUG_TO_TYPE:
+        wanted = CATEGORY_SLUG_TO_TYPE[category_slug]
+        wanted_media_type = 'tv' if wanted in SERIES_TYPES else 'movie'
 
     results = []
     for item in data.get('docs', []):
         parsed = _parse_item(item)
-        if parsed:
-            results.append(parsed)
+        if not parsed:
+            continue
+        if wanted_media_type and parsed['media_type'] != wanted_media_type:
+            continue
+        results.append(parsed)
     return results
 
 

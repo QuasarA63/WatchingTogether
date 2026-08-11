@@ -45,8 +45,10 @@
                 <div class="col">
                     <div class="card h-100">
                         {% if item.metadata.poster_url %}
-                            <img src="{{ item.metadata.poster_url }}" class="card-img-top" alt="{{ item.title }}"
-                                 style="max-height: 300px; object-fit: cover;">
+                            <div class="text-center bg-light">
+                                <img src="{{ item.metadata.poster_url }}" alt="{{ item.title }}"
+                                     style="max-height: 300px; max-width: 100%; object-fit: contain;">
+                            </div>
                         {% endif %}
                         <div class="card-body">
                             <h6 class="card-title">

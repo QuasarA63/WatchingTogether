@@ -2,8 +2,13 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import Category, ContentItem
-from .serializers import CategorySerializer, ContentItemSerializer, ContentItemCreateSerializer
+from .models import Category, ContentItem, UserContentItem
+from .serializers import (
+    CategorySerializer,
+    ContentItemSerializer,
+    ContentItemCreateSerializer,
+    UserContentItemSerializer,
+)
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -43,7 +48,7 @@ class ContentItemViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(is_active=True)
         category = self.request.query_params.get('category')
         if category:
             queryset = queryset.filter(category__slug=category)
@@ -61,3 +66,41 @@ class ContentItemViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
+
+
+class UserContentItemViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet личных объектов пользователя.
+
+    DELETE выполняет мягкое удаление: личная привязка удаляется,
+    а сам объект помечается is_active=False, если к нему
+    не привязаны другие пользователи и отзывы.
+    """
+    serializer_class = UserContentItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = UserContentItem.objects.filter(
+            user=self.request.user,
+            content_item__is_active=True,
+        ).select_related('content_item', 'content_item__category')
+        category = self.request.query_params.get('category')
+        if category:
+            queryset = queryset.filter(content_item__category__slug=category)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        entry = self.get_object()
+        content_item = entry.content_item
+        entry.delete()
+
+        has_other_entries = content_item.user_entries.exists()
+        has_reviews = content_item.reviews.exists()
+        if not has_other_entries and not has_reviews:
+            content_item.is_active = False
+            content_item.save(update_fields=['is_active', 'updated_at'])
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

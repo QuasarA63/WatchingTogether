@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, ContentItem
+from .models import Category, ContentItem, UserContentItem
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -54,3 +54,20 @@ class ContentItemCreateSerializer(serializers.ModelSerializer):
             'category', 'title', 'original_title', 'description',
             'year', 'poster', 'external_id', 'metadata'
         ]
+
+
+class UserContentItemSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор личного объекта пользователя.
+    """
+    content_item = ContentItemSerializer(read_only=True)
+    content_item_id = serializers.PrimaryKeyRelatedField(
+        queryset=ContentItem.objects.filter(is_active=True),
+        source='content_item',
+        write_only=True
+    )
+
+    class Meta:
+        model = UserContentItem
+        fields = ['id', 'content_item', 'content_item_id', 'comment', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']

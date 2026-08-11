@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from apps.core.models import TimeStampedModel
 
@@ -79,6 +80,11 @@ class ContentItem(TimeStampedModel):
         verbose_name='Метаданные',
         help_text='Дополнительные данные в формате JSON'
     )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='Активен',
+        help_text='Неактивные объекты скрыты из каталога (мягкое удаление)'
+    )
 
     class Meta:
         verbose_name = 'Элемент контента'
@@ -91,3 +97,40 @@ class ContentItem(TimeStampedModel):
 
     def __str__(self):
         return f'{self.title} ({self.year})' if self.year else self.title
+
+
+class UserContentItem(TimeStampedModel):
+    """
+    Личный объект пользователя: привязка элемента контента
+    к пользователю с личным комментарием.
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='content_items',
+        verbose_name='Пользователь'
+    )
+    content_item = models.ForeignKey(
+        ContentItem,
+        on_delete=models.CASCADE,
+        related_name='user_entries',
+        verbose_name='Элемент контента'
+    )
+    comment = models.TextField(
+        blank=True,
+        verbose_name='Личный комментарий'
+    )
+
+    class Meta:
+        verbose_name = 'Объект пользователя'
+        verbose_name_plural = 'Объекты пользователей'
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'content_item'],
+                name='unique_user_content_item'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.user} — {self.content_item}'

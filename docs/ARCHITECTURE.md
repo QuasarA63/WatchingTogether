@@ -163,11 +163,23 @@ class ContentItem(TimeStampedModel):
     poster = models.ImageField(upload_to='posters/', blank=True)
     external_id = models.CharField(max_length=100, blank=True)  # ID из внешних API (Kinopoisk, TMDB)
     metadata = models.JSONField(default=dict, blank=True)  # Дополнительные данные
+    is_active = models.BooleanField(default=True)  # Мягкое удаление
     
     class Meta:
         indexes = [
             models.Index(fields=['category', 'title']),
             models.Index(fields=['external_id']),
+        ]
+
+class UserContentItem(TimeStampedModel):
+    """Личный объект пользователя с комментарием"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='content_items')
+    content_item = models.ForeignKey(ContentItem, on_delete=models.CASCADE, related_name='user_entries')
+    comment = models.TextField(blank=True)  # Личный комментарий
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'content_item'], name='unique_user_content_item')
         ]
 ```
 
@@ -241,6 +253,15 @@ PATCH  /api/v1/content/{id}/           # Обновление контента
 GET    /api/v1/content/{id}/reviews/   # Отзывы на контент
 ```
 
+### Личные объекты пользователя
+```
+GET    /api/v1/my-content/             # Мои объекты (фильтр ?category=slug)
+POST   /api/v1/my-content/             # Добавить объект к себе (content_item_id, comment)
+GET    /api/v1/my-content/{id}/        # Детали личного объекта
+PATCH  /api/v1/my-content/{id}/        # Обновить личный комментарий
+DELETE /api/v1/my-content/{id}/        # Удалить из моих (мягкое удаление ContentItem)
+```
+
 ### Отзывы
 ```
 GET    /api/v1/reviews/                # Список отзывов (фильтры)
@@ -263,6 +284,8 @@ GET    /api/v1/reviews/{id}/comments/  # Комментарии к отзыву
 - `/groups/{id}/` — Страница группы
 - `/content/` — Каталог контента
 - `/content/{id}/` — Страница контента с отзывами
+- `/content/my/` — Мои объекты (личный список с фильтром по категориям)
+- `/content/my/search/` — Поиск и добавление объектов из TMDB
 - `/reviews/{id}/` — Детальный отзыв с комментариями
 
 ## Развертывание на beget.ru
@@ -295,8 +318,11 @@ ALLOWED_HOSTS=wt.larimaritgroup.ru
 3. Готово — категория доступна в API и интерфейсе
 
 ### Интеграция внешних API
-- **Kinopoisk API** — для фильмов и сериалов
-- **TMDB API** — альтернатива для фильмов
+- **TMDB API** — основной провайдер для фильмов и сериалов (реализовано в `apps/content/services.py`)
+  - Поиск: `services.search(query, category_slug)` — фильмы и сериалы с русской локализацией
+  - Детали: `services.get_details(external_id, media_type)` — жанры, страны, постер, рейтинг
+  - Ключ задаётся в `.env` как `TMDB_API_KEY` (получить: themoviedb.org/settings/api)
+- **Kinopoisk API** — альтернатива для фильмов
 - **Spotify API** — для музыки
 - **Google Books API** — для книг
 

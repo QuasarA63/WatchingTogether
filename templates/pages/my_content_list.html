@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Мои объекты — Смотрим вместе{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0"><i class="bi bi-bookmark-star"></i> Мои объекты</h2>
+    <a href="{% url 'my_content_search' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Добавить
+    </a>
+</div>
+
+{% if not tmdb_configured %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i>
+        Поиск по внешним базам недоступен: не задан ключ TMDB_API_KEY в настройках сервера.
+    </div>
+{% endif %}
+
+<!-- Фильтр по категориям -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <form method="get" class="d-flex gap-2">
+            <select name="category" class="form-select" onchange="this.form.submit()">
+                <option value="">Все типы</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if current_category %}
+                <a href="{% url 'my_content_list' %}" class="btn btn-outline-secondary" title="Сбросить фильтр">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+{% if entries_page %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for entry in entries_page %}
+            {% with item=entry.content_item %}
+                <div class="col">
+                    <div class="card h-100">
+                        {% if item.metadata.poster_url %}
+                            <img src="{{ item.metadata.poster_url }}" class="card-img-top" alt="{{ item.title }}"
+                                 style="max-height: 300px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <a href="{% url 'content_detail' item.pk %}" class="text-decoration-none">
+                                    {{ item.title }}
+                                </a>
+                            </h6>
+                            <p class="text-muted small mb-2">
+                                <i class="bi bi-tag"></i> {{ item.category.name }}
+                                {% if item.year %}&middot; {{ item.year }}{% endif %}
+                            </p>
+
+                            <!-- Личный комментарий -->
+                            <div class="mb-2">
+                                {% if entry.comment %}
+                                    <p class="card-text small fst-italic">«{{ entry.comment }}»</p>
+                                {% else %}
+                                    <p class="card-text small text-muted fst-italic">Нет комментария</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Редактирование комментария -->
+                            <details class="mb-2">
+                                <summary class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i> Комментарий
+                                </summary>
+                                <form method="post" action="{% url 'my_content_edit_comment' entry.pk %}" class="mt-2">
+                                    {% csrf_token %}
+                                    <textarea name="comment" class="form-control form-control-sm mb-2"
+                                              rows="2" placeholder="Ваш личный комментарий...">{{ entry.comment }}</textarea>
+                                    <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                                </form>
+                            </details>
+
+                            <!-- Удаление -->
+                            <form method="post" action="{% url 'my_content_remove' entry.pk %}"
+                                  onsubmit="return confirm('Удалить «{{ item.title }}» из ваших объектов?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Удалить
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if entries_page.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if entries_page.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ entries_page.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}">&laquo;</a>
+                    </li>
+                {% endif %}
+                {% for num in entries_page.paginator.page_range %}
+                    <li class="page-item {% if entries_page.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if entries_page.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ entries_page.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}">&raquo;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        {% if current_category %}
+            Объектов этой категории у вас пока нет.
+        {% else %}
+            У вас пока нет объектов. Нажмите «Добавить», чтобы найти фильм или сериал.
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

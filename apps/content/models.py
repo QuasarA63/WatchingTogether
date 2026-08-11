@@ -183,7 +183,12 @@ class UserContentItem(TimeStampedModel):
     )
     comment = models.TextField(
         blank=True,
-        verbose_name='Личный комментарий'
+        verbose_name='Комментарий'
+    )
+    is_public = models.BooleanField(
+        default=False,
+        verbose_name='Публичный',
+        help_text='Публичные комментарии видны всем на главной странице'
     )
 
     class Meta:

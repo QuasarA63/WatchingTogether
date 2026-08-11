@@ -136,10 +136,17 @@
                                         </details>
                                     {% endif %}
 
-                                    <!-- Личный комментарий -->
+                                    <!-- Комментарий -->
                                     <div class="mb-2">
                                         {% if entry.comment %}
-                                            <p class="card-text small fst-italic mb-1">«{{ entry.comment }}»</p>
+                                            <p class="card-text small fst-italic mb-1">
+                                                «{{ entry.comment }}»
+                                                {% if entry.is_public %}
+                                                    <span class="badge bg-success">Публичный</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Личный</span>
+                                                {% endif %}
+                                            </p>
                                         {% else %}
                                             <p class="card-text small text-muted fst-italic mb-1">Нет комментария</p>
                                         {% endif %}
@@ -176,11 +183,19 @@
                                         <details>
                                             <summary class="btn btn-sm btn-outline-secondary">
                                                 <i class="bi bi-pencil"></i> Комментарий
+                                                {% if entry.is_public %}<span class="badge bg-success ms-1">Публичный</span>{% endif %}
                                             </summary>
                                             <form method="post" action="{% url 'my_content_edit_comment' entry.pk %}" class="mt-2">
                                                 {% csrf_token %}
-                                                <textarea name="comment" class="form-control form-control-sm mb-2"
-                                                          rows="2" placeholder="Ваш личный комментарий...">{{ entry.comment }}</textarea>
+                                                <textarea name="comment" class="form-control mb-2"
+                                                          rows="4" placeholder="Ваш комментарий...">{{ entry.comment }}</textarea>
+                                                <div class="form-check mb-2">
+                                                    <input type="checkbox" name="is_public" class="form-check-input" id="is_public_{{ entry.pk }}"
+                                                           {% if entry.is_public %}checked{% endif %}>
+                                                    <label class="form-check-label" for="is_public_{{ entry.pk }}">
+                                                        Публичный (виден всем на главной)
+                                                    </label>
+                                                </div>
                                                 <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
                                             </form>
                                         </details>

@@ -287,12 +287,14 @@ def my_content_add(request):
 @login_required
 def my_content_edit_comment(request, pk):
     """
-    Редактирование личного комментария к объекту (POST).
+    Редактирование комментария к объекту (POST).
+    Сохраняет текст и признак публичности.
     """
     entry = get_object_or_404(UserContentItem, pk=pk, user=request.user)
     if request.method == 'POST':
         entry.comment = request.POST.get('comment', '').strip()
-        entry.save(update_fields=['comment', 'updated_at'])
+        entry.is_public = request.POST.get('is_public') == 'on'
+        entry.save(update_fields=['comment', 'is_public', 'updated_at'])
         messages.success(request, 'Комментарий обновлён.')
     return redirect('my_content_list')
 

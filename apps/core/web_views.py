@@ -4,14 +4,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from apps.reviews.models import Review
-from apps.content.models import ContentItem
+from apps.content.models import ContentItem, UserContentItem
 from apps.groups.models import Group
 from apps.users.forms import RegisterForm
 
 
 def home(request):
     """
-    Главная страница: последние отзывы и популярный контент.
+    Главная страница: последние отзывы, популярный контент
+    и объекты с публичными комментариями.
     """
     latest_reviews = Review.objects.select_related(
         'user', 'content_item', 'group'
@@ -21,9 +22,17 @@ def home(request):
         'reviews'
     ).order_by('-created_at')[:8]
 
+    # Объекты с публичными комментариями (для всех, включая неавторизованных)
+    public_entries = UserContentItem.objects.filter(
+        is_public=True,
+        comment__gt='',
+        content_item__is_active=True,
+    ).select_related('user', 'content_item', 'content_item__category').order_by('-updated_at')[:10]
+
     context = {
         'latest_reviews': latest_reviews,
         'popular_content': popular_content,
+        'public_entries': public_entries,
     }
     return render(request, 'pages/home.html', context)
 

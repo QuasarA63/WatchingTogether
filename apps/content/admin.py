@@ -46,8 +46,8 @@ class ContentItemAdmin(admin.ModelAdmin):
 
 @admin.register(UserContentItem)
 class UserContentItemAdmin(admin.ModelAdmin):
-    list_display = ['user', 'content_item', 'status', 'personal_rating', 'created_at']
-    list_filter = ['status', 'personal_rating', 'created_at']
+    list_display = ['user', 'content_item', 'status', 'personal_rating', 'is_public', 'created_at']
+    list_filter = ['status', 'personal_rating', 'is_public', 'created_at']
     search_fields = ['user__username', 'content_item__title', 'comment']
     raw_id_fields = ['user', 'content_item']
     ordering = ['-created_at']

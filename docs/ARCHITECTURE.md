@@ -318,11 +318,11 @@ ALLOWED_HOSTS=wt.larimaritgroup.ru
 3. Готово — категория доступна в API и интерфейсе
 
 ### Интеграция внешних API
-- **TMDB API** — основной провайдер для фильмов и сериалов (реализовано в `apps/content/services.py`)
-  - Поиск: `services.search(query, category_slug)` — фильмы и сериалы с русской локализацией
+- **Кинопоиск API** — основной провайдер для фильмов и сериалов (реализовано в `apps/content/services.py`)
+  - Поиск: `services.search(query, category_slug)` — фильмы и сериалы с русскими названиями и описаниями
   - Детали: `services.get_details(external_id, media_type)` — жанры, страны, постер, рейтинг
-  - Ключ задаётся в `.env` как `TMDB_API_KEY` (получить: themoviedb.org/settings/api)
-- **Kinopoisk API** — альтернатива для фильмов
+  - Токен задаётся в `.env` как `KINOPOISK_API_KEY` (получить: @kinopoiskdev_bot в Telegram)
+  - Примечание: TMDB не используется — домен themoviedb.org заблокирован на уровне DNS (в т.ч. на beget.ru)
 - **Spotify API** — для музыки
 - **Google Books API** — для книг
 

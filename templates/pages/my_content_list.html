@@ -10,10 +10,10 @@
     </a>
 </div>
 
-{% if not tmdb_configured %}
+{% if not search_configured %}
     <div class="alert alert-warning">
         <i class="bi bi-exclamation-triangle"></i>
-        Поиск по внешним базам недоступен: не задан ключ TMDB_API_KEY в настройках сервера.
+        Поиск по внешним базам недоступен: не задан ключ KINOPOISK_API_KEY в настройках сервера.
     </div>
 {% endif %}
 

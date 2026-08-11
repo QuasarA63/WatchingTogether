@@ -1,10 +1,14 @@
 """
 Сервисный слой для работы с внешними базами контента.
 
-Основной провайдер — TMDB (The Movie Database, themoviedb.org):
-бесплатный API с русской локализацией, постерами и метаданными
-для фильмов и сериалов. Ключ получается на themoviedb.org/settings/api
-и задаётся в .env как TMDB_API_KEY.
+Основной провайдер — Кинопоиск API (api.kinopoisk.dev):
+большая база фильмов и сериалов мира с русскими названиями
+и описаниями. Токен получается через @kinopoiskdev_bot
+и задаётся в .env как KINOPOISK_API_KEY.
+
+Примечание: TMDB (themoviedb.org) не используется, т.к. домен
+заблокирован на уровне DNS как у части провайдеров, так и на
+хостинге beget.ru.
 """
 
 import logging
@@ -14,150 +18,126 @@ from decouple import config
 
 logger = logging.getLogger(__name__)
 
-TMDB_API_KEY = config('TMDB_API_KEY', default='')
-TMDB_BASE_URL = 'https://api.themoviedb.org/3'
-TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'
+KINOPOISK_API_KEY = config('KINOPOISK_API_KEY', default='')
+KINOPOISK_BASE_URL = 'https://api.kinopoisk.dev'
 
-# Соответствие slug категорий типам поиска TMDB
-CATEGORY_SLUG_TO_SEARCH_TYPE = {
+# Соответствие slug категорий типам Кинопоиска
+CATEGORY_SLUG_TO_TYPE = {
     'movies': 'movie',
-    'series': 'tv',
+    'series': 'tv-series',
 }
 
+# Типы Кинопоиска, которые считаем сериалами
+SERIES_TYPES = {'tv-series', 'animated-series', 'anime'}
+# Типы, которые считаем фильмами
+MOVIE_TYPES = {'movie', 'cartoon', 'animated-film'}
 
-class TMDBError(Exception):
-    """Ошибка при обращении к TMDB API."""
+
+class KinopoiskError(Exception):
+    """Ошибка при обращении к Кинопоиск API."""
 
 
 def is_configured():
-    """Проверка, настроен ли API-ключ TMDB."""
-    return bool(TMDB_API_KEY)
+    """Проверка, настроен ли API-ключ Кинопоиска."""
+    return bool(KINOPOISK_API_KEY)
 
 
 def _get(endpoint, params=None):
-    """Выполнить GET-запрос к TMDB API."""
+    """Выполнить GET-запрос к Кинопоиск API."""
     if not is_configured():
-        raise TMDBError('TMDB API не настроен: задайте TMDB_API_KEY в .env')
+        raise KinopoiskError('Кинопоиск API не настроен: задайте KINOPOISK_API_KEY в .env')
 
-    url = f'{TMDB_BASE_URL}{endpoint}'
-    default_params = {'api_key': TMDB_API_KEY, 'language': 'ru-RU'}
-    if params:
-        default_params.update(params)
+    url = f'{KINOPOISK_BASE_URL}{endpoint}'
+    headers = {'X-API-KEY': KINOPOISK_API_KEY}
 
     try:
-        response = requests.get(url, params=default_params, timeout=10)
+        response = requests.get(url, headers=headers, params=params, timeout=15)
         response.raise_for_status()
         return response.json()
     except requests.RequestException as exc:
-        logger.warning('Ошибка запроса к TMDB: %s', exc)
-        raise TMDBError(f'Ошибка при обращении к TMDB: {exc}') from exc
+        logger.warning('Ошибка запроса к Кинопоиску: %s', exc)
+        raise KinopoiskError(f'Ошибка при обращении к Кинопоиску: {exc}') from exc
 
 
-def _poster_url(poster_path):
-    """Полный URL постера или None."""
-    if poster_path:
-        return f'{TMDB_IMAGE_BASE_URL}{poster_path}'
-    return None
+def _media_type_for(kp_type):
+    """Привести тип Кинопоиска к нашему media_type (movie/tv)."""
+    if kp_type in SERIES_TYPES:
+        return 'tv'
+    return 'movie'
 
 
-def _parse_year(date_string):
-    """Извлечь год из строки даты 'YYYY-MM-DD'."""
-    if date_string and len(date_string) >= 4:
-        try:
-            return int(date_string[:4])
-        except ValueError:
-            return None
-    return None
+def _parse_item(item):
+    """Нормализация элемента результата поиска Кинопоиска."""
+    title = item.get('name') or item.get('alternativeName') or item.get('enName') or ''
+    if not title:
+        return None
+
+    poster = item.get('poster') or {}
+    rating = item.get('rating') or {}
+
+    return {
+        'external_id': str(item.get('id', '')),
+        'media_type': _media_type_for(item.get('type')),
+        'kp_type': item.get('type'),
+        'title': title,
+        'original_title': item.get('alternativeName') or item.get('enName') or '',
+        'year': item.get('year'),
+        'overview': item.get('shortDescription') or item.get('description') or '',
+        'poster_url': poster.get('previewUrl') or poster.get('url'),
+        'rating': rating.get('kp') or rating.get('imdb'),
+    }
 
 
 def search(query, category_slug=None):
     """
-    Поиск контента в TMDB по названию.
+    Поиск контента в Кинопоиске по названию.
 
     Возвращает список словарей с нормализованными полями:
     external_id, media_type, title, original_title, year, overview, poster_url.
     """
+    params = {'page': 1, 'limit': 10, 'query': query}
+
+    kp_type = CATEGORY_SLUG_TO_TYPE.get(category_slug) if category_slug else None
+    if kp_type:
+        params['type'] = kp_type
+
+    data = _get('/v1.4/movie/search', params)
+
     results = []
-
-    if category_slug and category_slug in CATEGORY_SLUG_TO_SEARCH_TYPE:
-        media_type = CATEGORY_SLUG_TO_SEARCH_TYPE[category_slug]
-        data = _get(f'/search/{media_type}', {'query': query, 'include_adult': 'false'})
-        for item in data.get('results', []):
-            parsed = _parse_item(item, media_type)
-            if parsed:
-                results.append(parsed)
-    else:
-        data = _get('/search/multi', {'query': query, 'include_adult': 'false'})
-        for item in data.get('results', []):
-            media_type = item.get('media_type')
-            if media_type not in ('movie', 'tv'):
-                continue
-            parsed = _parse_item(item, media_type)
-            if parsed:
-                results.append(parsed)
-
+    for item in data.get('docs', []):
+        parsed = _parse_item(item)
+        if parsed:
+            results.append(parsed)
     return results
 
 
-def _parse_item(item, media_type):
-    """Нормализация элемента результата поиска TMDB."""
-    if media_type == 'movie':
-        title = item.get('title') or ''
-        original_title = item.get('original_title') or ''
-        year = _parse_year(item.get('release_date'))
-    else:  # tv
-        title = item.get('name') or ''
-        original_title = item.get('original_name') or ''
-        year = _parse_year(item.get('first_air_date'))
-
-    if not title:
-        return None
-
-    return {
-        'external_id': str(item.get('id', '')),
-        'media_type': media_type,
-        'title': title,
-        'original_title': original_title,
-        'year': year,
-        'overview': item.get('overview') or '',
-        'poster_url': _poster_url(item.get('poster_path')),
-        'rating': item.get('vote_average'),
-    }
-
-
-def get_details(external_id, media_type):
+def get_details(external_id, media_type=None):
     """
-    Получить детальную информацию об объекте TMDB.
+    Получить детальную информацию об объекте Кинопоиска по ID.
 
     Возвращает нормализованный словарь с полными данными,
     включая жанры и страны.
     """
-    data = _get(f'/{media_type}/{external_id}')
+    data = _get(f'/v1.4/movie/{external_id}')
 
-    if media_type == 'movie':
-        title = data.get('title') or ''
-        original_title = data.get('original_title') or ''
-        year = _parse_year(data.get('release_date'))
-    else:
-        title = data.get('name') or ''
-        original_title = data.get('original_name') or ''
-        year = _parse_year(data.get('first_air_date'))
+    title = data.get('name') or data.get('alternativeName') or data.get('enName') or ''
+    poster = data.get('poster') or {}
+    rating = data.get('rating') or {}
 
     genres = [g.get('name') for g in data.get('genres', []) if g.get('name')]
-    countries = [
-        c.get('name') for c in data.get('production_countries', []) if c.get('name')
-    ]
+    countries = [c.get('name') for c in data.get('countries', []) if c.get('name')]
 
     return {
         'external_id': str(data.get('id', external_id)),
-        'media_type': media_type,
+        'media_type': _media_type_for(data.get('type')),
+        'kp_type': data.get('type'),
         'title': title,
-        'original_title': original_title,
-        'year': year,
-        'overview': data.get('overview') or '',
-        'poster_url': _poster_url(data.get('poster_path')),
+        'original_title': data.get('alternativeName') or data.get('enName') or '',
+        'year': data.get('year'),
+        'overview': data.get('description') or data.get('shortDescription') or '',
+        'poster_url': poster.get('url') or poster.get('previewUrl'),
         'genres': genres,
         'countries': countries,
-        'rating': data.get('vote_average'),
-        'tagline': data.get('tagline') or '',
+        'rating': rating.get('kp') or rating.get('imdb'),
+        'tagline': '',
     }

@@ -97,7 +97,7 @@ def my_content_list(request):
         'entries_page': entries_page,
         'categories': categories,
         'current_category': category_slug,
-        'tmdb_configured': services.is_configured(),
+        'search_configured': services.is_configured(),
     }
     return render(request, 'pages/my_content_list.html', context)
 
@@ -105,7 +105,7 @@ def my_content_list(request):
 @login_required
 def my_content_search(request):
     """
-    Поиск объекта по названию во внешних базах (TMDB).
+    Поиск объекта по названию во внешней базе (Кинопоиск).
     """
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('category', '')
@@ -115,7 +115,7 @@ def my_content_search(request):
     if query:
         try:
             results = services.search(query, category_slug or None)
-        except services.TMDBError as exc:
+        except services.KinopoiskError as exc:
             search_error = str(exc)
 
     categories = Category.objects.all()
@@ -126,13 +126,13 @@ def my_content_search(request):
         'current_category': category_slug,
         'results': results,
         'search_error': search_error,
-        'tmdb_configured': services.is_configured(),
+        'search_configured': services.is_configured(),
     }
     return render(request, 'pages/my_content_search.html', context)
 
 
 def _category_for_media_type(media_type):
-    """Категория БД, соответствующая типу объекта TMDB."""
+    """Категория БД, соответствующая типу объекта (movie/tv)."""
     slug = 'movies' if media_type == 'movie' else 'series'
     return Category.objects.filter(slug=slug).first()
 
@@ -167,7 +167,7 @@ def my_content_add(request):
     if content_item is None:
         try:
             details = services.get_details(external_id, media_type)
-        except services.TMDBError as exc:
+        except services.KinopoiskError as exc:
             messages.error(request, str(exc))
             return redirect('my_content_search')
 
@@ -179,7 +179,7 @@ def my_content_add(request):
             year=details['year'],
             external_id=details['external_id'],
             metadata={
-                'source': 'tmdb',
+                'source': 'kinopoisk',
                 'media_type': media_type,
                 'poster_url': details['poster_url'],
                 'genres': details['genres'],

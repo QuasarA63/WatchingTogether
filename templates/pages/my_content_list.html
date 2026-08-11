@@ -17,11 +17,11 @@
     </div>
 {% endif %}
 
-<!-- Фильтр по категориям -->
+<!-- Фильтры -->
 <div class="row mb-4">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form method="get" class="d-flex gap-2">
-            <select name="category" class="form-select" onchange="this.form.submit()">
+            <select name="category" class="form-select" style="max-width: 180px;" onchange="this.form.submit()">
                 <option value="">Все типы</option>
                 {% for cat in categories %}
                     <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>
@@ -29,8 +29,16 @@
                     </option>
                 {% endfor %}
             </select>
-            {% if current_category %}
-                <a href="{% url 'my_content_list' %}" class="btn btn-outline-secondary" title="Сбросить фильтр">
+            <select name="genre" class="form-select" style="max-width: 180px;" onchange="this.form.submit()">
+                <option value="">Все жанры</option>
+                {% for genre in genres %}
+                    <option value="{{ genre.slug }}" {% if current_genre == genre.slug %}selected{% endif %}>
+                        {{ genre.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if current_category or current_genre %}
+                <a href="{% url 'my_content_list' %}" class="btn btn-outline-secondary" title="Сбросить фильтры">
                     <i class="bi bi-x-lg"></i>
                 </a>
             {% endif %}
@@ -60,6 +68,13 @@
                                 <i class="bi bi-tag"></i> {{ item.category.name }}
                                 {% if item.year %}&middot; {{ item.year }}{% endif %}
                             </p>
+                            {% if item.genres.all %}
+                                <p class="mb-2">
+                                    {% for genre in item.genres.all %}
+                                        <span class="badge bg-secondary">{{ genre.name }}</span>
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
 
                             <!-- Личный комментарий -->
                             <div class="mb-2">
@@ -104,17 +119,17 @@
             <ul class="pagination justify-content-center">
                 {% if entries_page.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ entries_page.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}">&laquo;</a>
+                        <a class="page-link" href="?page={{ entries_page.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}">&laquo;</a>
                     </li>
                 {% endif %}
                 {% for num in entries_page.paginator.page_range %}
                     <li class="page-item {% if entries_page.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}">{{ num }}</a>
                     </li>
                 {% endfor %}
                 {% if entries_page.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ entries_page.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}">&raquo;</a>
+                        <a class="page-link" href="?page={{ entries_page.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}">&raquo;</a>
                     </li>
                 {% endif %}
             </ul>

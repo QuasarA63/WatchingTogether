@@ -35,6 +35,29 @@ class Category(TimeStampedModel):
         return self.name
 
 
+class Genre(TimeStampedModel):
+    """
+    Жанр контента (для фильмов и сериалов) или стиль (для музыки).
+    """
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name='Название'
+    )
+    slug = models.SlugField(
+        unique=True,
+        verbose_name='Slug'
+    )
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class ContentItem(TimeStampedModel):
     """
     Элемент контента (фильм, сериал, альбом и т.д.).
@@ -44,6 +67,12 @@ class ContentItem(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name='items',
         verbose_name='Категория'
+    )
+    genres = models.ManyToManyField(
+        Genre,
+        blank=True,
+        related_name='items',
+        verbose_name='Жанры'
     )
     title = models.CharField(
         max_length=255,

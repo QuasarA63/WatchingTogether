@@ -152,10 +152,16 @@ class Category(TimeStampedModel):
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     icon = models.CharField(max_length=50, blank=True)  # CSS класс иконки
-    
+
+class Genre(TimeStampedModel):
+    """Жанр контента (для фильмов/сериалов) или стиль (для музыки)"""
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True)
+
 class ContentItem(TimeStampedModel):
     """Элемент контента"""
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='items')
+    genres = models.ManyToManyField(Genre, blank=True, related_name='items')
     title = models.CharField(max_length=255)
     original_title = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
@@ -164,7 +170,7 @@ class ContentItem(TimeStampedModel):
     external_id = models.CharField(max_length=100, blank=True)  # ID из внешних API (Kinopoisk, TMDB)
     metadata = models.JSONField(default=dict, blank=True)  # Дополнительные данные
     is_active = models.BooleanField(default=True)  # Мягкое удаление
-    
+
     class Meta:
         indexes = [
             models.Index(fields=['category', 'title']),
@@ -176,7 +182,7 @@ class UserContentItem(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='content_items')
     content_item = models.ForeignKey(ContentItem, on_delete=models.CASCADE, related_name='user_entries')
     comment = models.TextField(blank=True)  # Личный комментарий
-    
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['user', 'content_item'], name='unique_user_content_item')
@@ -246,16 +252,17 @@ GET    /api/v1/groups/{id}/reviews/    # Отзывы группы
 ### Контент
 ```
 GET    /api/v1/categories/             # Список категорий
-GET    /api/v1/content/                # Список контента (фильтры по категории, поиск)
+GET    /api/v1/genres/                 # Список жанров/стилей
+GET    /api/v1/content/                # Список контента (фильтры: ?category=slug, ?genre=slug, поиск ?search=)
 POST   /api/v1/content/                # Добавление контента
-GET    /api/v1/content/{id}/           # Детали контента
+GET    /api/v1/content/{id}/           # Детали контента (включая genres)
 PATCH  /api/v1/content/{id}/           # Обновление контента
 GET    /api/v1/content/{id}/reviews/   # Отзывы на контент
 ```
 
 ### Личные объекты пользователя
 ```
-GET    /api/v1/my-content/             # Мои объекты (фильтр ?category=slug)
+GET    /api/v1/my-content/             # Мои объекты (фильтры: ?category=slug, ?genre=slug)
 POST   /api/v1/my-content/             # Добавить объект к себе (content_item_id, comment)
 GET    /api/v1/my-content/{id}/        # Детали личного объекта
 PATCH  /api/v1/my-content/{id}/        # Обновить личный комментарий
@@ -282,9 +289,9 @@ GET    /api/v1/reviews/{id}/comments/  # Комментарии к отзыву
 - `/profile/` — Профиль пользователя
 - `/groups/` — Список групп
 - `/groups/{id}/` — Страница группы
-- `/content/` — Каталог контента
-- `/content/{id}/` — Страница контента с отзывами
-- `/content/my/` — Мои объекты (личный список с фильтром по категориям)
+- `/content/` — Каталог контента (фильтры по категории и жанру)
+- `/content/{id}/` — Страница контента с отзывами (отображение жанров)
+- `/content/my/` — Мои объекты (личный список с фильтрами по категории и жанру)
 - `/content/my/search/` — Поиск и добавление объектов из TMDB
 - `/reviews/{id}/` — Детальный отзыв с комментариями
 

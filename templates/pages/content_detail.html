@@ -15,6 +15,14 @@
             {% if item.year %}&middot; <i class="bi bi-calendar"></i> {{ item.year }}{% endif %}
         </p>
 
+        {% if item.genres.all %}
+            <div class="mb-3">
+                {% for genre in item.genres.all %}
+                    <span class="badge bg-secondary">{{ genre.name }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         {% if item.avg_rating %}
             <div class="mb-3">
                 <span class="badge bg-primary fs-5">

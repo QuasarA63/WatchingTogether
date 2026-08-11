@@ -2,9 +2,10 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import Category, ContentItem, UserContentItem
+from .models import Category, Genre, ContentItem, UserContentItem
 from .serializers import (
     CategorySerializer,
+    GenreSerializer,
     ContentItemSerializer,
     ContentItemCreateSerializer,
     UserContentItemSerializer,
@@ -17,6 +18,14 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+class GenreViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet для просмотра жанров/стилей контента.
+    """
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
 
 
 class ContentItemViewSet(viewsets.ModelViewSet):
@@ -52,7 +61,10 @@ class ContentItemViewSet(viewsets.ModelViewSet):
         category = self.request.query_params.get('category')
         if category:
             queryset = queryset.filter(category__slug=category)
-        return queryset.select_related('category')
+        genre = self.request.query_params.get('genre')
+        if genre:
+            queryset = queryset.filter(genres__slug=genre)
+        return queryset.select_related('category').prefetch_related('genres').distinct()
 
     @action(detail=True, methods=['get'])
     def reviews(self, request, pk=None):
@@ -83,11 +95,16 @@ class UserContentItemViewSet(viewsets.ModelViewSet):
         queryset = UserContentItem.objects.filter(
             user=self.request.user,
             content_item__is_active=True,
-        ).select_related('content_item', 'content_item__category')
+        ).select_related('content_item', 'content_item__category').prefetch_related(
+            'content_item__genres'
+        )
         category = self.request.query_params.get('category')
         if category:
             queryset = queryset.filter(content_item__category__slug=category)
-        return queryset
+        genre = self.request.query_params.get('genre')
+        if genre:
+            queryset = queryset.filter(content_item__genres__slug=genre)
+        return queryset.distinct()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

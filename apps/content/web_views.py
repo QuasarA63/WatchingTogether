@@ -3,39 +3,48 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count
-from .models import Category, ContentItem, UserContentItem
+from django.utils.text import slugify
+from .models import Category, Genre, ContentItem, UserContentItem
 from . import services
 
 
 def content_list(request):
     """
-    Каталог контента с фильтрами по категории и поиском.
+    Каталог контента с фильтрами по категории, жанру и поиском.
     """
-    items = ContentItem.objects.filter(is_active=True).select_related('category').annotate(
+    items = ContentItem.objects.filter(is_active=True).select_related('category').prefetch_related(
+        'genres'
+    ).annotate(
         avg_rating=Avg('reviews__rating'),
         reviews_count=Count('reviews')
     )
 
     category_slug = request.GET.get('category', '')
+    genre_slug = request.GET.get('genre', '')
     search = request.GET.get('q', '')
 
     if category_slug:
         items = items.filter(category__slug=category_slug)
+    if genre_slug:
+        items = items.filter(genres__slug=genre_slug)
     if search:
         items = items.filter(title__icontains=search)
 
-    items = items.order_by('-created_at')
+    items = items.order_by('-created_at').distinct()
 
     paginator = Paginator(items, 12)
     page_number = request.GET.get('page')
     items_page = paginator.get_page(page_number)
 
     categories = Category.objects.all()
+    genres = Genre.objects.all()
 
     context = {
         'items_page': items_page,
         'categories': categories,
+        'genres': genres,
         'current_category': category_slug,
+        'current_genre': genre_slug,
         'search': search,
     }
     return render(request, 'pages/content_list.html', context)
@@ -46,7 +55,7 @@ def content_detail(request, pk):
     Страница контента с отзывами.
     """
     item = get_object_or_404(
-        ContentItem.objects.select_related('category').annotate(
+        ContentItem.objects.select_related('category').prefetch_related('genres').annotate(
             avg_rating=Avg('reviews__rating'),
             reviews_count=Count('reviews')
         ),
@@ -74,29 +83,38 @@ def content_detail(request, pk):
 def my_content_list(request):
     """
     Вкладка «Мои объекты»: список объектов пользователя
-    с фильтром по категории и личными комментариями.
+    с фильтром по категории, жанру и личными комментариями.
     """
     entries = UserContentItem.objects.filter(
         user=request.user,
         content_item__is_active=True,
-    ).select_related('content_item', 'content_item__category')
+    ).select_related('content_item', 'content_item__category').prefetch_related(
+        'content_item__genres'
+    )
 
     category_slug = request.GET.get('category', '')
     if category_slug:
         entries = entries.filter(content_item__category__slug=category_slug)
 
-    entries = entries.order_by('-created_at')
+    genre_slug = request.GET.get('genre', '')
+    if genre_slug:
+        entries = entries.filter(content_item__genres__slug=genre_slug)
+
+    entries = entries.order_by('-created_at').distinct()
 
     paginator = Paginator(entries, 12)
     page_number = request.GET.get('page')
     entries_page = paginator.get_page(page_number)
 
     categories = Category.objects.all()
+    genres = Genre.objects.all()
 
     context = {
         'entries_page': entries_page,
         'categories': categories,
+        'genres': genres,
         'current_category': category_slug,
+        'current_genre': genre_slug,
         'search_configured': services.is_configured(),
     }
     return render(request, 'pages/my_content_list.html', context)
@@ -135,6 +153,24 @@ def _category_for_media_type(media_type):
     """Категория БД, соответствующая типу объекта (movie/tv)."""
     slug = 'movies' if media_type == 'movie' else 'series'
     return Category.objects.filter(slug=slug).first()
+
+
+def _get_or_create_genres(genre_names):
+    """Получить или создать жанры по списку названий."""
+    genres = []
+    for name in genre_names:
+        name = name.strip()
+        if not name:
+            continue
+        slug = slugify(name)
+        if not slug:
+            slug = f'genre-{Genre.objects.count() + 1}'
+        genre, _ = Genre.objects.get_or_create(
+            slug=slug,
+            defaults={'name': name},
+        )
+        genres.append(genre)
+    return genres
 
 
 @login_required
@@ -188,6 +224,9 @@ def my_content_add(request):
                 'tagline': details['tagline'],
             },
         )
+        # Привязываем жанры из внешней базы
+        genres = _get_or_create_genres(details.get('genres', []))
+        content_item.genres.set(genres)
     elif not content_item.is_active:
         # Восстанавливаем ранее удалённый объект
         content_item.is_active = True

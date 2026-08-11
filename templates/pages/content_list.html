@@ -7,14 +7,22 @@
 
 <!-- Фильтры -->
 <div class="row mb-4">
-    <div class="col-md-8">
-        <form method="get" class="d-flex gap-2">
-            <input type="text" name="q" class="form-control" placeholder="Поиск..." value="{{ search }}">
-            <select name="category" class="form-select" style="max-width: 200px;">
+    <div class="col-md-10">
+        <form method="get" class="d-flex gap-2 flex-wrap">
+            <input type="text" name="q" class="form-control" placeholder="Поиск..." value="{{ search }}" style="max-width: 200px;">
+            <select name="category" class="form-select" style="max-width: 180px;">
                 <option value="">Все категории</option>
                 {% for cat in categories %}
                     <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>
                         {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <select name="genre" class="form-select" style="max-width: 180px;">
+                <option value="">Все жанры</option>
+                {% for genre in genres %}
+                    <option value="{{ genre.slug }}" {% if current_genre == genre.slug %}selected{% endif %}>
+                        {{ genre.name }}
                     </option>
                 {% endfor %}
             </select>
@@ -41,6 +49,13 @@
                             <i class="bi bi-tag"></i> {{ item.category.name }}
                             {% if item.year %}&middot; {{ item.year }}{% endif %}
                         </p>
+                        {% if item.genres.all %}
+                            <p class="mb-1">
+                                {% for genre in item.genres.all %}
+                                    <span class="badge bg-secondary">{{ genre.name }}</span>
+                                {% endfor %}
+                            </p>
+                        {% endif %}
                         {% if item.avg_rating %}
                             <span class="badge bg-primary">
                                 <i class="bi bi-star-fill"></i> {{ item.avg_rating|floatformat:1 }}
@@ -61,17 +76,17 @@
             <ul class="pagination justify-content-center">
                 {% if items_page.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ items_page.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">&laquo;</a>
+                        <a class="page-link" href="?page={{ items_page.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}">&laquo;</a>
                     </li>
                 {% endif %}
                 {% for num in items_page.paginator.page_range %}
                     <li class="page-item {% if items_page.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}">{{ num }}</a>
                     </li>
                 {% endfor %}
                 {% if items_page.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ items_page.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">&raquo;</a>
+                        <a class="page-link" href="?page={{ items_page.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}">&raquo;</a>
                     </li>
                 {% endif %}
             </ul>

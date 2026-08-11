@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, ContentItem, UserContentItem
+from .models import Category, Genre, ContentItem, UserContentItem
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -17,11 +17,34 @@ class CategorySerializer(serializers.ModelSerializer):
         return obj.items.count()
 
 
+class GenreSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для жанра/стиля контента.
+    """
+    items_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Genre
+        fields = ['id', 'name', 'slug', 'items_count', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+    def get_items_count(self, obj):
+        return obj.items.count()
+
+
 class ContentItemSerializer(serializers.ModelSerializer):
     """
     Сериализатор для элемента контента.
     """
     category_name = serializers.CharField(source='category.name', read_only=True)
+    genres = GenreSerializer(many=True, read_only=True)
+    genre_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Genre.objects.all(),
+        source='genres',
+        many=True,
+        write_only=True,
+        required=False
+    )
     reviews_count = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
 
@@ -30,6 +53,7 @@ class ContentItemSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'category', 'category_name', 'title', 'original_title',
             'description', 'year', 'poster', 'external_id', 'metadata',
+            'genres', 'genre_ids',
             'reviews_count', 'average_rating', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
@@ -48,11 +72,18 @@ class ContentItemCreateSerializer(serializers.ModelSerializer):
     """
     Сериализатор для создания элемента контента.
     """
+    genre_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Genre.objects.all(),
+        source='genres',
+        many=True,
+        required=False
+    )
+
     class Meta:
         model = ContentItem
         fields = [
             'category', 'title', 'original_title', 'description',
-            'year', 'poster', 'external_id', 'metadata'
+            'year', 'poster', 'external_id', 'metadata', 'genre_ids'
         ]
 
 

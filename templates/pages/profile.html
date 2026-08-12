@@ -23,6 +23,9 @@
                 <p class="text-muted small">
                     <i class="bi bi-calendar"></i> На сайте с {{ user.date_joined|date:"d.m.Y" }}
                 </p>
+                <a href="{% url 'profile_edit' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Редактировать профиль
+                </a>
             </div>
         </div>
 

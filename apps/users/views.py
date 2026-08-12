@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .models import User
-from .serializers import UserSerializer, UserUpdateSerializer, RegisterSerializer
+from .serializers import UserSerializer, UserUpdateSerializer, RegisterSerializer, AccountUpdateSerializer
 
 
 class RegisterView(generics.CreateAPIView):
@@ -38,10 +38,12 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'partial_update':
             return UserUpdateSerializer
+        if self.action == 'account':
+            return AccountUpdateSerializer
         return UserSerializer
 
     def get_permissions(self):
-        if self.action in ['partial_update']:
+        if self.action in ['partial_update', 'account']:
             return [IsAuthenticated()]
         return super().get_permissions()
 
@@ -54,6 +56,20 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         return super().partial_update(request, *args, **kwargs)
+
+    @action(detail=True, methods=['patch'])
+    def account(self, request, pk=None):
+        """Обновление учётных данных (логин, email, пароль)."""
+        user = self.get_object()
+        if user != request.user:
+            return Response(
+                {'detail': 'Вы можете редактировать только свой профиль.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(UserSerializer(user).data)
 
     @action(detail=True, methods=['get'])
     def reviews(self, request, pk=None):

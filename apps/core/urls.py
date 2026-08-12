@@ -11,4 +11,5 @@ urlpatterns = [
     ), name='login'),
     path('logout/', web_views.logout_view, name='logout'),
     path('profile/', web_views.profile_view, name='profile'),
+    path('profile/edit/', web_views.profile_edit_view, name='profile_edit'),
 ]

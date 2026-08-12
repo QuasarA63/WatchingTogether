@@ -22,6 +22,53 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'email', 'avatar', 'bio']
 
 
+class AccountUpdateSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для обновления учётных данных (логин, email, пароль).
+    """
+    new_password = serializers.CharField(
+        write_only=True,
+        required=False,
+        validators=[validate_password],
+        style={'input_type': 'password'},
+        label='Новый пароль'
+    )
+    password_confirm = serializers.CharField(
+        write_only=True,
+        required=False,
+        style={'input_type': 'password'},
+        label='Подтверждение пароля'
+    )
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'new_password', 'password_confirm']
+
+    def validate(self, attrs):
+        new_password = attrs.get('new_password')
+        password_confirm = attrs.get('password_confirm')
+
+        if new_password or password_confirm:
+            if new_password != password_confirm:
+                raise serializers.ValidationError({
+                    'password_confirm': 'Пароли не совпадают.'
+                })
+
+        return attrs
+
+    def update(self, instance, validated_data):
+        new_password = validated_data.pop('new_password', None)
+        validated_data.pop('password_confirm', None)
+
+        instance = super().update(instance, validated_data)
+
+        if new_password:
+            instance.set_password(new_password)
+            instance.save()
+
+        return instance
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     """
     Сериализатор для регистрации нового пользователя.

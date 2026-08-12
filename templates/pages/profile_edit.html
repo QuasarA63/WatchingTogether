@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Редактирование профиля — Смотрим вместе{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-person-gear"></i> Редактирование профиля</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="text-danger small">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-3"><i class="bi bi-key"></i> Смена пароля</h5>
+                    <p class="text-muted small">Оставьте поля пустыми, если не хотите менять пароль.</p>
+
+                    <div class="mb-3">
+                        <label for="{{ form.new_password.id_for_label }}" class="form-label">{{ form.new_password.label }}</label>
+                        {{ form.new_password }}
+                        {% if form.new_password.errors %}
+                            <div class="text-danger small">{{ form.new_password.errors }}</div>
+                        {% endif %}
+                        {% if form.new_password.help_text %}
+                            <div class="form-text">{{ form.new_password.help_text }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.confirm_password.id_for_label }}" class="form-label">{{ form.confirm_password.label }}</label>
+                        {{ form.confirm_password }}
+                        {% if form.confirm_password.errors %}
+                            <div class="text-danger small">{{ form.confirm_password.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Сохранить
+                        </button>
+                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

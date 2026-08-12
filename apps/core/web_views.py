@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from apps.reviews.models import Review
 from apps.content.models import ContentItem, UserContentItem
 from apps.groups.models import Group
-from apps.users.forms import RegisterForm
+from apps.users.forms import RegisterForm, AccountForm
 
 
 def home(request):
@@ -86,3 +86,25 @@ def profile_view(request):
         'user_groups': user_groups,
     }
     return render(request, 'pages/profile.html', context)
+
+
+@login_required
+def profile_edit_view(request):
+    """
+    Редактирование учётных данных пользователя (логин, email, пароль).
+    """
+    if request.method == 'POST':
+        form = AccountForm(request.POST, instance=request.user)
+        if form.is_valid():
+            user = form.save()
+            # Если пароль был изменён, обновляем сессию, чтобы не разлогинило
+            if form.cleaned_data.get('new_password'):
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Пароль успешно изменён.')
+            else:
+                messages.success(request, 'Профиль обновлён.')
+            return redirect('profile')
+    else:
+        form = AccountForm(instance=request.user)
+
+    return render(request, 'pages/profile_edit.html', {'form': form})

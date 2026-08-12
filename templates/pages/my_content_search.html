@@ -66,6 +66,9 @@
                                         {% else %}
                                             <span class="badge bg-secondary">Сериал</span>
                                         {% endif %}
+                                        {% if result.countries %}
+                                            <span class="badge bg-info text-dark">{{ result.countries|join:", " }}</span>
+                                        {% endif %}
                                         {% if result.rating %}
                                             <span class="badge bg-primary"><i class="bi bi-star-fill"></i> {{ result.rating|floatformat:1 }}</span>
                                         {% endif %}

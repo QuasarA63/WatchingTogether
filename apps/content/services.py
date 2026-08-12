@@ -74,6 +74,7 @@ def _parse_item(item):
 
     poster = item.get('poster') or {}
     rating = item.get('rating') or {}
+    countries = [c.get('name') for c in item.get('countries', []) if c.get('name')]
 
     return {
         'external_id': str(item.get('id', '')),
@@ -85,6 +86,7 @@ def _parse_item(item):
         'overview': item.get('shortDescription') or item.get('description') or '',
         'poster_url': poster.get('previewUrl') or poster.get('url'),
         'rating': rating.get('kp') or rating.get('imdb'),
+        'countries': countries,
     }
 
 

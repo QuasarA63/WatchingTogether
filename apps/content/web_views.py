@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count
 from django.utils.text import slugify
-from .models import Category, Genre, ContentItem, UserContentItem
+from .models import Category, Genre, ContentItem, UserContentItem, Person, ContentItemPerson
 from . import services
 
 
@@ -208,6 +208,44 @@ def _get_or_create_genres(genre_names):
     return genres
 
 
+def _get_or_create_persons(persons_data):
+    """
+    Получить или создать персоны и привязать их к элементу контента.
+
+    Принимает список словарей из services._parse_persons:
+    [{external_id, name, photo, role}, ...]
+    """
+    results = []
+    for p_data in persons_data:
+        name = p_data.get('name', '').strip()
+        if not name:
+            continue
+
+        # Ищем по external_id, если есть, иначе по имени
+        person = None
+        ext_id = p_data.get('external_id', '')
+        if ext_id:
+            person = Person.objects.filter(external_id=ext_id).first()
+        if person is None:
+            person = Person.objects.filter(name=name).first()
+        if person is None:
+            person = Person.objects.create(
+                name=name,
+                external_id=ext_id,
+                photo=p_data.get('photo', ''),
+            )
+
+        role = p_data.get('role', '')
+        if role:
+            _, created = ContentItemPerson.objects.get_or_create(
+                content_item=p_data['_content_item'],
+                person=person,
+                role=role,
+            )
+            results.append(person)
+    return results
+
+
 @login_required
 def my_content_add(request):
     """
@@ -263,6 +301,12 @@ def my_content_add(request):
         # Привязываем жанры из внешней базы
         genres = _get_or_create_genres(details.get('genres', []))
         content_item.genres.set(genres)
+
+        # Привязываем персон (режиссёры, актёры и т.д.)
+        persons_data = details.get('persons', [])
+        for p in persons_data:
+            p['_content_item'] = content_item
+        _get_or_create_persons(persons_data)
     elif not content_item.is_active:
         # Восстанавливаем ранее удалённый объект
         content_item.is_active = True

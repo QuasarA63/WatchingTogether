@@ -23,6 +23,21 @@
             </div>
         {% endif %}
 
+        <!-- Персоны -->
+        {% if item.persons.all %}
+            <div class="mb-3">
+                {% regroup item.persons.all by role as persons_by_role %}
+                {% for group in persons_by_role %}
+                    <div class="mb-1">
+                        <strong>{{ group.list.0.get_role_display }}:</strong>
+                        {% for cp in group.list %}
+                            <span class="text-muted">{{ cp.person.name }}</span>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <!-- Рейтинги -->
         <div class="mb-3 d-flex gap-3 flex-wrap">
             {% if item.external_rating %}

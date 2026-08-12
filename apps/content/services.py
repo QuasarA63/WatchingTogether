@@ -119,6 +119,47 @@ def search(query, category_slug=None):
     return results
 
 
+def _parse_persons(persons_data):
+    """
+    Нормализация списка персон из ответа Кинопоиск API.
+
+    Возвращает список словарей: {external_id, name, photo, role}.
+    Роль приводится к нашим значениям: director, actor, producer, writer, composer.
+    """
+    ROLE_MAP = {
+        'Режиссеры': 'director',
+        'Актеры': 'actor',
+        'Продюсеры': 'producer',
+        'Сценаристы': 'writer',
+        'Композиторы': 'composer',
+        'Художники': None,       # пропускаем
+        'Операторы': None,
+        'Монтажеры': None,
+        'Звукооператоры': None,
+        'Дизайнеры': None,
+        'Редакторы': None,
+    }
+
+    results = []
+    for person in persons_data or []:
+        profession = person.get('profession') or person.get('enProfession', '')
+        role = ROLE_MAP.get(profession)
+        if role is None:
+            continue
+
+        name = person.get('name') or person.get('enName') or ''
+        if not name:
+            continue
+
+        results.append({
+            'external_id': str(person.get('id', '')),
+            'name': name,
+            'photo': person.get('photo') or '',
+            'role': role,
+        })
+    return results
+
+
 def get_details(external_id, media_type=None):
     """
     Получить детальную информацию об объекте Кинопоиска по ID.
@@ -134,6 +175,7 @@ def get_details(external_id, media_type=None):
 
     genres = [g.get('name') for g in data.get('genres', []) if g.get('name')]
     countries = [c.get('name') for c in data.get('countries', []) if c.get('name')]
+    persons = _parse_persons(data.get('persons', []))
 
     return {
         'external_id': str(data.get('id', external_id)),
@@ -148,4 +190,5 @@ def get_details(external_id, media_type=None):
         'countries': countries,
         'rating': rating.get('kp') or rating.get('imdb'),
         'tagline': '',
+        'persons': persons,
     }

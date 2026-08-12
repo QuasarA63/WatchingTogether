@@ -144,6 +144,82 @@ class ContentItem(TimeStampedModel):
         return round(sum(r.rating for r in reviews) / len(reviews), 1)
 
 
+class Person(TimeStampedModel):
+    """
+    Персона: режиссёр, актёр, исполнитель, участник группы и т.д.
+    """
+    name = models.CharField(
+        max_length=255,
+        verbose_name='Имя'
+    )
+    external_id = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name='Внешний ID',
+        help_text='ID из внешних API (Kinopoisk и т.д.)'
+    )
+    photo = models.URLField(
+        blank=True,
+        verbose_name='Фото',
+        help_text='URL фотографии персоны'
+    )
+
+    class Meta:
+        verbose_name = 'Персона'
+        verbose_name_plural = 'Персоны'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class ContentItemPerson(TimeStampedModel):
+    """
+    Связь персоны с элементом контента с указанием роли.
+    """
+
+    class Role(models.TextChoices):
+        DIRECTOR = 'director', 'Режиссёр'
+        ACTOR = 'actor', 'Актёр'
+        ARTIST = 'artist', 'Исполнитель'
+        BAND_MEMBER = 'band_member', 'Участник группы'
+        COMPOSER = 'composer', 'Композитор'
+        PRODUCER = 'producer', 'Продюсер'
+        WRITER = 'writer', 'Сценарист'
+
+    content_item = models.ForeignKey(
+        ContentItem,
+        on_delete=models.CASCADE,
+        related_name='persons',
+        verbose_name='Элемент контента'
+    )
+    person = models.ForeignKey(
+        Person,
+        on_delete=models.CASCADE,
+        related_name='content_items',
+        verbose_name='Персона'
+    )
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,
+        verbose_name='Роль'
+    )
+
+    class Meta:
+        verbose_name = 'Персона контента'
+        verbose_name_plural = 'Персоны контента'
+        ordering = ['role', 'person__name']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['content_item', 'person', 'role'],
+                name='unique_content_item_person_role'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.person.name} — {self.get_role_display()} ({self.content_item.title})'
+
+
 class UserContentItem(TimeStampedModel):
     """
     Личный объект пользователя: привязка элемента контента

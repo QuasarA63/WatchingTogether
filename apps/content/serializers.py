@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Genre, ContentItem, UserContentItem
+from .models import Category, Genre, ContentItem, UserContentItem, Person, ContentItemPerson
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -32,6 +32,30 @@ class GenreSerializer(serializers.ModelSerializer):
         return obj.items.count()
 
 
+class PersonSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор персоны.
+    """
+
+    class Meta:
+        model = Person
+        fields = ['id', 'name', 'external_id', 'photo', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class ContentItemPersonSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор связи персоны с контентом (с ролью).
+    """
+    person = PersonSerializer(read_only=True)
+    role_display = serializers.CharField(source='get_role_display', read_only=True)
+
+    class Meta:
+        model = ContentItemPerson
+        fields = ['id', 'person', 'role', 'role_display', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
 class ContentItemSerializer(serializers.ModelSerializer):
     """
     Сериализатор для элемента контента.
@@ -45,6 +69,7 @@ class ContentItemSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
+    persons = ContentItemPersonSerializer(many=True, read_only=True)
     reviews_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -52,7 +77,7 @@ class ContentItemSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'category', 'category_name', 'title', 'original_title',
             'description', 'year', 'poster', 'external_id', 'metadata',
-            'external_rating', 'genres', 'genre_ids',
+            'external_rating', 'genres', 'genre_ids', 'persons',
             'reviews_count', 'average_rating', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']

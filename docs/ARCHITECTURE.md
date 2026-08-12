@@ -183,6 +183,33 @@ class ContentItem(TimeStampedModel):
             models.Index(fields=['external_id']),
         ]
 
+class Person(TimeStampedModel):
+    """Персона: режиссёр, актёр, исполнитель, участник группы и т.д."""
+    name = models.CharField(max_length=255)
+    external_id = models.CharField(max_length=100, blank=True)  # ID из внешних API
+    photo = models.URLField(blank=True)  # URL фотографии
+
+class ContentItemPerson(TimeStampedModel):
+    """Связь персоны с элементом контента с указанием роли"""
+
+    class Role(models.TextChoices):
+        DIRECTOR = 'director', 'Режиссёр'
+        ACTOR = 'actor', 'Актёр'
+        ARTIST = 'artist', 'Исполнитель'
+        BAND_MEMBER = 'band_member', 'Участник группы'
+        COMPOSER = 'composer', 'Композитор'
+        PRODUCER = 'producer', 'Продюсер'
+        WRITER = 'writer', 'Сценарист'
+
+    content_item = models.ForeignKey(ContentItem, on_delete=models.CASCADE, related_name='persons')
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='content_items')
+    role = models.CharField(max_length=20, choices=Role.choices)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['content_item', 'person', 'role'], name='unique_content_item_person_role')
+        ]
+
 class UserContentItem(TimeStampedModel):
     """Личный объект пользователя с комментарием и статусом просмотра"""
 

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Genre, ContentItem, UserContentItem
+from .models import Category, Genre, ContentItem, UserContentItem, Person, ContentItemPerson
 
 
 @admin.register(Category)
@@ -18,6 +18,13 @@ class GenreAdmin(admin.ModelAdmin):
     ordering = ['name']
 
 
+class ContentItemPersonInline(admin.TabularInline):
+    model = ContentItemPerson
+    extra = 1
+    raw_id_fields = ['person']
+    ordering = ['role', 'person__name']
+
+
 @admin.register(ContentItem)
 class ContentItemAdmin(admin.ModelAdmin):
     list_display = ['title', 'category', 'year', 'external_rating', 'external_id', 'is_active', 'created_at']
@@ -25,6 +32,7 @@ class ContentItemAdmin(admin.ModelAdmin):
     search_fields = ['title', 'original_title', 'description', 'external_id']
     raw_id_fields = ['category']
     filter_horizontal = ['genres']
+    inlines = [ContentItemPersonInline]
     ordering = ['-created_at']
 
     fieldsets = (
@@ -42,6 +50,22 @@ class ContentItemAdmin(admin.ModelAdmin):
             'fields': ('is_active',)
         }),
     )
+
+
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ['name', 'external_id', 'created_at']
+    search_fields = ['name']
+    ordering = ['name']
+
+
+@admin.register(ContentItemPerson)
+class ContentItemPersonAdmin(admin.ModelAdmin):
+    list_display = ['person', 'content_item', 'role', 'created_at']
+    list_filter = ['role', 'created_at']
+    search_fields = ['person__name', 'content_item__title']
+    raw_id_fields = ['person', 'content_item']
+    ordering = ['role', 'person__name']
 
 
 @admin.register(UserContentItem)

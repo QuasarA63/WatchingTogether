@@ -79,7 +79,9 @@ def content_detail(request, pk):
     Страница контента с отзывами.
     """
     item = get_object_or_404(
-        ContentItem.objects.select_related('category').prefetch_related('genres').annotate(
+        ContentItem.objects.select_related('category').prefetch_related(
+            'genres', 'persons__person'
+        ).annotate(
             avg_rating=Avg('reviews__rating'),
             reviews_count=Count('reviews')
         ),
@@ -95,10 +97,19 @@ def content_detail(request, pk):
     if request.user.is_authenticated:
         user_review = item.reviews.filter(user=request.user).first()
 
+    # Группировка персон по ролям для шаблона
+    persons_by_role = {}
+    for cp in item.persons.select_related('person').order_by('role', 'person__name'):
+        role_display = cp.get_role_display()
+        if role_display not in persons_by_role:
+            persons_by_role[role_display] = []
+        persons_by_role[role_display].append(cp.person.name)
+
     context = {
         'item': item,
         'reviews_page': reviews_page,
         'user_review': user_review,
+        'persons_by_role': persons_by_role,
     }
     return render(request, 'pages/content_detail.html', context)
 

@@ -126,24 +126,30 @@ def _parse_persons(persons_data):
     Возвращает список словарей: {external_id, name, photo, role}.
     Роль приводится к нашим значениям: director, actor, producer, writer, composer.
     """
-    ROLE_MAP = {
+    # Маппинг русских профессий из API
+    ROLE_MAP_RU = {
         'Режиссеры': 'director',
         'Актеры': 'actor',
         'Продюсеры': 'producer',
         'Сценаристы': 'writer',
         'Композиторы': 'composer',
-        'Художники': None,       # пропускаем
-        'Операторы': None,
-        'Монтажеры': None,
-        'Звукооператоры': None,
-        'Дизайнеры': None,
-        'Редакторы': None,
+    }
+    # Маппинг английских профессий (enProfession)
+    ROLE_MAP_EN = {
+        'director': 'director',
+        'actor': 'actor',
+        'producer': 'producer',
+        'writer': 'writer',
+        'composer': 'composer',
     }
 
     results = []
     for person in persons_data or []:
-        profession = person.get('profession') or person.get('enProfession', '')
-        role = ROLE_MAP.get(profession)
+        # Пробуем русское название профессии, затем английское
+        profession_ru = person.get('profession', '')
+        profession_en = person.get('enProfession', '')
+
+        role = ROLE_MAP_RU.get(profession_ru) or ROLE_MAP_EN.get(profession_en)
         if role is None:
             continue
 

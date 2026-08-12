@@ -91,10 +91,10 @@ def profile_view(request):
 @login_required
 def profile_edit_view(request):
     """
-    Редактирование учётных данных пользователя (логин, email, пароль).
+    Редактирование профиля пользователя (логин, email, пароль, личные данные, аватар).
     """
     if request.method == 'POST':
-        form = AccountForm(request.POST, instance=request.user)
+        form = AccountForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             user = form.save()
             # Если пароль был изменён, обновляем сессию, чтобы не разлогинило

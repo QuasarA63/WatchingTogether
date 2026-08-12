@@ -10,7 +10,7 @@
                 <h4 class="mb-0"><i class="bi bi-person-gear"></i> Редактирование профиля</h4>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
 
                     {% if form.non_field_errors %}
@@ -20,6 +20,54 @@
                             {% endfor %}
                         </div>
                     {% endif %}
+
+                    <!-- Аватар -->
+                    <div class="mb-3 text-center">
+                        {% if form.instance.avatar %}
+                            <img src="{{ form.instance.avatar.url }}" class="rounded-circle mb-2" width="100" height="100" alt="Аватар" id="avatar-preview">
+                        {% else %}
+                            <div class="mb-2">
+                                <i class="bi bi-person-circle" style="font-size: 4rem;" id="avatar-preview-icon"></i>
+                                <img src="" class="rounded-circle mb-2 d-none" width="100" height="100" alt="Аватар" id="avatar-preview">
+                            </div>
+                        {% endif %}
+                        <label for="{{ form.avatar.id_for_label }}" class="form-label d-block">{{ form.avatar.label }}</label>
+                        {{ form.avatar }}
+                        {% if form.avatar.errors %}
+                            <div class="text-danger small">{{ form.avatar.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-3"><i class="bi bi-person"></i> Личные данные</h5>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small">{{ form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.bio.id_for_label }}" class="form-label">{{ form.bio.label }}</label>
+                        {{ form.bio }}
+                        {% if form.bio.errors %}
+                            <div class="text-danger small">{{ form.bio.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-3"><i class="bi bi-shield-lock"></i> Учётные данные</h5>
 
                     <div class="mb-3">
                         <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
@@ -73,4 +121,22 @@
         </div>
     </div>
 </div>
+
+<script>
+// Превью аватара при выборе файла
+document.getElementById('{{ form.avatar.id_for_label }}').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('avatar-preview');
+            const icon = document.getElementById('avatar-preview-icon');
+            preview.src = e.target.result;
+            preview.classList.remove('d-none');
+            if (icon) icon.classList.add('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 {% endblock %}

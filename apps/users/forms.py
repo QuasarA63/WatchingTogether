@@ -72,7 +72,7 @@ class ProfileForm(forms.ModelForm):
 
 class AccountForm(forms.ModelForm):
     """
-    Форма редактирования учётных данных: логин, email, пароль.
+    Форма редактирования профиля: логин, email, пароль, личные данные, аватар.
     """
     new_password = forms.CharField(
         required=False,
@@ -88,14 +88,22 @@ class AccountForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['username', 'email', 'first_name', 'last_name', 'bio', 'avatar']
         labels = {
             'username': 'Имя пользователя',
             'email': 'Email',
+            'first_name': 'Имя',
+            'last_name': 'Фамилия',
+            'bio': 'О себе',
+            'avatar': 'Аватар',
         }
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'avatar': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
     def clean(self):

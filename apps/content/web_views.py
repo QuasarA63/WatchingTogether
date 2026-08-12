@@ -273,6 +273,11 @@ def my_content_add(request):
         messages.error(request, 'Некорректные данные объекта.')
         return redirect('my_content_search')
 
+    # Логирование для отладки
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f'Adding content: external_id={external_id}, media_type={media_type}')
+
     category = _category_for_media_type(media_type)
     if category is None:
         messages.error(request, 'Категория для этого типа контента не найдена в БД.')
@@ -286,7 +291,9 @@ def my_content_add(request):
 
     if content_item is None:
         try:
+            logger.info(f'Fetching details for external_id={external_id}')
             details = services.get_details(external_id, media_type)
+            logger.info(f'Got details: title={details.get("title")}, year={details.get("year")}, persons={len(details.get("persons", []))}')
         except services.KinopoiskError as exc:
             messages.error(request, str(exc))
             return redirect('my_content_search')

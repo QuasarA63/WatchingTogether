@@ -55,11 +55,11 @@
                                 <div class="card-body">
                                     <h6 class="card-title mb-1">
                                         {{ result.title }}
+                                        {% if result.original_title and result.original_title != result.title %}
+                                            <span class="text-muted fw-normal">({{ result.original_title }})</span>
+                                        {% endif %}
                                         {% if result.year %}<span class="text-muted">({{ result.year }})</span>{% endif %}
                                     </h6>
-                                    {% if result.original_title and result.original_title != result.title %}
-                                        <p class="text-muted small mb-1">{{ result.original_title }}</p>
-                                    {% endif %}
                                     <p class="text-muted small mb-1">
                                         {% if result.media_type == 'movie' %}
                                             <span class="badge bg-secondary">Фильм</span>

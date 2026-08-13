@@ -20,6 +20,34 @@
     </div>
 </form>
 
+{% if my_groups %}
+    <h4 class="mb-3"><i class="bi bi-person-check"></i> Мои группы</h4>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+        {% for group in my_groups %}
+            <div class="col">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'group_detail' group.pk %}" class="text-decoration-none">
+                                {{ group.name }}
+                            </a>
+                            {% if group.is_private %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-lock"></i></span>
+                            {% endif %}
+                        </h5>
+                        <p class="card-text text-muted">{{ group.description|truncatewords:15 }}</p>
+                    </div>
+                    <div class="card-footer text-muted small">
+                        <i class="bi bi-people-fill"></i> {{ group.members.count }} участн.
+                        &middot; {{ group.created_at|date:"d.m.Y" }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <h4 class="mb-3"><i class="bi bi-globe"></i> Все публичные группы</h4>
+{% endif %}
+
 {% if groups_page %}
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for group in groups_page %}
@@ -66,7 +94,7 @@
     {% endif %}
 {% else %}
     <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> Группы не найдены.
+        <i class="bi bi-info-circle"></i> Публичные группы не найдены.
         {% if user.is_authenticated %}
             <a href="{% url 'group_create' %}">Создайте первую группу!</a>
         {% endif %}

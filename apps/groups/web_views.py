@@ -39,7 +39,7 @@ def _notify_invitation(invitation):
 
 def group_list(request):
     """
-    Список всех публичных групп.
+    Список публичных групп + группы текущего пользователя (включая приватные).
     """
     groups = Group.objects.filter(is_private=False).prefetch_related('members')
     search = request.GET.get('q', '')
@@ -50,8 +50,13 @@ def group_list(request):
     page_number = request.GET.get('page')
     groups_page = paginator.get_page(page_number)
 
+    my_groups = None
+    if request.user.is_authenticated:
+        my_groups = request.user.member_groups.prefetch_related('members')
+
     context = {
         'groups_page': groups_page,
+        'my_groups': my_groups,
         'search': search,
     }
     return render(request, 'pages/group_list.html', context)

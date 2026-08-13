@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Group, GroupMembership, GroupInvitation, GroupMessage
+from .models import Group, GroupMembership, GroupInvitation, GroupMessage, GroupContentComment
 
 
 class GroupMembershipInline(admin.TabularInline):
@@ -42,4 +42,13 @@ class GroupMessageAdmin(admin.ModelAdmin):
     list_filter = ['created_at']
     search_fields = ['group__name', 'user__username', 'text']
     raw_id_fields = ['group', 'user']
+    ordering = ['-created_at']
+
+
+@admin.register(GroupContentComment)
+class GroupContentCommentAdmin(admin.ModelAdmin):
+    list_display = ['group', 'content_item', 'user', 'parent', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['group__name', 'content_item__title', 'user__username', 'text']
+    raw_id_fields = ['group', 'content_item', 'user', 'parent']
     ordering = ['-created_at']

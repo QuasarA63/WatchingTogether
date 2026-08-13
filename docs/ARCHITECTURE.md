@@ -180,6 +180,19 @@ class GroupMessage(TimeStampedModel):
     class Meta:
         ordering = ['created_at']
         indexes = [models.Index(fields=['group', 'id'])]
+
+class GroupContentComment(TimeStampedModel):
+    """Комментарий к обсуждению объекта в группе (форумная вложенность)"""
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='content_comments')
+    content_item = models.ForeignKey(ContentItem, on_delete=models.CASCADE, related_name='group_comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_content_comments')
+    text = models.TextField(max_length=2000)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE,
+                               null=True, blank=True, related_name='replies')
+
+    class Meta:
+        ordering = ['created_at']
+        indexes = [models.Index(fields=['group', 'content_item'])]
 ```
 
 ### Notifications (apps/notifications/models.py)
@@ -356,6 +369,8 @@ POST   /api/v1/groups/{id}/invite/     # Пригласить пользоват
 GET    /api/v1/groups/{id}/invitations/  # Приглашения группы (owner/admin, фильтр ?status=)
 GET    /api/v1/groups/{id}/messages/   # Сообщения чата (участники, ?after_id= для polling)
 POST   /api/v1/groups/{id}/messages/   # Отправить сообщение в чат (участники)
+GET    /api/v1/groups/{id}/content/{content_id}/comments/   # Дерево комментариев обсуждения (участники)
+POST   /api/v1/groups/{id}/content/{content_id}/comments/   # Комментарий в обсуждение (text, parent опционально)
 ```
 
 ### Приглашения в группы
@@ -416,8 +431,8 @@ GET    /api/v1/reviews/{id}/comments/  # Комментарии к отзыву
 - `/groups/` — Список групп
 - `/groups/{id}/` — Страница группы (вкладки: Отзывы / Обсуждения / Участники)
 - `/groups/{id}/invite/` — Приглашение пользователя в группу (owner/admin)
-- `/groups/{id}/chat/` — Групповой чат (AJAX polling каждые 3 сек, только участники)
-- `/groups/{id}/content/{content_id}/` — Обсуждение объекта в группе (комментарии участников, «Взять себе»)
+- `/groups/{id}/chat/` — Групповой чат (AJAX polling каждые 3 сек, только участники; справа список участников)
+- `/groups/{id}/content/{content_id}/` — Обсуждение объекта в группе (сводка по участникам, форумные вложенные комментарии, «Взять себе»)
 - `/notifications/` — Уведомления (колокольчик в navbar со счётчиком непрочитанных)
 - `/content/` — Каталог контента (фильтры по категории и жанру, рейтинги)
 - `/content/{id}/` — Страница контента с отзывами (жанры, рейтинги Кинопоиска и пользователей)

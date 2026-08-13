@@ -91,6 +91,53 @@ class GroupMessage(TimeStampedModel):
         return f'{self.user.username} в {self.group.name}: {self.text[:50]}'
 
 
+class GroupContentComment(TimeStampedModel):
+    """
+    Комментарий к обсуждению объекта контента внутри группы (с вложенностью).
+    """
+    group = models.ForeignKey(
+        'Group',
+        on_delete=models.CASCADE,
+        related_name='content_comments',
+        verbose_name='Группа'
+    )
+    content_item = models.ForeignKey(
+        'content.ContentItem',
+        on_delete=models.CASCADE,
+        related_name='group_comments',
+        verbose_name='Элемент контента'
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='group_content_comments',
+        verbose_name='Автор'
+    )
+    text = models.TextField(
+        max_length=2000,
+        verbose_name='Текст комментария'
+    )
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='replies',
+        verbose_name='Родительский комментарий'
+    )
+
+    class Meta:
+        verbose_name = 'Комментарий обсуждения'
+        verbose_name_plural = 'Комментарии обсуждений'
+        ordering = ['created_at']
+        indexes = [
+            models.Index(fields=['group', 'content_item']),
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} о {self.content_item.title} в {self.group.name}: {self.text[:50]}'
+
+
 class Group(TimeStampedModel):
     """
     Группа для обсуждения контента.

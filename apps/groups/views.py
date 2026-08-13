@@ -4,12 +4,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from .models import Group, GroupMembership, GroupInvitation, GroupMessage
+from .models import Group, GroupMembership, GroupInvitation, GroupMessage, GroupContentComment
 from .serializers import (
     GroupSerializer, GroupCreateSerializer, GroupMembershipSerializer,
     GroupInvitationSerializer, GroupInvitationCreateSerializer,
     GroupMessageSerializer, GroupMessageCreateSerializer,
+    GroupContentCommentSerializer, GroupContentCommentCreateSerializer,
 )
+from apps.content.models import ContentItem
 from apps.notifications.models import Notification
 
 
@@ -220,6 +222,46 @@ class GroupViewSet(viewsets.ModelViewSet):
             serializer = GroupMessageSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         serializer = GroupMessageSerializer(messages_qs, many=True)
+        return Response(serializer.data)
+
+    @action(
+        detail=True, methods=['get', 'post'], permission_classes=[IsAuthenticated],
+        url_path='content/(?P<content_pk>[^/.]+)/comments'
+    )
+    def content_comments(self, request, pk=None, content_pk=None):
+        """Комментарии обсуждения объекта в группе (только участники)."""
+        group = self.get_object()
+        if not GroupMembership.objects.filter(user=request.user, group=group).exists():
+            return Response(
+                {'detail': 'Обсуждение доступно только участникам группы.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        content_item = get_object_or_404(ContentItem, pk=content_pk)
+
+        if request.method == 'POST':
+            serializer = GroupContentCommentCreateSerializer(
+                data=request.data,
+                context={'request': request, 'group': group, 'content_item': content_item}
+            )
+            serializer.is_valid(raise_exception=True)
+            comment = serializer.save()
+            return Response(
+                GroupContentCommentSerializer(comment).data,
+                status=status.HTTP_201_CREATED
+            )
+
+        comments = (
+            GroupContentComment.objects
+            .filter(group=group, content_item=content_item, parent=None)
+            .select_related('user')
+            .prefetch_related('replies__user')
+            .order_by('created_at')
+        )
+        page = self.paginate_queryset(comments)
+        if page is not None:
+            serializer = GroupContentCommentSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = GroupContentCommentSerializer(comments, many=True)
         return Response(serializer.data)
 
 

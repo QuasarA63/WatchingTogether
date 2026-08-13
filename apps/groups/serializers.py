@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Group, GroupMembership, GroupInvitation, GroupMessage
+from .models import Group, GroupMembership, GroupInvitation, GroupMessage, GroupContentComment
 
 
 class GroupMembershipSerializer(serializers.ModelSerializer):
@@ -115,6 +115,60 @@ class GroupMessageCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return GroupMessage.objects.create(
             group=self.context['group'],
+            user=self.context['request'].user,
+            **validated_data
+        )
+
+
+class GroupContentCommentReplySerializer(serializers.ModelSerializer):
+    """
+    Сериализатор ответа на комментарий обсуждения (без дальнейшей вложенности).
+    """
+    username = serializers.CharField(source='user.username', read_only=True)
+    avatar = serializers.ImageField(source='user.avatar', read_only=True)
+
+    class Meta:
+        model = GroupContentComment
+        fields = ['id', 'user', 'username', 'avatar', 'text', 'parent', 'created_at']
+        read_only_fields = fields
+
+
+class GroupContentCommentSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор комментария обсуждения с вложенными ответами.
+    """
+    username = serializers.CharField(source='user.username', read_only=True)
+    avatar = serializers.ImageField(source='user.avatar', read_only=True)
+    replies = GroupContentCommentReplySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = GroupContentComment
+        fields = ['id', 'user', 'username', 'avatar', 'text', 'parent', 'replies', 'created_at']
+        read_only_fields = fields
+
+
+class GroupContentCommentCreateSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор создания комментария обсуждения.
+    """
+    class Meta:
+        model = GroupContentComment
+        fields = ['text', 'parent']
+
+    def validate_parent(self, value):
+        if value is not None:
+            group = self.context['group']
+            content_item = self.context['content_item']
+            if value.group_id != group.id or value.content_item_id != content_item.id:
+                raise serializers.ValidationError(
+                    'Родительский комментарий не относится к этому обсуждению.'
+                )
+        return value
+
+    def create(self, validated_data):
+        return GroupContentComment.objects.create(
+            group=self.context['group'],
+            content_item=self.context['content_item'],
             user=self.context['request'].user,
             **validated_data
         )

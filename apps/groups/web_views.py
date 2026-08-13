@@ -6,8 +6,8 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from .models import Group, GroupMembership, GroupInvitation, GroupMessage
-from .forms import GroupForm, GroupInviteForm, GroupMessageForm
+from .models import Group, GroupMembership, GroupInvitation, GroupMessage, GroupContentComment
+from .forms import GroupForm, GroupInviteForm, GroupMessageForm, GroupContentCommentForm
 from apps.content.models import ContentItem, UserContentItem
 from apps.notifications.models import Notification
 
@@ -277,7 +277,8 @@ def invitation_decline(request, pk):
 
 def group_content_detail(request, pk, content_pk):
     """
-    Обсуждение объекта внутри группы: комментарии участников и отзывы.
+    Обсуждение объекта внутри группы: сводка по участникам, отзывы
+    и форумное обсуждение (вложенные комментарии).
     """
     group = get_object_or_404(Group, pk=pk)
     content_item = get_object_or_404(ContentItem, pk=content_pk)
@@ -295,6 +296,13 @@ def group_content_detail(request, pk, content_pk):
         .select_related('user')
         .order_by('created_at')
     )
+    discussion_comments = (
+        GroupContentComment.objects
+        .filter(group=group, content_item=content_item, parent=None)
+        .select_related('user')
+        .prefetch_related('replies__user')
+        .order_by('created_at')
+    )
     already_have = (
         request.user.is_authenticated
         and UserContentItem.objects.filter(user=request.user, content_item=content_item).exists()
@@ -305,9 +313,45 @@ def group_content_detail(request, pk, content_pk):
         'content_item': content_item,
         'entries': entries,
         'reviews': reviews,
+        'discussion_comments': discussion_comments,
+        'comment_form': GroupContentCommentForm() if membership else None,
         'is_member': membership is not None,
         'already_have': already_have,
     })
+
+
+@login_required
+@require_POST
+def group_content_comment_add(request, pk, content_pk):
+    """
+    Добавление комментария в обсуждение объекта (только участники).
+    """
+    group = get_object_or_404(Group, pk=pk)
+    content_item = get_object_or_404(ContentItem, pk=content_pk)
+    if not _get_membership(request.user, group):
+        messages.error(request, 'Комментировать могут только участники группы.')
+        return redirect('group_content_detail', pk=pk, content_pk=content_pk)
+
+    form = GroupContentCommentForm(request.POST)
+    if form.is_valid():
+        comment = GroupContentComment(
+            group=group,
+            content_item=content_item,
+            user=request.user,
+            text=form.cleaned_data['text'],
+        )
+        parent_id = request.POST.get('parent_id')
+        if parent_id:
+            parent = GroupContentComment.objects.filter(
+                pk=parent_id, group=group, content_item=content_item
+            ).first()
+            if parent:
+                comment.parent = parent
+        comment.save()
+        messages.success(request, 'Комментарий добавлен.')
+    else:
+        messages.error(request, 'Комментарий не может быть пустым.')
+    return redirect(f'/groups/{pk}/content/{content_pk}/#discussion')
 
 
 @login_required
@@ -352,9 +396,17 @@ def group_chat(request, pk):
     )
     chat_messages = list(reversed(chat_messages))
 
+    memberships = (
+        GroupMembership.objects
+        .filter(group=group)
+        .select_related('user')
+        .order_by('joined_at')
+    )
+
     return render(request, 'pages/group_chat.html', {
         'group': group,
         'chat_messages': chat_messages,
+        'memberships': memberships,
         'form': GroupMessageForm(),
     })
 

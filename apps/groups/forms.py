@@ -64,3 +64,18 @@ class GroupMessageForm(forms.Form):
             'placeholder': 'Введите сообщение...'
         }),
     )
+
+
+class GroupContentCommentForm(forms.Form):
+    """
+    Форма комментария к обсуждению объекта в группе.
+    """
+    text = forms.CharField(
+        label='Комментарий',
+        max_length=2000,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Ваш комментарий...'
+        }),
+    )

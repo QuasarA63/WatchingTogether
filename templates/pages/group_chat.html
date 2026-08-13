@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Чат — {{ group.name }} — Смотрим вместе{% endblock %}
+
+{% block extra_css %}
+<style>
+    #chat-box {
+        height: 55vh;
+        overflow-y: auto;
+    }
+    .chat-message {
+        max-width: 75%;
+    }
+    .chat-message .chat-text {
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'group_detail' group.pk %}">{{ group.name }}</a></li>
+        <li class="breadcrumb-item active">Чат</li>
+    </ol>
+</nav>
+
+<h2 class="mb-3"><i class="bi bi-chat-dots"></i> Чат группы «{{ group.name }}»</h2>
+
+<div class="card">
+    <div class="card-body" id="chat-box"
+         data-messages-url="{% url 'group_chat_messages' group.pk %}"
+         data-current-user="{{ user.username }}"
+         data-csrf-token="{{ csrf_token }}">
+        {% for message in chat_messages %}
+            <div class="d-flex mb-3 {% if message.user == user %}justify-content-end{% endif %}"
+                 data-message-id="{{ message.id }}">
+                <div class="chat-message">
+                    <div class="d-flex align-items-center mb-1 {% if message.user == user %}justify-content-end{% endif %}">
+                        {% if message.user.avatar %}
+                            <img src="{{ message.user.avatar.url }}" alt="{{ message.user.username }}"
+                                 class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;">
+                        {% else %}
+                            <i class="bi bi-person-circle me-2 text-muted"></i>
+                        {% endif %}
+                        <strong class="small">{{ message.user.username }}</strong>
+                        <span class="text-muted small ms-2">{{ message.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <div class="p-2 rounded {% if message.user == user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                        <span class="chat-text">{{ message.text }}</span>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center text-muted" id="chat-empty">
+                <i class="bi bi-chat-square"></i> Сообщений пока нет. Напишите первым!
+            </div>
+        {% endfor %}
+    </div>
+    <div class="card-footer">
+        <form id="chat-form">
+            <div class="input-group">
+                <textarea class="form-control" id="chat-input" rows="2" maxlength="2000"
+                          placeholder="Введите сообщение..." required></textarea>
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-send"></i> Отправить
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/group_chat.js' %}"></script>
+{% endblock %}

@@ -3,94 +3,219 @@
 {% block title %}{{ group.name }} — Смотрим вместе{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-                <h2><i class="bi bi-people"></i> {{ group.name }}</h2>
-                {% if group.is_private %}
-                    <span class="badge bg-warning text-dark"><i class="bi bi-lock"></i> Приватная</span>
-                {% endif %}
-            </div>
-            {% if user.is_authenticated %}
-                {% if is_member %}
-                    <a href="{% url 'group_leave' group.pk %}" class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-box-arrow-left"></i> Покинуть
-                    </a>
-                {% else %}
-                    <a href="{% url 'group_join' group.pk %}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle"></i> Вступить
-                    </a>
-                {% endif %}
-            {% endif %}
-        </div>
-
-        {% if group.description %}
-            <p class="lead">{{ group.description }}</p>
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h2><i class="bi bi-people"></i> {{ group.name }}</h2>
+        {% if group.is_private %}
+            <span class="badge bg-warning text-dark"><i class="bi bi-lock"></i> Приватная</span>
         {% endif %}
-
-        <p class="text-muted">
-            <i class="bi bi-person"></i> Владелец: {{ group.owner.username }}
-            &middot; <i class="bi bi-people-fill"></i> {{ members_count }} участн.
-            &middot; <i class="bi bi-calendar"></i> Создана {{ group.created_at|date:"d.m.Y" }}
-        </p>
-
-        <hr>
-
-        <h4 class="mb-3"><i class="bi bi-chat-square-text"></i> Отзывы группы</h4>
-        {% if reviews_page %}
-            {% for review in reviews_page %}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="card-title mb-1">
-                                    <a href="{% url 'review_detail' review.pk %}" class="text-decoration-none">
-                                        {% if review.title %}{{ review.title }}{% else %}Отзыв на «{{ review.content_item.title }}»{% endif %}
-                                    </a>
-                                </h5>
-                                <p class="text-muted small mb-2">
-                                    <i class="bi bi-person"></i> {{ review.user.username }}
-                                    &middot;
-                                    <a href="{% url 'content_detail' review.content_item.pk %}" class="text-decoration-none">
-                                        {{ review.content_item.title }}
-                                    </a>
-                                    &middot; {{ review.created_at|date:"d.m.Y H:i" }}
-                                </p>
-                            </div>
-                            <span class="badge bg-primary fs-6">{{ review.rating }}/10</span>
-                        </div>
-                        <p class="card-text">{{ review.text|truncatewords:30 }}</p>
-                    </div>
-                </div>
-            {% endfor %}
-
-            {% if reviews_page.has_other_pages %}
-                <nav>
-                    <ul class="pagination">
-                        {% if reviews_page.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ reviews_page.previous_page_number }}">&laquo;</a>
-                            </li>
-                        {% endif %}
-                        {% for num in reviews_page.paginator.page_range %}
-                            <li class="page-item {% if reviews_page.number == num %}active{% endif %}">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
-                        {% endfor %}
-                        {% if reviews_page.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ reviews_page.next_page_number }}">&raquo;</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
+    </div>
+    <div class="d-flex gap-2">
+        {% if user.is_authenticated %}
+            {% if can_invite %}
+                <a href="{% url 'group_invite' group.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-person-plus"></i> Пригласить
+                </a>
             {% endif %}
-        {% else %}
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> В этой группе пока нет отзывов.
-            </div>
+            {% if is_member %}
+                <a href="{% url 'group_chat' group.pk %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-chat-dots"></i> Чат
+                </a>
+                <form method="post" action="{% url 'group_leave' group.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-box-arrow-left"></i> Покинуть
+                    </button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'group_join' group.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle"></i> Вступить
+                    </button>
+                </form>
+            {% endif %}
         {% endif %}
     </div>
 </div>
+
+{% if group.description %}
+    <p class="lead">{{ group.description }}</p>
+{% endif %}
+
+<p class="text-muted">
+    <i class="bi bi-person"></i> Владелец: {{ group.owner.username }}
+    &middot; <i class="bi bi-people-fill"></i> {{ members_count }} участн.
+    &middot; <i class="bi bi-calendar"></i> Создана {{ group.created_at|date:"d.m.Y" }}
+</p>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link {% if tab == 'reviews' %}active{% endif %}" href="?tab=reviews">
+            <i class="bi bi-chat-square-text"></i> Отзывы
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if tab == 'discussions' %}active{% endif %}" href="?tab=discussions">
+            <i class="bi bi-collection-play"></i> Обсуждения
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if tab == 'members' %}active{% endif %}" href="?tab=members">
+            <i class="bi bi-people-fill"></i> Участники
+        </a>
+    </li>
+</ul>
+
+{% if tab == 'discussions' %}
+    {% if discussions_page %}
+        {% for discussion in discussions_page %}
+            <div class="card mb-3">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-1">
+                            <a href="{% url 'group_content_detail' group.pk discussion.content_item.pk %}" class="text-decoration-none">
+                                {{ discussion.content_item.title }}
+                            </a>
+                            {% if discussion.content_item.year %}
+                                <span class="text-muted">({{ discussion.content_item.year }})</span>
+                            {% endif %}
+                        </h5>
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-chat-left-text"></i> {{ discussion.entries_count }} коммент.
+                            участников
+                        </p>
+                    </div>
+                    <a href="{% url 'group_content_detail' group.pk discussion.content_item.pk %}" class="btn btn-outline-primary btn-sm">
+                        Обсуждение <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if discussions_page.has_other_pages %}
+            <nav>
+                <ul class="pagination">
+                    {% if discussions_page.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=discussions&page={{ discussions_page.previous_page_number }}">&laquo;</a>
+                        </li>
+                    {% endif %}
+                    {% for num in discussions_page.paginator.page_range %}
+                        <li class="page-item {% if discussions_page.number == num %}active{% endif %}">
+                            <a class="page-link" href="?tab=discussions&page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if discussions_page.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=discussions&page={{ discussions_page.next_page_number }}">&raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Участники группы пока не добавили ни одного объекта.
+        </div>
+    {% endif %}
+
+{% elif tab == 'members' %}
+    {% if memberships_page %}
+        <div class="list-group mb-3">
+            {% for membership in memberships_page %}
+                <div class="list-group-item d-flex align-items-center">
+                    {% if membership.user.avatar %}
+                        <img src="{{ membership.user.avatar.url }}" alt="{{ membership.user.username }}"
+                             class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                    {% else %}
+                        <i class="bi bi-person-circle fs-3 me-3 text-muted"></i>
+                    {% endif %}
+                    <div>
+                        <strong>{{ membership.user.username }}</strong>
+                        <span class="badge bg-secondary ms-2">{{ membership.get_role_display }}</span>
+                        <div class="text-muted small">в группе с {{ membership.joined_at|date:"d.m.Y" }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if memberships_page.has_other_pages %}
+            <nav>
+                <ul class="pagination">
+                    {% if memberships_page.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=members&page={{ memberships_page.previous_page_number }}">&laquo;</a>
+                        </li>
+                    {% endif %}
+                    {% for num in memberships_page.paginator.page_range %}
+                        <li class="page-item {% if memberships_page.number == num %}active{% endif %}">
+                            <a class="page-link" href="?tab=members&page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if memberships_page.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=members&page={{ memberships_page.next_page_number }}">&raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% endif %}
+
+{% else %}
+    {% if reviews_page %}
+        {% for review in reviews_page %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title mb-1">
+                                <a href="{% url 'review_detail' review.pk %}" class="text-decoration-none">
+                                    {% if review.title %}{{ review.title }}{% else %}Отзыв на «{{ review.content_item.title }}»{% endif %}
+                                </a>
+                            </h5>
+                            <p class="text-muted small mb-2">
+                                <i class="bi bi-person"></i> {{ review.user.username }}
+                                &middot;
+                                <a href="{% url 'group_content_detail' group.pk review.content_item.pk %}" class="text-decoration-none">
+                                    {{ review.content_item.title }}
+                                </a>
+                                &middot; {{ review.created_at|date:"d.m.Y H:i" }}
+                            </p>
+                        </div>
+                        <span class="badge bg-primary fs-6">{{ review.rating }}/10</span>
+                    </div>
+                    <p class="card-text">{{ review.text|truncatewords:30 }}</p>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if reviews_page.has_other_pages %}
+            <nav>
+                <ul class="pagination">
+                    {% if reviews_page.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=reviews&page={{ reviews_page.previous_page_number }}">&laquo;</a>
+                        </li>
+                    {% endif %}
+                    {% for num in reviews_page.paginator.page_range %}
+                        <li class="page-item {% if reviews_page.number == num %}active{% endif %}">
+                            <a class="page-link" href="?tab=reviews&page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if reviews_page.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=reviews&page={{ reviews_page.next_page_number }}">&raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> В этой группе пока нет отзывов.
+        </div>
+    {% endif %}
+{% endif %}
 {% endblock %}

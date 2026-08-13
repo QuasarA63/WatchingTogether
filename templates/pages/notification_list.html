@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Уведомления — Смотрим вместе{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-bell"></i> Уведомления</h2>
+    {% if unread_notifications_count %}
+        <form method="post" action="{% url 'notification_mark_all_read' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-check2-all"></i> Прочитать все
+            </button>
+        </form>
+    {% endif %}
+</div>
+
+{% if notifications_page %}
+    <div class="list-group mb-3">
+        {% for notification in notifications_page %}
+            <div class="list-group-item {% if not notification.is_read %}list-group-item-primary{% endif %}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center mb-1">
+                            {% if notification.notification_type == 'group_invite' %}
+                                <i class="bi bi-person-plus me-2"></i>
+                            {% elif notification.notification_type == 'group_invite_accepted' %}
+                                <i class="bi bi-check-circle me-2 text-success"></i>
+                            {% elif notification.notification_type == 'group_invite_declined' %}
+                                <i class="bi bi-x-circle me-2 text-danger"></i>
+                            {% else %}
+                                <i class="bi bi-chat-dots me-2"></i>
+                            {% endif %}
+                            <strong>{{ notification.title }}</strong>
+                            {% if not notification.is_read %}
+                                <span class="badge bg-danger ms-2">Новое</span>
+                            {% endif %}
+                        </div>
+                        {% if notification.message %}
+                            <p class="mb-1">{{ notification.message|linebreaksbr }}</p>
+                        {% endif %}
+                        <small class="text-muted">{{ notification.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                    <div class="ms-3 text-nowrap">
+                        {% if notification.notification_type == 'group_invite' and notification.invitation and notification.invitation.status == 'pending' %}
+                            <form method="post" action="{% url 'invitation_accept' notification.invitation.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="bi bi-check-lg"></i> Принять
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'invitation_decline' notification.invitation.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-x-lg"></i> Отклонить
+                                </button>
+                            </form>
+                        {% elif notification.link %}
+                            <a href="{% url 'notification_open' notification.pk %}" class="btn btn-outline-primary btn-sm">
+                                Открыть <i class="bi bi-arrow-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if notifications_page.has_other_pages %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if notifications_page.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ notifications_page.previous_page_number }}">&laquo;</a>
+                    </li>
+                {% endif %}
+                {% for num in notifications_page.paginator.page_range %}
+                    <li class="page-item {% if notifications_page.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if notifications_page.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ notifications_page.next_page_number }}">&raquo;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> У вас пока нет уведомлений.
+    </div>
+{% endif %}
+{% endblock %}

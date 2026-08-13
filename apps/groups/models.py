@@ -3,6 +3,94 @@ from django.conf import settings
 from apps.core.models import TimeStampedModel
 
 
+class GroupInvitation(TimeStampedModel):
+    """
+    Приглашение пользователя в группу.
+    """
+    STATUS_CHOICES = [
+        ('pending', 'Ожидает ответа'),
+        ('accepted', 'Принято'),
+        ('declined', 'Отклонено'),
+    ]
+
+    group = models.ForeignKey(
+        'Group',
+        on_delete=models.CASCADE,
+        related_name='invitations',
+        verbose_name='Группа'
+    )
+    from_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='sent_group_invitations',
+        verbose_name='Кто пригласил'
+    )
+    to_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='received_group_invitations',
+        verbose_name='Кого пригласили'
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name='Статус'
+    )
+    message = models.TextField(
+        blank=True,
+        verbose_name='Сообщение'
+    )
+
+    class Meta:
+        verbose_name = 'Приглашение в группу'
+        verbose_name_plural = 'Приглашения в группы'
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['group', 'to_user'],
+                condition=models.Q(status='pending'),
+                name='unique_pending_group_invitation'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.from_user.username} → {self.to_user.username} в {self.group.name} ({self.get_status_display()})'
+
+
+class GroupMessage(TimeStampedModel):
+    """
+    Сообщение в групповом чате.
+    """
+    group = models.ForeignKey(
+        'Group',
+        on_delete=models.CASCADE,
+        related_name='messages',
+        verbose_name='Группа'
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='group_messages',
+        verbose_name='Автор'
+    )
+    text = models.TextField(
+        max_length=2000,
+        verbose_name='Текст сообщения'
+    )
+
+    class Meta:
+        verbose_name = 'Сообщение группы'
+        verbose_name_plural = 'Сообщения групп'
+        ordering = ['created_at']
+        indexes = [
+            models.Index(fields=['group', 'id']),
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} в {self.group.name}: {self.text[:50]}'
+
+
 class Group(TimeStampedModel):
     """
     Группа для обсуждения контента.

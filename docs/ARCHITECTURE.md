@@ -71,6 +71,15 @@ watching_together/
 │   │   ├── views.py
 │   │   ├── urls.py
 │   │   └── admin.py
+│   ├── notifications/     # Уведомления (колокольчик в navbar)
+│   │   ├── __init__.py
+│   │   ├── models.py
+│   │   ├── serializers.py
+│   │   ├── views.py
+│   │   ├── web_views.py
+│   │   ├── context_processors.py
+│   │   ├── urls.py
+│   │   └── admin.py
 │   └── api/               # API v1 (агрегация)
 │       ├── __init__.py
 │       ├── urls.py
@@ -141,6 +150,59 @@ class GroupMembership(TimeStampedModel):
         ('member', 'Участник'),
     ], default='member')
     joined_at = models.DateTimeField(auto_now_add=True)
+
+class GroupInvitation(TimeStampedModel):
+    """Приглашение пользователя в группу"""
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='invitations')
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_group_invitations')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_group_invitations')
+    status = models.CharField(max_length=20, choices=[
+        ('pending', 'Ожидает ответа'),
+        ('accepted', 'Принято'),
+        ('declined', 'Отклонено'),
+    ], default='pending')
+    message = models.TextField(blank=True)
+
+    class Meta:
+        constraints = [
+            # Одно активное приглашение на пару (группа, пользователь)
+            models.UniqueConstraint(fields=['group', 'to_user'],
+                                    condition=models.Q(status='pending'),
+                                    name='unique_pending_group_invitation')
+        ]
+
+class GroupMessage(TimeStampedModel):
+    """Сообщение в групповом чате (AJAX polling, без WebSocket)"""
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='messages')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_messages')
+    text = models.TextField(max_length=2000)
+
+    class Meta:
+        ordering = ['created_at']
+        indexes = [models.Index(fields=['group', 'id'])]
+```
+
+### Notifications (apps/notifications/models.py)
+
+```python
+class Notification(TimeStampedModel):
+    """Уведомление пользователя (приглашения в группы и др.)"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=30, choices=[
+        ('group_invite', 'Приглашение в группу'),
+        ('group_invite_accepted', 'Приглашение принято'),
+        ('group_invite_declined', 'Приглашение отклонено'),
+        ('group_new_message', 'Новое сообщение в группе'),
+    ])
+    title = models.CharField(max_length=255)
+    message = models.TextField(blank=True)
+    link = models.CharField(max_length=500, blank=True)  # URL перехода по клику
+    is_read = models.BooleanField(default=False)
+    invitation = models.ForeignKey('groups.GroupInvitation', on_delete=models.CASCADE,
+                                   null=True, blank=True, related_name='notifications')
+
+    class Meta:
+        indexes = [models.Index(fields=['user', 'is_read'])]
 ```
 
 ### Content (apps/content/models.py)
@@ -286,10 +348,31 @@ POST   /api/v1/groups/                 # Создание группы
 GET    /api/v1/groups/{id}/            # Детали группы
 PATCH  /api/v1/groups/{id}/            # Обновление группы
 DELETE /api/v1/groups/{id}/            # Удаление группы
-POST   /api/v1/groups/{id}/join/       # Вступить в группу
+POST   /api/v1/groups/{id}/join/       # Вступить в группу (приватная — только по приглашению)
 POST   /api/v1/groups/{id}/leave/      # Покинуть группу
 GET    /api/v1/groups/{id}/members/    # Участники группы
 GET    /api/v1/groups/{id}/reviews/    # Отзывы группы
+POST   /api/v1/groups/{id}/invite/     # Пригласить пользователя (owner/admin)
+GET    /api/v1/groups/{id}/invitations/  # Приглашения группы (owner/admin, фильтр ?status=)
+GET    /api/v1/groups/{id}/messages/   # Сообщения чата (участники, ?after_id= для polling)
+POST   /api/v1/groups/{id}/messages/   # Отправить сообщение в чат (участники)
+```
+
+### Приглашения в группы
+```
+GET    /api/v1/group-invitations/      # Входящие и исходящие приглашения (фильтр ?status=)
+GET    /api/v1/group-invitations/{id}/ # Детали приглашения
+POST   /api/v1/group-invitations/{id}/accept/   # Принять (только получатель)
+POST   /api/v1/group-invitations/{id}/decline/  # Отклонить (только получатель)
+```
+
+### Уведомления
+```
+GET    /api/v1/notifications/          # Уведомления текущего пользователя
+GET    /api/v1/notifications/{id}/     # Детали уведомления
+POST   /api/v1/notifications/{id}/mark_read/   # Пометить прочитанным
+POST   /api/v1/notifications/mark_all_read/    # Пометить все прочитанными
+GET    /api/v1/notifications/unread_count/     # Счётчик непрочитанных
 ```
 
 ### Контент
@@ -331,7 +414,11 @@ GET    /api/v1/reviews/{id}/comments/  # Комментарии к отзыву
 - `/register/` — Регистрация
 - `/profile/` — Профиль пользователя
 - `/groups/` — Список групп
-- `/groups/{id}/` — Страница группы
+- `/groups/{id}/` — Страница группы (вкладки: Отзывы / Обсуждения / Участники)
+- `/groups/{id}/invite/` — Приглашение пользователя в группу (owner/admin)
+- `/groups/{id}/chat/` — Групповой чат (AJAX polling каждые 3 сек, только участники)
+- `/groups/{id}/content/{content_id}/` — Обсуждение объекта в группе (комментарии участников, «Взять себе»)
+- `/notifications/` — Уведомления (колокольчик в navbar со счётчиком непрочитанных)
 - `/content/` — Каталог контента (фильтры по категории и жанру, рейтинги)
 - `/content/{id}/` — Страница контента с отзывами (жанры, рейтинги Кинопоиска и пользователей)
 - `/content/my/` — Мои объекты (фильтры по категории, жанру, статусу; карточки с постером слева)
@@ -377,7 +464,7 @@ ALLOWED_HOSTS=wt.larimaritgroup.ru
 - **Google Books API** — для книг
 
 ### Будущие возможности
-- Уведомления (email, push)
+- Уведомления по email и push (внутренние уведомления реализованы)
 - Рекомендательная система
 - Импорт оценок из других сервисов
 - Мобильное приложение (React Native / Flutter)

@@ -43,6 +43,17 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
+                            <a class="nav-link position-relative" href="{% url 'notification_list' %}" title="Уведомления">
+                                <i class="bi bi-bell"></i>
+                                {% if unread_notifications_count %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ unread_notifications_count }}
+                                        <span class="visually-hidden">непрочитанных уведомлений</span>
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'profile' %}">
                                 <i class="bi bi-person-circle"></i> {{ user.username }}
                             </a>

@@ -23,6 +23,7 @@ urlpatterns = [
     path('groups/', include('apps.groups.urls')),
     path('content/', include('apps.content.urls')),
     path('reviews/', include('apps.reviews.urls')),
+    path('notifications/', include('apps.notifications.urls')),
 ]
 
 if settings.DEBUG:

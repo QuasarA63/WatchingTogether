@@ -2,6 +2,21 @@
 
 {% block title %}{{ title }} — Смотрим вместе{% endblock %}
 
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
+        <li class="breadcrumb-item"><a href="{% url 'content_list' %}">Каталог</a></li>
+        {% if content_item.parent %}
+            <li class="breadcrumb-item"><a href="{% url 'content_detail' content_item.parent.pk %}">{{ content_item.parent.title }}</a></li>
+        {% else %}
+            <li class="breadcrumb-item"><a href="{% url 'content_detail' content_item.pk %}">{{ content_item.title }}</a></li>
+        {% endif %}
+        <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-7">

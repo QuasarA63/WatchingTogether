@@ -2,6 +2,23 @@
 
 {% block title %}{% if review.title %}{{ review.title }}{% else %}Отзыв{% endif %} — Смотрим вместе{% endblock %}
 
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
+        {% if review.group %}
+            <li class="breadcrumb-item"><a href="{% url 'group_list' %}">Группы</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'group_detail' review.group.pk %}">{{ review.group.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'group_content_detail' review.group.pk review.content_item.pk %}">{{ review.content_item.title }}</a></li>
+        {% else %}
+            <li class="breadcrumb-item"><a href="{% url 'content_list' %}">Каталог</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'content_detail' review.content_item.pk %}">{{ review.content_item.title }}</a></li>
+        {% endif %}
+        <li class="breadcrumb-item active" aria-current="page">Отзыв</li>
+    </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">

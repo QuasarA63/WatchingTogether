@@ -3,6 +3,17 @@
 
 {% block title %}Чат — {{ group.name }} — Смотрим вместе{% endblock %}
 
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
+        <li class="breadcrumb-item"><a href="{% url 'group_list' %}">Группы</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'group_detail' group.pk %}">{{ group.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Чат</li>
+    </ol>
+</nav>
+{% endblock %}
+
 {% block extra_css %}
 <style>
     #chat-box {
@@ -24,13 +35,6 @@
 {% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'group_detail' group.pk %}">{{ group.name }}</a></li>
-        <li class="breadcrumb-item active">Чат</li>
-    </ol>
-</nav>
-
 <h2 class="mb-3"><i class="bi bi-chat-dots"></i> Чат группы «{{ group.name }}»</h2>
 
 <div class="row">

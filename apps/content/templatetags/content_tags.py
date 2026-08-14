@@ -9,3 +9,9 @@ def get_item(dictionary, key):
     if dictionary is None:
         return None
     return dictionary.get(key)
+
+
+@register.filter
+def times(number):
+    """Вернуть range от 1 до number включительно (для циклов в шаблоне)."""
+    return range(1, int(number) + 1)

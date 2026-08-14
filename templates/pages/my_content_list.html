@@ -106,7 +106,7 @@
                                             <!-- Личная оценка -->
                                             {% if entry.personal_rating %}
                                                 <span class="badge bg-success" title="Моя оценка">
-                                                    {% for i in "12345"|slice:entry.personal_rating %}<i class="bi bi-star-fill"></i>{% endfor %}
+                                                    <i class="bi bi-star-fill"></i> {{ entry.personal_rating|floatformat:1 }}
                                                 </span>
                                             {% endif %}
                                             {% if item.external_rating %}
@@ -142,11 +142,9 @@
                                             {% if seasons %}
                                                 <div class="mb-2 d-flex gap-3 flex-wrap">
                                                     {% for s in seasons %}
-                                                        <span class="small" title="Сезон {{ s.number }} — средняя оценка {{ s.avg }}/5">
+                                                        <span class="small" title="Сезон {{ s.number }} — средняя оценка {{ s.avg }}">
                                                             <span class="text-muted">С{{ s.number }}:</span>
-                                                            {% for i in "12345" %}
-                                                                <i class="bi bi-star{% if forloop.counter <= s.avg %}-fill{% endif %}" style="color: #ffc107;"></i>
-                                                            {% endfor %}
+                                                            <i class="bi bi-star-fill" style="color: #ffc107;"></i> {{ s.avg }}
                                                         </span>
                                                     {% endfor %}
                                                 </div>
@@ -195,13 +193,13 @@
                                             <!-- Выбор оценки (показывается при «Посмотрел») -->
                                             <div id="rating-{{ entry.pk }}" class="rating-stars {% if entry.status != 'completed' %}d-none{% endif %}">
                                                 <input type="hidden" name="personal_rating" id="rating-input-{{ entry.pk }}" value="{{ entry.personal_rating|default:'' }}">
-                                                {% for i in "12345" %}
+                                                {% for i in "12345678910" %}
                                                     <i class="bi bi-star{% if entry.personal_rating and forloop.counter <= entry.personal_rating %}-fill{% endif %} rating-star"
                                                        data-value="{{ forloop.counter }}"
                                                        onclick="setRating({{ entry.pk }}, {{ forloop.counter }})"
-                                                       style="cursor: pointer; font-size: 1.2rem; color: #ffc107;"></i>
+                                                       style="cursor: pointer; font-size: 1.1rem; color: #ffc107;"></i>
                                                 {% endfor %}
-                                                <button type="submit" class="btn btn-sm btn-success ms-2" title="Сохранить">
+                                                <button type="submit" class="btn btn-sm btn-success ms-1" title="Сохранить">
                                                     <i class="bi bi-check"></i>
                                                 </button>
                                             </div>

@@ -154,11 +154,11 @@ class ContentItem(TimeStampedModel):
 
     @property
     def average_rating(self):
-        """Средняя оценка по отзывам пользователей."""
+        """Средняя оценка по отзывам пользователей (целое, 1-10)."""
         reviews = self.reviews.all()
         if not reviews:
             return None
-        return round(sum(r.rating for r in reviews) / len(reviews), 1)
+        return round(sum(r.rating for r in reviews) / len(reviews))
 
     @property
     def is_season(self):
@@ -282,9 +282,9 @@ class UserContentItem(TimeStampedModel):
     personal_rating = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
-        choices=[(i, i) for i in range(1, 6)],
+        choices=[(i, i) for i in range(1, 11)],
         verbose_name='Личная оценка',
-        help_text='Оценка от 1 до 5 звёзд'
+        help_text='Оценка от 1 до 10'
     )
     comment = models.TextField(
         blank=True,

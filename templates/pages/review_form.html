@@ -29,7 +29,18 @@
                     {% csrf_token %}
                     {% for field in form %}
                         <div class="mb-3">
-                            {% if field.field.widget.input_type == 'checkbox' %}
+                            {% if field.name == 'rating' %}
+                                <label class="form-label d-block">{{ field.label }}</label>
+                                <input type="hidden" name="rating" id="rating-input" value="{{ field.value|default:'' }}">
+                                <span id="rating-stars">
+                                    {% for i in "12345678910" %}
+                                        <i class="bi bi-star{% if field.value and forloop.counter <= field.value %}-fill{% endif %} rating-star"
+                                           data-value="{{ forloop.counter }}"
+                                           onclick="setRating({{ forloop.counter }})"
+                                           style="cursor: pointer; font-size: 1.5rem; color: #ffc107;"></i>
+                                    {% endfor %}
+                                </span>
+                            {% elif field.field.widget.input_type == 'checkbox' %}
                                 <div class="form-check">
                                     {{ field }}
                                     <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -52,4 +63,21 @@
         </div>
     </div>
 </div>
+
+<script>
+// Установить оценку (звёзды)
+function setRating(value) {
+    document.getElementById('rating-input').value = value;
+    const stars = document.querySelectorAll('#rating-stars .rating-star');
+    stars.forEach((star, index) => {
+        if (index < value) {
+            star.classList.remove('bi-star');
+            star.classList.add('bi-star-fill');
+        } else {
+            star.classList.remove('bi-star-fill');
+            star.classList.add('bi-star');
+        }
+    });
+}
+</script>
 {% endblock %}

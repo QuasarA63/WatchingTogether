@@ -61,7 +61,7 @@
                     <span class="badge bg-secondary">{{ entry.get_status_display }}</span>
                     {% if entry.personal_rating %}
                         <span class="badge bg-warning text-dark ms-1">
-                            <i class="bi bi-star-fill"></i> {{ entry.personal_rating }}/5
+                            <i class="bi bi-star-fill"></i> {{ entry.personal_rating|floatformat:1 }}
                         </span>
                     {% endif %}
                     {% if entry.comment %}

@@ -43,6 +43,7 @@ class Review(TimeStampedModel):
         verbose_name='Заголовок отзыва'
     )
     text = models.TextField(
+        blank=True,
         verbose_name='Текст отзыва'
     )
     is_spoiler = models.BooleanField(

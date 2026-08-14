@@ -187,7 +187,7 @@ def my_content_list(request):
             if season.avg_rating is not None:
                 season_ratings.setdefault(season.parent_id, []).append({
                     'number': season.metadata.get('season_number'),
-                    'avg': round(season.avg_rating / 2, 1),  # 1-10 -> 1-5 звёзд
+                    'avg': round(season.avg_rating),  # 1-10, целое
                 })
 
     categories = Category.objects.all()
@@ -476,7 +476,7 @@ def my_content_edit_status(request, pk):
                 personal_rating = request.POST.get('personal_rating', '')
                 if personal_rating and personal_rating.isdigit():
                     rating = int(personal_rating)
-                    if 1 <= rating <= 5:
+                    if 1 <= rating <= 10:
                         entry.personal_rating = rating
             entry.save(update_fields=['status', 'personal_rating', 'updated_at'])
             messages.success(request, f'Статус изменён на «{entry.get_status_display()}».')

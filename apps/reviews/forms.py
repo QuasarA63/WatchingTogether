@@ -12,13 +12,13 @@ class ReviewForm(forms.ModelForm):
         labels = {
             'rating': 'Оценка (1-10)',
             'title': 'Заголовок отзыва',
-            'text': 'Текст отзыва',
+            'text': 'Текст отзыва (необязательно)',
             'is_spoiler': 'Содержит спойлеры',
         }
         widgets = {
             'rating': forms.Select(attrs={'class': 'form-select'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Заголовок (необязательно)'}),
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Ваш отзыв...'}),
+            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Ваш отзыв... (необязательно)'}),
             'is_spoiler': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 

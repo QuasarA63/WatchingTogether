@@ -64,13 +64,13 @@ def group_list(request):
 
 def group_detail(request, pk):
     """
-    Страница группы: отзывы, обсуждения объектов, участники.
+    Страница группы: обсуждения объектов и участники.
     """
     group = get_object_or_404(Group, pk=pk)
     membership = _get_membership(request.user, group)
     is_member = membership is not None
     can_invite = is_member and membership.role in ('owner', 'admin')
-    tab = request.GET.get('tab', 'reviews')
+    tab = request.GET.get('tab', 'discussions')
 
     context = {
         'group': group,
@@ -80,8 +80,19 @@ def group_detail(request, pk):
         'members_count': group.members.count(),
     }
 
-    if tab == 'discussions':
+    if tab == 'members':
+        memberships = (
+            GroupMembership.objects
+            .filter(group=group)
+            .select_related('user')
+            .order_by('joined_at')
+        )
+        paginator = Paginator(memberships, 20)
+        context['memberships_page'] = paginator.get_page(request.GET.get('page'))
+    else:
         # Объекты, которые участники группы добавили себе, с количеством комментариев
+        tab = 'discussions'
+        context['tab'] = tab
         discussions = (
             UserContentItem.objects
             .filter(user__member_groups=group)
@@ -102,19 +113,6 @@ def group_detail(request, pk):
         ]
         paginator = Paginator(discussion_list, 10)
         context['discussions_page'] = paginator.get_page(request.GET.get('page'))
-    elif tab == 'members':
-        memberships = (
-            GroupMembership.objects
-            .filter(group=group)
-            .select_related('user')
-            .order_by('joined_at')
-        )
-        paginator = Paginator(memberships, 20)
-        context['memberships_page'] = paginator.get_page(request.GET.get('page'))
-    else:
-        reviews = group.reviews.select_related('user', 'content_item').order_by('-created_at')
-        paginator = Paginator(reviews, 10)
-        context['reviews_page'] = paginator.get_page(request.GET.get('page'))
 
     return render(request, 'pages/group_detail.html', context)
 

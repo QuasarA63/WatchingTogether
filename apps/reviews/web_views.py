@@ -41,7 +41,7 @@ def review_create(request, content_pk):
         return redirect('review_detail', pk=existing.pk)
 
     if request.method == 'POST':
-        form = ReviewForm(request.POST, user=request.user)
+        form = ReviewForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
             review.user = request.user
@@ -50,7 +50,7 @@ def review_create(request, content_pk):
             messages.success(request, 'Отзыв опубликован!')
             return redirect('content_detail', pk=content_item.pk)
     else:
-        form = ReviewForm(user=request.user)
+        form = ReviewForm()
 
     context = {
         'form': form,
@@ -68,13 +68,13 @@ def review_edit(request, pk):
     review = get_object_or_404(Review, pk=pk, user=request.user)
 
     if request.method == 'POST':
-        form = ReviewForm(request.POST, instance=review, user=request.user)
+        form = ReviewForm(request.POST, instance=review)
         if form.is_valid():
             form.save()
             messages.success(request, 'Отзыв обновлён!')
             return redirect('review_detail', pk=review.pk)
     else:
-        form = ReviewForm(instance=review, user=request.user)
+        form = ReviewForm(instance=review)
 
     context = {
         'form': form,

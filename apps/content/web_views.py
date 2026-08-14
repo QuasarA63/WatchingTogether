@@ -170,6 +170,26 @@ def my_content_list(request):
     page_number = request.GET.get('page')
     entries_page = paginator.get_page(page_number)
 
+    # Средние оценки по сезонам для объектов со статусом «Смотрю»/«Отложил»
+    season_ratings = {}
+    status_items = [
+        e.content_item for e in entries_page
+        if e.status in (UserContentItem.Status.WATCHING, UserContentItem.Status.ON_HOLD)
+    ]
+    if status_items:
+        seasons_qs = ContentItem.objects.filter(
+            parent__in=status_items,
+            is_active=True,
+        ).annotate(
+            avg_rating=Avg('reviews__rating'),
+        ).order_by('metadata__season_number')
+        for season in seasons_qs:
+            if season.avg_rating is not None:
+                season_ratings.setdefault(season.parent_id, []).append({
+                    'number': season.metadata.get('season_number'),
+                    'avg': round(season.avg_rating / 2, 1),  # 1-10 -> 1-5 звёзд
+                })
+
     categories = Category.objects.all()
     genres = Genre.objects.all()
     status_choices = UserContentItem.Status.choices
@@ -183,6 +203,7 @@ def my_content_list(request):
         'current_genre': genre_slug,
         'current_status': status_filter,
         'search_configured': services.is_configured(),
+        'season_ratings': season_ratings,
     }
     return render(request, 'pages/my_content_list.html', context)
 

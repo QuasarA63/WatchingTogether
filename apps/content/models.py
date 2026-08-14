@@ -25,11 +25,16 @@ class Category(TimeStampedModel):
         verbose_name='Иконка',
         help_text='CSS класс иконки (например, bi-film)'
     )
+    sort = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Порядок сортировки',
+        help_text='Чем меньше число, тем выше категория в списках'
+    )
 
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-        ordering = ['name']
+        ordering = ['sort', 'name']
 
     def __str__(self):
         return self.name

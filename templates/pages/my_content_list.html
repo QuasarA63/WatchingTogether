@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load content_tags %}
 
 {% block title %}Мои объекты — Смотрим вместе{% endblock %}
 
@@ -133,6 +134,24 @@
                                                 <span class="badge bg-secondary">{{ genre.name }}</span>
                                             {% endfor %}
                                         </p>
+                                    {% endif %}
+
+                                    <!-- Средние оценки по сезонам (для «Смотрю»/«Отложил») -->
+                                    {% if entry.status == 'watching' or entry.status == 'on_hold' %}
+                                        {% with seasons=season_ratings|get_item:item.pk %}
+                                            {% if seasons %}
+                                                <div class="mb-2 d-flex gap-3 flex-wrap">
+                                                    {% for s in seasons %}
+                                                        <span class="small" title="Сезон {{ s.number }} — средняя оценка {{ s.avg }}/5">
+                                                            <span class="text-muted">С{{ s.number }}:</span>
+                                                            {% for i in "12345" %}
+                                                                <i class="bi bi-star{% if forloop.counter <= s.avg %}-fill{% endif %}" style="color: #ffc107;"></i>
+                                                            {% endfor %}
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
                                     {% endif %}
 
                                     <!-- Описание (раскрывающееся) -->

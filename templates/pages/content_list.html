@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-<h2 class="mb-4"><i class="bi bi-collection-play"></i> Каталог контента</h2>
+<h2 class="mb-4"><i class="bi bi-collection-play"></i> Каталог</h2>
 
 <!-- Фильтры -->
 <div class="row mb-4">
@@ -45,7 +45,20 @@
         {% for item in items_page %}
             <div class="col">
                 <div class="card h-100">
-                    <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-auto">
+                            {% if item.metadata.poster_url %}
+                                <img src="{{ item.metadata.poster_url }}" alt="{{ item.title }}"
+                                     class="rounded m-2" style="width: 70px; height: 105px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center rounded m-2"
+                                     style="width: 70px; height: 105px;">
+                                    <i class="bi bi-film fs-3 text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            <div class="card-body">
                         <h6 class="card-title">
                             <a href="{% url 'content_detail' item.pk %}" class="text-decoration-none">
                                 {{ item.title }}
@@ -80,6 +93,8 @@
                             {% if not item.external_rating and not item.avg_rating %}
                                 <small class="text-muted">Нет оценок</small>
                             {% endif %}
+                        </div>
+                            </div>
                         </div>
                     </div>
                 </div>

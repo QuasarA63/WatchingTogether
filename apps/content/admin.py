@@ -27,17 +27,17 @@ class ContentItemPersonInline(admin.TabularInline):
 
 @admin.register(ContentItem)
 class ContentItemAdmin(admin.ModelAdmin):
-    list_display = ['title', 'category', 'year', 'external_rating', 'external_id', 'is_active', 'created_at']
+    list_display = ['title', 'parent', 'category', 'year', 'external_rating', 'external_id', 'is_active', 'created_at']
     list_filter = ['category', 'genres', 'is_active', 'year', 'created_at']
     search_fields = ['title', 'original_title', 'description', 'external_id']
-    raw_id_fields = ['category']
+    raw_id_fields = ['category', 'parent']
     filter_horizontal = ['genres']
     inlines = [ContentItemPersonInline]
     ordering = ['-created_at']
 
     fieldsets = (
         ('Основная информация', {
-            'fields': ('category', 'title', 'original_title', 'description', 'year', 'genres')
+            'fields': ('parent', 'category', 'title', 'original_title', 'description', 'year', 'genres')
         }),
         ('Медиа', {
             'fields': ('poster',)

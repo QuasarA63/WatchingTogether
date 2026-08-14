@@ -18,7 +18,10 @@ def home(request):
         'user', 'content_item', 'group'
     ).order_by('-created_at')[:10]
 
-    popular_content = ContentItem.objects.prefetch_related(
+    popular_content = ContentItem.objects.filter(
+        is_active=True,
+        parent__isnull=True,
+    ).prefetch_related(
         'reviews'
     ).order_by('-created_at')[:8]
 

@@ -64,7 +64,14 @@ class ContentItemViewSet(viewsets.ModelViewSet):
         genre = self.request.query_params.get('genre')
         if genre:
             queryset = queryset.filter(genres__slug=genre)
-        return queryset.select_related('category').prefetch_related('genres').distinct()
+        parent = self.request.query_params.get('parent')
+        if parent:
+            queryset = queryset.filter(parent_id=parent)
+        # Фильтр: только родительские объекты (без parent)
+        top_level = self.request.query_params.get('top_level')
+        if top_level and top_level.lower() in ('1', 'true'):
+            queryset = queryset.filter(parent__isnull=True)
+        return queryset.select_related('category', 'parent').prefetch_related('genres').distinct()
 
     @action(detail=True, methods=['get'])
     def reviews(self, request, pk=None):
@@ -77,6 +84,18 @@ class ContentItemViewSet(viewsets.ModelViewSet):
             serializer = ReviewSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def children(self, request, pk=None):
+        """Дочерние объекты (например, сезоны сериала)."""
+        content_item = self.get_object()
+        children = content_item.children.filter(is_active=True).order_by('metadata__season_number')
+        page = self.paginate_queryset(children)
+        if page is not None:
+            serializer = ContentItemSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = ContentItemSerializer(children, many=True)
         return Response(serializer.data)
 
 
@@ -95,6 +114,7 @@ class UserContentItemViewSet(viewsets.ModelViewSet):
         queryset = UserContentItem.objects.filter(
             user=self.request.user,
             content_item__is_active=True,
+            content_item__parent__isnull=True,
         ).select_related('content_item', 'content_item__category').prefetch_related(
             'content_item__genres'
         )

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load content_tags %}
 
 {% block title %}{{ item.title }} — Смотрим вместе{% endblock %}
 
@@ -60,6 +61,56 @@
 
         {% if item.description %}
             <p>{{ item.description }}</p>
+        {% endif %}
+
+        <!-- Ссылка на родительский объект (если это сезон) -->
+        {% if item.parent %}
+            <div class="alert alert-secondary">
+                <i class="bi bi-arrow-up"></i>
+                Сезон сериала <a href="{% url 'content_detail' item.parent.pk %}">{{ item.parent.title }}</a>
+            </div>
+        {% endif %}
+
+        <!-- Сезоны сериала -->
+        {% if seasons %}
+            <div class="mb-4">
+                <h4 class="mb-3"><i class="bi bi-collection-play"></i> Сезоны</h4>
+                {% for season in seasons %}
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-bold">{{ season.metadata.season_number }}. {{ season.title }}</span>
+                                    {% if season.metadata.episodes_count %}
+                                        <small class="text-muted ms-2">{{ season.metadata.episodes_count }} эпизод{{ season.metadata.episodes_count|pluralize:"ов,а,ов" }}</small>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if season.avg_rating %}
+                                        <span class="badge bg-primary">
+                                            <i class="bi bi-star-fill"></i> {{ season.avg_rating|floatformat:1 }}
+                                        </span>
+                                        <small class="text-muted">({{ season.reviews_count }})</small>
+                                    {% endif %}
+                                    {% if user.is_authenticated %}
+                                        {% with review_obj=user_season_reviews|get_item:season.pk %}
+                                            {% if review_obj %}
+                                                <a href="{% url 'review_detail' review_obj.pk %}" class="btn btn-sm btn-outline-success" title="Ваш отзыв">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'review_create' season.pk %}" class="btn btn-sm btn-outline-primary" title="Написать отзыв">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
 
         {% if user.is_authenticated %}

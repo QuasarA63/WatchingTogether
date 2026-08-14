@@ -60,8 +60,20 @@ class Genre(TimeStampedModel):
 
 class ContentItem(TimeStampedModel):
     """
-    Элемент контента (фильм, сериал, альбом и т.д.).
+    Элемент контента (фильм, сериал, альбом, сезон и т.д.).
+
+    Поддерживает вложенность через self-FK parent:
+    например, сезон сериала ссылается на родительский сериал.
     """
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='children',
+        verbose_name='Родительский объект',
+        help_text='Например, сериал для сезона'
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
@@ -142,6 +154,18 @@ class ContentItem(TimeStampedModel):
         if not reviews:
             return None
         return round(sum(r.rating for r in reviews) / len(reviews), 1)
+
+    @property
+    def is_season(self):
+        """Является ли объект сезоном (дочерним объектом сериала)."""
+        return self.parent_id is not None
+
+    @property
+    def season_number(self):
+        """Номер сезона из метаданных (если это сезон)."""
+        if self.is_season:
+            return self.metadata.get('season_number')
+        return None
 
 
 class Person(TimeStampedModel):

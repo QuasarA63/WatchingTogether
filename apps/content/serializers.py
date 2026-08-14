@@ -71,19 +71,27 @@ class ContentItemSerializer(serializers.ModelSerializer):
     )
     persons = ContentItemPersonSerializer(many=True, read_only=True)
     reviews_count = serializers.SerializerMethodField()
+    parent_title = serializers.CharField(source='parent.title', read_only=True, default=None)
+    children_count = serializers.SerializerMethodField()
+    is_season = serializers.BooleanField(read_only=True)
+    season_number = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = ContentItem
         fields = [
-            'id', 'category', 'category_name', 'title', 'original_title',
+            'id', 'parent', 'parent_title', 'category', 'category_name', 'title', 'original_title',
             'description', 'year', 'poster', 'external_id', 'metadata',
             'external_rating', 'genres', 'genre_ids', 'persons',
-            'reviews_count', 'average_rating', 'created_at', 'updated_at'
+            'reviews_count', 'average_rating', 'children_count',
+            'is_season', 'season_number', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_reviews_count(self, obj):
         return obj.reviews.count()
+
+    def get_children_count(self, obj):
+        return obj.children.filter(is_active=True).count()
 
 
 class ContentItemCreateSerializer(serializers.ModelSerializer):

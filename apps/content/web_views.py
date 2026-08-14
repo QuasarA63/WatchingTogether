@@ -35,8 +35,12 @@ def make_slug(name):
 def content_list(request):
     """
     Каталог контента с фильтрами по категории, жанру и поиском.
+    Показывает только родительские объекты (без вложенных сезонов).
     """
-    items = ContentItem.objects.filter(is_active=True).select_related('category').prefetch_related(
+    items = ContentItem.objects.filter(
+        is_active=True,
+        parent__isnull=True,
+    ).select_related('category').prefetch_related(
         'genres'
     ).annotate(
         avg_rating=Avg('reviews__rating'),
@@ -77,9 +81,10 @@ def content_list(request):
 def content_detail(request, pk):
     """
     Страница контента с отзывами.
+    Для сериалов показывает список сезонов с отзывами на каждый.
     """
     item = get_object_or_404(
-        ContentItem.objects.select_related('category').prefetch_related(
+        ContentItem.objects.select_related('category', 'parent').prefetch_related(
             'genres', 'persons__person'
         ).annotate(
             avg_rating=Avg('reviews__rating'),
@@ -105,11 +110,30 @@ def content_detail(request, pk):
             persons_by_role[role_display] = []
         persons_by_role[role_display].append(cp.person.name)
 
+    # Сезоны (дочерние объекты) с аннотацией рейтингов
+    seasons = item.children.filter(is_active=True).annotate(
+        avg_rating=Avg('reviews__rating'),
+        reviews_count=Count('reviews'),
+    ).order_by('metadata__season_number')
+
+    # Отзывы пользователя на сезоны (если авторизован)
+    user_season_reviews = {}
+    if request.user.is_authenticated and seasons:
+        from apps.reviews.models import Review
+        season_ids = [s.id for s in seasons]
+        user_reviews_qs = Review.objects.filter(
+            user=request.user,
+            content_item_id__in=season_ids,
+        )
+        user_season_reviews = {r.content_item_id: r for r in user_reviews_qs}
+
     context = {
         'item': item,
         'reviews_page': reviews_page,
         'user_review': user_review,
         'persons_by_role': persons_by_role,
+        'seasons': seasons,
+        'user_season_reviews': user_season_reviews,
     }
     return render(request, 'pages/content_detail.html', context)
 
@@ -123,6 +147,7 @@ def my_content_list(request):
     entries = UserContentItem.objects.filter(
         user=request.user,
         content_item__is_active=True,
+        content_item__parent__isnull=True,
     ).select_related('content_item', 'content_item__category').prefetch_related(
         'content_item__genres'
     )
@@ -257,6 +282,51 @@ def _get_or_create_persons(persons_data):
     return results
 
 
+def _import_seasons(series_item, external_id):
+    """
+    Импортировать сезоны сериала с Кинопоиска.
+
+    Создаёт дочерние ContentItem для каждого сезона.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    try:
+        seasons = services.get_seasons(external_id)
+    except services.KinopoiskError as exc:
+        logger.warning('Не удалось получить сезоны для %s: %s', external_id, exc)
+        return
+
+    for season_data in seasons:
+        season_num = season_data['number']
+        season_title = f'{series_item.title}. {season_data["name"]}'
+
+        # Проверяем, не создан ли уже этот сезон
+        existing = series_item.children.filter(
+            metadata__season_number=season_num,
+        ).first()
+        if existing:
+            continue
+
+        ContentItem.objects.create(
+            parent=series_item,
+            category=series_item.category,
+            title=season_title,
+            original_title=season_data.get('en_name', ''),
+            description='',
+            year=series_item.year,
+            external_id=f'{external_id}_s{season_num}',
+            metadata={
+                'source': 'kinopoisk',
+                'media_type': 'season',
+                'season_number': season_num,
+                'episodes_count': season_data['episodes_count'],
+                'episodes': season_data['episodes'],
+            },
+        )
+        logger.info('Создан сезон %s для «%s»', season_num, series_item.title)
+
+
 @login_required
 def my_content_add(request):
     """
@@ -325,10 +395,18 @@ def my_content_add(request):
         for p in persons_data:
             p['_content_item'] = content_item
         _get_or_create_persons(persons_data)
+
+        # Для сериалов — подтягиваем сезоны с Кинопоиска
+        if media_type == 'tv':
+            _import_seasons(content_item, external_id)
     elif not content_item.is_active:
         # Восстанавливаем ранее удалённый объект
         content_item.is_active = True
         content_item.save(update_fields=['is_active', 'updated_at'])
+
+        # Если у сериала ещё нет сезонов — подтягиваем
+        if media_type == 'tv' and not content_item.children.exists():
+            _import_seasons(content_item, external_id)
 
     entry, created = UserContentItem.objects.get_or_create(
         user=request.user,

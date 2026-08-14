@@ -200,3 +200,36 @@ def get_details(external_id, media_type=None):
         'tagline': '',
         'persons': persons,
     }
+
+
+def get_seasons(external_id):
+    """
+    Получить список сезонов сериала с Кинопоиска.
+
+    Возвращает список словарей:
+    [{number, name, en_name, episodes_count, episodes: [...]}, ...]
+    """
+    data = _get('/v1.4/season', {'movieId': external_id, 'limit': 50})
+
+    seasons = []
+    for doc in data.get('docs', []):
+        episodes = []
+        for ep in doc.get('episodes', []) or []:
+            episodes.append({
+                'number': ep.get('number'),
+                'name': ep.get('name') or ep.get('enName') or '',
+                'description': ep.get('description') or ep.get('enDescription') or '',
+                'air_date': ep.get('airDate', ''),
+                'duration': ep.get('duration'),
+            })
+
+        seasons.append({
+            'number': doc.get('number') or len(seasons) + 1,
+            'name': doc.get('name') or f'Сезон {doc.get("number", len(seasons) + 1)}',
+            'en_name': doc.get('enName') or '',
+            'episodes_count': doc.get('episodesCount') or len(episodes),
+            'episodes': episodes,
+        })
+
+    seasons.sort(key=lambda s: s['number'])
+    return seasons

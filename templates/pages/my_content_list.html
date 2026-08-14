@@ -150,6 +150,19 @@
                                                 </div>
                                             {% endif %}
                                         {% endwith %}
+                                        <!-- Дата выхода последней/ближайшей серии -->
+                                        {% with last_ep=latest_episodes|get_item:item.pk %}
+                                            {% if last_ep %}
+                                                <div class="mb-2">
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-calendar3"></i>
+                                                        С{{ last_ep.season }}E{{ last_ep.episode }}
+                                                        {% if last_ep.name %}«{{ last_ep.name }}»{% endif %}
+                                                        — {{ last_ep.air_date|date:"d.m.Y" }}
+                                                    </small>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
                                     {% endif %}
 
                                     <!-- Описание (раскрывающееся) -->

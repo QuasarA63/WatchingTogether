@@ -4,8 +4,19 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count
 from django.utils.text import slugify
+from datetime import date
 from .models import Category, Genre, ContentItem, UserContentItem, Person, ContentItemPerson
 from . import services
+
+
+def _parse_air_date(date_str):
+    """Парсинг даты выхода из ISO-строки в объект date."""
+    if not date_str:
+        return None
+    try:
+        return date.fromisoformat(date_str[:10])
+    except (ValueError, TypeError):
+        return None
 
 
 # Транслитерация кириллицы для slug
@@ -116,6 +127,28 @@ def content_detail(request, pk):
         reviews_count=Count('reviews'),
     ).order_by('metadata__season_number')
 
+    # Даты выхода сезонов (из метаданных эпизодов)
+    season_air_dates = {}
+    today = date.today()
+    for season in seasons:
+        episodes = season.metadata.get('episodes', [])
+        dates = []
+        total_episodes = len(episodes)
+        for ep in episodes:
+            d = _parse_air_date(ep.get('air_date'))
+            if d:
+                dates.append(d)
+        if dates:
+            # Сезон незавершён, если:
+            # 1. Не у всех эпизодов есть даты, ИЛИ
+            # 2. Дата последнего эпизода в будущем
+            is_ongoing = len(dates) < total_episodes or max(dates) > today
+            season_air_dates[season.pk] = {
+                'first': min(dates),
+                'last': max(dates),
+                'is_ongoing': is_ongoing,
+            }
+
     # Отзывы пользователя на сезоны (если авторизован)
     user_season_reviews = {}
     if request.user.is_authenticated and seasons:
@@ -127,6 +160,18 @@ def content_detail(request, pk):
         )
         user_season_reviews = {r.content_item_id: r for r in user_reviews_qs}
 
+    # Эпизоды с датами (если это сезон)
+    episodes_with_dates = []
+    if item.is_season:
+        for ep in item.metadata.get('episodes', []):
+            episodes_with_dates.append({
+                'number': ep.get('number'),
+                'name': ep.get('name', ''),
+                'air_date': _parse_air_date(ep.get('air_date')),
+                'description': ep.get('description', ''),
+            })
+        episodes_with_dates.sort(key=lambda e: e['number'] or 0)
+
     context = {
         'item': item,
         'reviews_page': reviews_page,
@@ -134,6 +179,8 @@ def content_detail(request, pk):
         'persons_by_role': persons_by_role,
         'seasons': seasons,
         'user_season_reviews': user_season_reviews,
+        'season_air_dates': season_air_dates,
+        'episodes_with_dates': episodes_with_dates,
     }
     return render(request, 'pages/content_detail.html', context)
 
@@ -172,6 +219,8 @@ def my_content_list(request):
 
     # Средние оценки по сезонам для объектов со статусом «Смотрю»/«Отложил»
     season_ratings = {}
+    # Даты выхода серий для объектов со статусом «Смотрю»/«Отложил»
+    episode_dates = {}
     status_items = [
         e.content_item for e in entries_page
         if e.status in (UserContentItem.Status.WATCHING, UserContentItem.Status.ON_HOLD)
@@ -190,6 +239,37 @@ def my_content_list(request):
                     'avg': round(season.avg_rating),  # 1-10, целое
                 })
 
+            # Собираем даты выхода эпизодов
+            episodes = season.metadata.get('episodes', [])
+            dates = []
+            for ep in episodes:
+                d = _parse_air_date(ep.get('air_date'))
+                if d:
+                    dates.append({
+                        'season': season.metadata.get('season_number'),
+                        'episode': ep.get('number'),
+                        'name': ep.get('name', ''),
+                        'air_date': d,
+                    })
+            if dates:
+                episode_dates.setdefault(season.parent_id, []).extend(dates)
+
+    # Для каждого сериала найдём последнюю вышедшую серию
+    today = date.today()
+    latest_episodes = {}
+    for parent_id, eps in episode_dates.items():
+        # Сортируем по дате (от новых к старым)
+        eps.sort(key=lambda e: e['air_date'], reverse=True)
+        # Берём последнюю вышедшую (дата <= сегодня)
+        for ep in eps:
+            if ep['air_date'] <= today:
+                latest_episodes[parent_id] = ep
+                break
+        # Если все даты в будущем — берём ближайшую
+        if parent_id not in latest_episodes and eps:
+            eps.sort(key=lambda e: e['air_date'])
+            latest_episodes[parent_id] = eps[0]
+
     categories = Category.objects.all()
     genres = Genre.objects.all()
     status_choices = UserContentItem.Status.choices
@@ -204,6 +284,7 @@ def my_content_list(request):
         'current_status': status_filter,
         'search_configured': services.is_configured(),
         'season_ratings': season_ratings,
+        'latest_episodes': latest_episodes,
     }
     return render(request, 'pages/my_content_list.html', context)
 

@@ -93,10 +93,24 @@
                         <div class="card-body py-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="fw-bold">{{ season.metadata.season_number }}. {{ season.title }}</span>
+                                    <a href="{% url 'content_detail' season.pk %}" class="text-decoration-none fw-bold">
+                                        {{ season.metadata.season_number }}. {{ season.title }}
+                                    </a>
                                     {% if season.metadata.episodes_count %}
                                         <small class="text-muted ms-2">{{ season.metadata.episodes_count }} эпизод{{ season.metadata.episodes_count|pluralize:"ов,а,ов" }}</small>
                                     {% endif %}
+                                    {% with dates=season_air_dates|get_item:season.pk %}
+                                        {% if dates %}
+                                            <small class="text-muted ms-2">
+                                                <i class="bi bi-calendar3"></i>
+                                                {% if dates.is_ongoing %}
+                                                    <em>{{ dates.first|date:"d.m.Y" }} — ...</em>
+                                                {% else %}
+                                                    {{ dates.first|date:"d.m.Y" }} — {{ dates.last|date:"d.m.Y" }}
+                                                {% endif %}
+                                            </small>
+                                        {% endif %}
+                                    {% endwith %}
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
                                     {% if season.avg_rating %}
@@ -123,6 +137,44 @@
                         </div>
                     </div>
                 {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Эпизоды сезона с датами выхода -->
+        {% if episodes_with_dates %}
+            <div class="mb-4">
+                <h4 class="mb-3"><i class="bi bi-list-ol"></i> Эпизоды</h4>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">№</th>
+                                <th>Название</th>
+                                <th style="width: 120px;">Дата выхода</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ep in episodes_with_dates %}
+                                <tr>
+                                    <td>{{ ep.number }}</td>
+                                    <td>
+                                        {{ ep.name|default:"—" }}
+                                        {% if ep.description %}
+                                            <br><small class="text-muted">{{ ep.description|truncatewords:20 }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if ep.air_date %}
+                                            <i class="bi bi-calendar3"></i> {{ ep.air_date|date:"d.m.Y" }}
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         {% endif %}
 

@@ -3,12 +3,15 @@
 Деплой на beget.ru через git pull
 """
 import paramiko
+from decouple import Config, RepositoryEnv
 
-SSH_HOST = 'lancelot.beget.com'
-SSH_PORT = 22
-SSH_USER = 'larimagu'
-SSH_PASSWORD = 'CucumbeR!!!000'
-REMOTE_PATH = '/home/l/larimagu/wt.larimaritgroup.ru/public_html'
+config = Config(RepositoryEnv('.env.production'))
+
+SSH_HOST = config('SSH_HOST')
+SSH_PORT = config('SSH_PORT', default=22, cast=int)
+SSH_USER = config('SSH_USER')
+SSH_PASSWORD = config('SSH_PASSWORD')
+REMOTE_PATH = config('REMOTE_PATH')
 
 def exec_cmd(ssh, cmd):
     print(f"\n>>> {cmd}")

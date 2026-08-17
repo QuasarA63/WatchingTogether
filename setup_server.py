@@ -3,13 +3,16 @@
 Настройка окружения на сервере beget.ru
 """
 import paramiko
+from decouple import Config, RepositoryEnv
 
-SSH_HOST = 'lancelot.beget.com'
-SSH_PORT = 22
-SSH_USER = 'larimagu'
-SSH_PASSWORD = 'CucumbeR!!!000'
-DOCKER_PORT = 222
-REMOTE_PATH = '/home/l/larimagu/wt.larimaritgroup.ru/public_html'
+config = Config(RepositoryEnv('.env.production'))
+
+SSH_HOST = config('SSH_HOST')
+SSH_PORT = config('SSH_PORT', default=22, cast=int)
+SSH_USER = config('SSH_USER')
+SSH_PASSWORD = config('SSH_PASSWORD')
+DOCKER_PORT = config('DOCKER_PORT', default=222, cast=int)
+REMOTE_PATH = config('REMOTE_PATH')
 
 def exec_cmd(ssh, cmd, show_output=True):
     """Выполняет команду и возвращает результат"""
@@ -44,16 +47,16 @@ def main():
     
     # Создаём .env для production
     print("\n=== Creating .env ===")
-    env_content = '''DEBUG=False
+    env_content = f'''DEBUG=False
 SECRET_KEY=django-insecure-wt-production-key-change-me-later
 ALLOWED_HOSTS=wt.larimaritgroup.ru
 
-DB_ENGINE=mysql
-DB_NAME=larimagu_wt
-DB_USER=larimagu
-DB_PASSWORD=CaimbA___000
-DB_HOST=localhost
-DB_PORT=3306
+DB_ENGINE={config('DB_ENGINE', default='mysql')}
+DB_NAME={config('DB_NAME')}
+DB_USER={config('DB_USER')}
+DB_PASSWORD={config('DB_PASSWORD')}
+DB_HOST={config('DB_HOST', default='localhost')}
+DB_PORT={config('DB_PORT', default='3306')}
 
 JWT_ACCESS_TOKEN_LIFETIME=3600
 JWT_REFRESH_TOKEN_LIFETIME=86400

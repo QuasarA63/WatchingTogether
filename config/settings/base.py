@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.notifications.context_processors.notifications_context',
+                'apps.core.context_processors.turnstile_context',
             ],
         },
     },
@@ -207,3 +208,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Cloudflare Turnstile (bot protection)
+# https://developers.cloudflare.com/turnstile/
+TURNSTILE_SITE_KEY = config('TURNSTILE_SITE_KEY', default='')
+TURNSTILE_SECRET_KEY = config('TURNSTILE_SECRET_KEY', default='')
+TURNSTILE_ENABLED = bool(TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY)

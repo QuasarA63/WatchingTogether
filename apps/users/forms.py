@@ -1,11 +1,36 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.conf import settings
 from .models import User
+from apps.core.turnstile import verify_turnstile
 
 
-class RegisterForm(UserCreationForm):
+class TurnstileMixin:
+    """
+    Миксин для добавления проверки Cloudflare Turnstile в форму.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['turnstile_token'] = forms.CharField(
+            required=False,
+            widget=forms.HiddenInput(),
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if settings.TURNSTILE_ENABLED:
+            token = cleaned_data.get('turnstile_token', '')
+            if not verify_turnstile(token):
+                raise ValidationError(
+                    'Проверка защиты от ботов не пройдена. Попробуйте ещё раз.'
+                )
+        return cleaned_data
+
+
+class RegisterForm(TurnstileMixin, UserCreationForm):
     """
     Форма регистрации нового пользователя.
     """
@@ -45,6 +70,23 @@ class RegisterForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class LoginForm(TurnstileMixin, AuthenticationForm):
+    """
+    Форма входа с защитой от ботов.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Имя пользователя'
+        })
+        self.fields['password'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Пароль'
+        })
 
 
 class ProfileForm(forms.ModelForm):

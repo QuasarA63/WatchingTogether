@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
+from django.conf import settings
 from .models import User
+from apps.core.turnstile import verify_turnstile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -86,19 +88,31 @@ class RegisterSerializer(serializers.ModelSerializer):
         style={'input_type': 'password'},
         label='Подтверждение пароля'
     )
+    turnstile_token = serializers.CharField(
+        write_only=True,
+        required=False,
+        label='Turnstile токен'
+    )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'password_confirm']
+        fields = ['username', 'email', 'password', 'password_confirm', 'turnstile_token']
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password_confirm']:
             raise serializers.ValidationError({
                 'password_confirm': 'Пароли не совпадают.'
             })
+        if settings.TURNSTILE_ENABLED:
+            token = attrs.get('turnstile_token', '')
+            if not verify_turnstile(token):
+                raise serializers.ValidationError({
+                    'turnstile_token': 'Проверка защиты от ботов не пройдена.'
+                })
         return attrs
 
     def create(self, validated_data):
         validated_data.pop('password_confirm')
+        validated_data.pop('turnstile_token', None)
         user = User.objects.create_user(**validated_data)
         return user

@@ -3,8 +3,27 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.conf import settings
 from .models import User
 from .serializers import UserSerializer, UserUpdateSerializer, RegisterSerializer, AccountUpdateSerializer
+from apps.core.turnstile import verify_turnstile
+
+
+class TurnstileTokenObtainPairView(TokenObtainPairView):
+    """
+    Получение JWT-токенов с проверкой Cloudflare Turnstile.
+    """
+
+    def post(self, request, *args, **kwargs):
+        if settings.TURNSTILE_ENABLED:
+            token = request.data.get('turnstile_token', '')
+            if not verify_turnstile(token):
+                return Response(
+                    {'detail': 'Проверка защиты от ботов не пройдена.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        return super().post(request, *args, **kwargs)
 
 
 class RegisterView(generics.CreateAPIView):

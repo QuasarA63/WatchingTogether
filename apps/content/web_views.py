@@ -19,6 +19,54 @@ def _parse_air_date(date_str):
         return None
 
 
+def _collect_episodes(seasons):
+    """
+    Собрать эпизоды со всех сезонов в плоский список.
+
+    Возвращает список словарей:
+    [{season, episode, name, air_date}, ...]
+    Только эпизоды с известной датой выхода.
+    """
+    episodes = []
+    for season in seasons:
+        season_num = season.metadata.get('season_number')
+        for ep in season.metadata.get('episodes', []) or []:
+            air_date = _parse_air_date(ep.get('air_date'))
+            if not air_date:
+                continue
+            episodes.append({
+                'season': season_num,
+                'episode': ep.get('number'),
+                'name': ep.get('name', ''),
+                'air_date': air_date,
+            })
+    return episodes
+
+
+def _find_next_episode(seasons, today=None):
+    """
+    Ближайшая ещё не вышедшая серия (дата выхода в будущем).
+
+    Возвращает словарь {season, episode, name, air_date}
+    или None, если анонсированных серий нет.
+    """
+    today = today or date.today()
+    upcoming = [e for e in _collect_episodes(seasons) if e['air_date'] > today]
+    if not upcoming:
+        return None
+    return min(upcoming, key=lambda e: e['air_date'])
+
+
+def _plural_days(n):
+    """Русское склонение слова «день» по числу n."""
+    n = int(n)
+    if n % 10 == 1 and n % 100 != 11:
+        return 'день'
+    if 2 <= n % 10 <= 4 and (n % 100 < 10 or n % 100 >= 20):
+        return 'дня'
+    return 'дней'
+
+
 # Транслитерация кириллицы для slug
 TRANSLIT_MAP = {
     'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
@@ -164,13 +212,24 @@ def content_detail(request, pk):
     episodes_with_dates = []
     if item.is_season:
         for ep in item.metadata.get('episodes', []):
+            air_date = _parse_air_date(ep.get('air_date'))
             episodes_with_dates.append({
                 'number': ep.get('number'),
                 'name': ep.get('name', ''),
-                'air_date': _parse_air_date(ep.get('air_date')),
+                'air_date': air_date,
+                'is_upcoming': bool(air_date and air_date > today),
                 'description': ep.get('description', ''),
             })
         episodes_with_dates.sort(key=lambda e: e['number'] or 0)
+
+    # Ближайшая ещё не вышедшая серия (только для сериала с сезонами)
+    next_episode = None
+    if seasons and not item.is_season:
+        next_episode = _find_next_episode(seasons, today)
+        if next_episode:
+            days_left = (next_episode['air_date'] - today).days
+            next_episode['days_left'] = days_left
+            next_episode['days_label'] = f'через {days_left} {_plural_days(days_left)}'
 
     context = {
         'item': item,
@@ -181,6 +240,7 @@ def content_detail(request, pk):
         'user_season_reviews': user_season_reviews,
         'season_air_dates': season_air_dates,
         'episodes_with_dates': episodes_with_dates,
+        'next_episode': next_episode,
     }
     return render(request, 'pages/content_detail.html', context)
 
@@ -270,6 +330,13 @@ def my_content_list(request):
             eps.sort(key=lambda e: e['air_date'])
             latest_episodes[parent_id] = eps[0]
 
+    # Для каждого сериала найдём ближайшую ещё не вышедшую серию
+    next_episodes = {}
+    for parent_id, eps in episode_dates.items():
+        upcoming = [e for e in eps if e['air_date'] > today]
+        if upcoming:
+            next_episodes[parent_id] = min(upcoming, key=lambda e: e['air_date'])
+
     categories = Category.objects.all()
     genres = Genre.objects.all()
     status_choices = UserContentItem.Status.choices
@@ -285,6 +352,7 @@ def my_content_list(request):
         'search_configured': services.is_configured(),
         'season_ratings': season_ratings,
         'latest_episodes': latest_episodes,
+        'next_episodes': next_episodes,
     }
     return render(request, 'pages/my_content_list.html', context)
 
@@ -408,6 +476,17 @@ def _import_seasons(series_item, external_id):
             metadata__season_number=season_num,
         ).first()
         if existing:
+            # Обновляем даты выхода эпизодов (планируемые даты меняются со временем)
+            changed = False
+            if existing.metadata.get('episodes') != season_data['episodes']:
+                existing.metadata['episodes'] = season_data['episodes']
+                changed = True
+            if existing.metadata.get('episodes_count') != season_data['episodes_count']:
+                existing.metadata['episodes_count'] = season_data['episodes_count']
+                changed = True
+            if changed:
+                existing.save(update_fields=['metadata', 'updated_at'])
+                logger.info('Обновлены даты сезона %s для «%s»', season_num, series_item.title)
             continue
 
         ContentItem.objects.create(

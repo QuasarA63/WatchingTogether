@@ -76,6 +76,20 @@
             <p>{{ item.description }}</p>
         {% endif %}
 
+        <!-- Ближайшая ещё не вышедшая серия -->
+        {% if next_episode %}
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <i class="bi bi-calendar-event me-2 fs-4"></i>
+                <div>
+                    <strong>Следующая серия:</strong>
+                    С{{ next_episode.season }}E{{ next_episode.episode }}
+                    {% if next_episode.name %}«{{ next_episode.name }}»{% endif %}
+                    — {{ next_episode.air_date|date:"d.m.Y" }}
+                    <span class="badge bg-warning text-dark ms-1">{{ next_episode.days_label }}</span>
+                </div>
+            </div>
+        {% endif %}
+
         <!-- Ссылка на родительский объект (если это сезон) -->
         {% if item.parent %}
             <div class="alert alert-secondary">
@@ -155,7 +169,7 @@
                         </thead>
                         <tbody>
                             {% for ep in episodes_with_dates %}
-                                <tr>
+                                <tr {% if ep.is_upcoming %}class="table-warning"{% endif %}>
                                     <td>{{ ep.number }}</td>
                                     <td>
                                         {{ ep.name|default:"—" }}
@@ -166,6 +180,9 @@
                                     <td>
                                         {% if ep.air_date %}
                                             <i class="bi bi-calendar3"></i> {{ ep.air_date|date:"d.m.Y" }}
+                                            {% if ep.is_upcoming %}
+                                                <span class="badge bg-warning text-dark ms-1" title="Серия ещё не вышла">анонс</span>
+                                            {% endif %}
                                         {% else %}
                                             <span class="text-muted">—</span>
                                         {% endif %}

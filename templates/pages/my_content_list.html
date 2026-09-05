@@ -163,6 +163,21 @@
                                                 </div>
                                             {% endif %}
                                         {% endwith %}
+                                        <!-- Ближайшая ещё не вышедшая серия -->
+                                        {% with next_ep=next_episodes|get_item:item.pk %}
+                                            {% if next_ep %}
+                                                <div class="mb-2">
+                                                    <small>
+                                                        <i class="bi bi-calendar-event"></i>
+                                                        <strong>Следующая:</strong>
+                                                        С{{ next_ep.season }}E{{ next_ep.episode }}
+                                                        {% if next_ep.name %}«{{ next_ep.name }}»{% endif %}
+                                                        — {{ next_ep.air_date|date:"d.m.Y" }}
+                                                        <span class="badge bg-warning text-dark">анонс</span>
+                                                    </small>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
                                     {% endif %}
 
                                     <!-- Описание (раскрывающееся) -->

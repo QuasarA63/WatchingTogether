@@ -246,6 +246,32 @@ def content_detail(request, pk):
 
 
 @login_required
+def content_refresh_dates(request, pk):
+    """
+    Обновить даты выхода серий и сезонов сериала с Кинопоиска (POST).
+    """
+    item = get_object_or_404(ContentItem, pk=pk, is_active=True)
+
+    if request.method != 'POST':
+        return redirect('content_detail', pk=pk)
+
+    if item.is_season or item.category.slug != 'series' or not item.external_id:
+        messages.error(request, 'Даты выхода можно обновлять только для сериала.')
+        return redirect('content_detail', pk=pk)
+
+    if not services.is_configured():
+        messages.error(request, 'Кинопоиск API не настроен: задайте KINOPOISK_API_KEY.')
+        return redirect('content_detail', pk=pk)
+
+    if _import_seasons(item, item.external_id):
+        messages.success(request, 'Даты выхода серий обновлены.')
+    else:
+        messages.error(request, 'Не удалось обновить даты. Попробуйте позже.')
+
+    return redirect('content_detail', pk=pk)
+
+
+@login_required
 def my_content_list(request):
     """
     Вкладка «Мои объекты»: список объектов пользователя
@@ -456,7 +482,8 @@ def _import_seasons(series_item, external_id):
     """
     Импортировать сезоны сериала с Кинопоиска.
 
-    Создаёт дочерние ContentItem для каждого сезона.
+    Создаёт дочерние ContentItem для каждого сезона и обновляет
+    даты выхода у уже существующих. Возвращает True при успехе.
     """
     import logging
     logger = logging.getLogger(__name__)
@@ -465,7 +492,7 @@ def _import_seasons(series_item, external_id):
         seasons = services.get_seasons(external_id)
     except services.KinopoiskError as exc:
         logger.warning('Не удалось получить сезоны для %s: %s', external_id, exc)
-        return
+        return False
 
     for season_data in seasons:
         season_num = season_data['number']
@@ -506,6 +533,8 @@ def _import_seasons(series_item, external_id):
             },
         )
         logger.info('Создан сезон %s для «%s»', season_num, series_item.title)
+
+    return True
 
 
 @login_required

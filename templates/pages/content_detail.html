@@ -90,6 +90,18 @@
             </div>
         {% endif %}
 
+        <!-- Кнопка обновления дат выхода (для сериала) -->
+        {% if user.is_authenticated and not item.is_season and item.category.slug == 'series' and item.external_id %}
+            <div class="mb-3">
+                <form method="post" action="{% url 'content_refresh_dates' item.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Обновить даты выхода с Кинопоиска">
+                        <i class="bi bi-arrow-clockwise"></i> Обновить даты выхода
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+
         <!-- Ссылка на родительский объект (если это сезон) -->
         {% if item.parent %}
             <div class="alert alert-secondary">

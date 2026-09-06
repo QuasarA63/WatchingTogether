@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from .models import Group, GroupMembership, GroupInvitation, GroupMessage, GroupContentComment
 from .forms import GroupForm, GroupInviteForm, GroupMessageForm, GroupContentCommentForm
@@ -448,5 +449,5 @@ def _serialize_message(message):
         'username': message.user.username,
         'avatar_url': avatar_url,
         'text': message.text,
-        'created_at': message.created_at.strftime('%d.%m.%Y %H:%M'),
+        'created_at': timezone.localtime(message.created_at).strftime('%d.%m.%Y %H:%M'),
     }

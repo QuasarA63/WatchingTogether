@@ -4,12 +4,13 @@ from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Count, Q, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from .models import Group, GroupMembership, GroupInvitation, GroupMessage, GroupContentComment
 from .forms import GroupForm, GroupInviteForm, GroupMessageForm, GroupContentCommentForm
-from apps.content.models import ContentItem, UserContentItem
+from apps.content.models import ContentItem, UserContentItem, Genre
 from apps.notifications.models import Notification
 
 User = get_user_model()
@@ -94,18 +95,28 @@ def group_detail(request, pk):
         # Объекты, которые участники группы добавили себе, с количеством комментариев
         tab = 'discussions'
         context['tab'] = tab
+        genre_slug = request.GET.get('genre', '')
+        context['genres'] = Genre.objects.all()
+        context['current_genre'] = genre_slug
+
+        discussions = UserContentItem.objects.filter(user__member_groups=group)
+        if genre_slug:
+            discussions = discussions.filter(content_item__genres__slug=genre_slug)
+
         discussions = (
-            UserContentItem.objects
-            .filter(user__member_groups=group)
+            discussions
             .values('content_item')
             .annotate(
                 entries_count=Count('id'),
-                comments_count=Subquery(
-                    GroupContentComment.objects
-                    .filter(group=group, content_item=OuterRef('content_item'))
-                    .values('content_item')
-                    .annotate(cnt=Count('id'))
-                    .values('cnt')
+                comments_count=Coalesce(
+                    Subquery(
+                        GroupContentComment.objects
+                        .filter(group=group, content_item=OuterRef('content_item'))
+                        .values('content_item')
+                        .annotate(cnt=Count('id'))
+                        .values('cnt')
+                    ),
+                    0,
                 ),
             )
             .order_by('-entries_count')

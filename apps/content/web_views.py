@@ -658,15 +658,15 @@ def my_content_edit_comment(request, pk):
 def my_content_edit_status(request, pk):
     """
     Изменение статуса просмотра объекта (POST).
-    При статусе «Посмотрел» сохраняет личную оценку.
+    При статусе «Смотрю» или «Посмотрел» сохраняет личную оценку.
     """
     entry = get_object_or_404(UserContentItem, pk=pk, user=request.user)
     if request.method == 'POST':
         new_status = request.POST.get('status', '')
         if new_status in dict(UserContentItem.Status.choices):
             entry.status = new_status
-            # При статусе «Посмотрел» сохраняем личную оценку
-            if new_status == UserContentItem.Status.COMPLETED:
+            # При статусе «Смотрю»/«Посмотрел» сохраняем личную оценку
+            if new_status in (UserContentItem.Status.WATCHING, UserContentItem.Status.COMPLETED):
                 personal_rating = request.POST.get('personal_rating', '')
                 if personal_rating and personal_rating.isdigit():
                     rating = int(personal_rating)

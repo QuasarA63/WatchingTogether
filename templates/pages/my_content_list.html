@@ -220,8 +220,8 @@
                                                     </option>
                                                 {% endfor %}
                                             </select>
-                                            <!-- Выбор оценки (показывается при «Посмотрел») -->
-                                            <div id="rating-{{ entry.pk }}" class="rating-stars {% if entry.status != 'completed' %}d-none{% endif %}">
+                                            <!-- Выбор оценки (показывается при «Смотрю»/«Посмотрел») -->
+                                            <div id="rating-{{ entry.pk }}" class="rating-stars {% if entry.status != 'completed' and entry.status != 'watching' %}d-none{% endif %}">
                                                 <input type="hidden" name="personal_rating" id="rating-input-{{ entry.pk }}" value="{{ entry.personal_rating|default:'' }}">
                                                 {% for i in 10|times %}
                                                     <i class="bi bi-star{% if entry.personal_rating and i <= entry.personal_rating %}-fill{% endif %} rating-star"
@@ -311,7 +311,7 @@
 // Показать/скрыть выбор оценки при смене статуса
 function toggleRating(entryId, status) {
     const ratingDiv = document.getElementById('rating-' + entryId);
-    if (status === 'completed') {
+    if (status === 'completed' || status === 'watching') {
         ratingDiv.classList.remove('d-none');
         // Не отправляем форму сразу — ждём выбора оценки
     } else {

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, Q, OuterRef, Subquery
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -98,7 +98,16 @@ def group_detail(request, pk):
             UserContentItem.objects
             .filter(user__member_groups=group)
             .values('content_item')
-            .annotate(entries_count=Count('id'))
+            .annotate(
+                entries_count=Count('id'),
+                comments_count=Subquery(
+                    GroupContentComment.objects
+                    .filter(group=group, content_item=OuterRef('content_item'))
+                    .values('content_item')
+                    .annotate(cnt=Count('id'))
+                    .values('cnt')
+                ),
+            )
             .order_by('-entries_count')
         )
         content_items = ContentItem.objects.filter(
@@ -109,6 +118,7 @@ def group_detail(request, pk):
             {
                 'content_item': items_by_pk[d['content_item']],
                 'entries_count': d['entries_count'],
+                'comments_count': d['comments_count'],
             }
             for d in discussions if d['content_item'] in items_by_pk
         ]

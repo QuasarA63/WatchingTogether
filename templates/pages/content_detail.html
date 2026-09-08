@@ -32,6 +32,14 @@
             {% endif %}
         </p>
 
+        {% if not item.is_season and item.category.slug == 'series' %}
+            {% if item.is_ended is True %}
+                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Сериал завершён</span>
+            {% elif item.is_ended is False %}
+                <span class="badge bg-info text-dark"><i class="bi bi-hourglass-split"></i> Идёт — ожидаются новые сезоны</span>
+            {% endif %}
+        {% endif %}
+
         {% if item.genres.all %}
             <div class="mb-3">
                 {% for genre in item.genres.all %}

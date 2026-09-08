@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from apps.content.models import ContentItem
-from apps.content.web_views import _import_seasons
+from apps.content.web_views import _import_seasons, _refresh_ended_flag
 
 
 class Command(BaseCommand):
@@ -38,6 +38,7 @@ class Command(BaseCommand):
             try:
                 before = {s.id: s.metadata.get('episodes') for s in item.children.all()}
                 _import_seasons(item, item.external_id)
+                _refresh_ended_flag(item)
                 after = {s.id: s.metadata.get('episodes') for s in item.children.all()}
                 if before != after:
                     self.stdout.write(self.style.SUCCESS('даты обновлены'))

@@ -166,6 +166,18 @@ class ContentItem(TimeStampedModel):
         return self.parent_id is not None
 
     @property
+    def is_ended(self):
+        """
+        Завершён ли сериал (не ожидаются новые сезоны).
+
+        Возвращает True/False по данным Кинопоиска или None,
+        если признак ещё не был получен.
+        """
+        if 'ended' not in self.metadata:
+            return None
+        return bool(self.metadata.get('ended'))
+
+    @property
     def season_number(self):
         """Номер сезона из метаданных (если это сезон)."""
         if self.is_season:

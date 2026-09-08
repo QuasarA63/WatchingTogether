@@ -109,11 +109,16 @@ def content_list(request):
     category_slug = request.GET.get('category', '')
     genre_slug = request.GET.get('genre', '')
     search = request.GET.get('q', '')
+    ended = request.GET.get('ended', '')
 
     if category_slug:
         items = items.filter(category__slug=category_slug)
     if genre_slug:
         items = items.filter(genres__slug=genre_slug)
+    if ended == 'ended':
+        items = items.filter(metadata__ended=True)
+    elif ended == 'ongoing':
+        items = items.filter(metadata__ended=False)
     if search:
         items = items.filter(title__icontains=search)
 
@@ -132,6 +137,7 @@ def content_list(request):
         'genres': genres,
         'current_category': category_slug,
         'current_genre': genre_slug,
+        'current_ended': ended,
         'search': search,
     }
     return render(request, 'pages/content_list.html', context)
@@ -263,8 +269,10 @@ def content_refresh_dates(request, pk):
         messages.error(request, 'Кинопоиск API не настроен: задайте KINOPOISK_API_KEY.')
         return redirect('content_detail', pk=pk)
 
-    if _import_seasons(item, item.external_id):
-        messages.success(request, 'Даты выхода серий обновлены.')
+    seasons_ok = _import_seasons(item, item.external_id)
+    _refresh_ended_flag(item)
+    if seasons_ok:
+        messages.success(request, 'Даты выхода серий и статус сериала обновлены.')
     else:
         messages.error(request, 'Не удалось обновить даты. Попробуйте позже.')
 
@@ -296,6 +304,12 @@ def my_content_list(request):
     status_filter = request.GET.get('status', '')
     if status_filter:
         entries = entries.filter(status=status_filter)
+
+    ended = request.GET.get('ended', '')
+    if ended == 'ended':
+        entries = entries.filter(content_item__metadata__ended=True)
+    elif ended == 'ongoing':
+        entries = entries.filter(content_item__metadata__ended=False)
 
     search = request.GET.get('q', '')
     if search:
@@ -379,6 +393,7 @@ def my_content_list(request):
         'current_category': category_slug,
         'current_genre': genre_slug,
         'current_status': status_filter,
+        'current_ended': ended,
         'search': search,
         'search_configured': services.is_configured(),
         'season_ratings': season_ratings,
@@ -542,6 +557,25 @@ def _import_seasons(series_item, external_id):
     return True
 
 
+def _refresh_ended_flag(item):
+    """
+    Обновить признак завершённости сериала с Кинопоиска.
+
+    Записывает в metadata['ended'] True/False и metadata['ended_year'].
+    Возвращает True при успехе.
+    """
+    if not item.external_id:
+        return False
+    try:
+        details = services.get_details(item.external_id, 'tv')
+    except services.KinopoiskError:
+        return False
+    item.metadata['ended'] = bool(details.get('is_ended'))
+    item.metadata['ended_year'] = details.get('ended_year')
+    item.save(update_fields=['metadata', 'updated_at'])
+    return True
+
+
 @login_required
 def my_content_add(request):
     """
@@ -599,6 +633,8 @@ def my_content_add(request):
                 'countries': details['countries'],
                 'rating': details['rating'],
                 'tagline': details['tagline'],
+                'ended': details.get('is_ended', False),
+                'ended_year': details.get('ended_year'),
             },
         )
         # Привязываем жанры из внешней базы

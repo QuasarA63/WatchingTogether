@@ -185,6 +185,18 @@ def get_details(external_id, media_type=None):
     countries = [c.get('name') for c in data.get('countries', []) if c.get('name')]
     persons = _parse_persons(data.get('persons', []))
 
+    # Признак завершённости сериала: releaseYears[].end содержит год
+    # окончания для закрытых сериалов и 0 (или null) для идущих.
+    release_years = data.get('releaseYears') or []
+    ended_year = None
+    for ry in release_years:
+        end = ry.get('end')
+        if end:
+            ended_year = end
+            break
+    is_series = data.get('isSeries') or data.get('type') in SERIES_TYPES
+    is_ended = bool(is_series and ended_year)
+
     return {
         'external_id': str(data.get('id', external_id)),
         'media_type': _media_type_for(data.get('type')),
@@ -199,6 +211,8 @@ def get_details(external_id, media_type=None):
         'rating': rating.get('kp') or rating.get('imdb'),
         'tagline': '',
         'persons': persons,
+        'ended_year': ended_year,
+        'is_ended': is_ended,
     }
 
 

@@ -31,6 +31,7 @@
 <div class="row mb-4">
     <div class="col-md-10">
         <form method="get" class="d-flex gap-2 flex-wrap">
+            <input type="text" name="q" class="form-control" placeholder="Поиск..." value="{{ search }}" style="max-width: 200px;">
             <select name="category" class="form-select" style="max-width: 160px;" onchange="this.form.submit()">
                 <option value="">Все типы</option>
                 {% for cat in categories %}
@@ -55,7 +56,8 @@
                     </option>
                 {% endfor %}
             </select>
-            {% if current_category or current_genre or current_status %}
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+            {% if current_category or current_genre or current_status or search %}
                 <a href="{% url 'my_content_list' %}" class="btn btn-outline-secondary" title="Сбросить фильтры">
                     <i class="bi bi-x-lg"></i>
                 </a>
@@ -278,17 +280,17 @@
             <ul class="pagination justify-content-center">
                 {% if entries_page.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ entries_page.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}">&laquo;</a>
+                        <a class="page-link" href="?page={{ entries_page.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if search %}&q={{ search }}{% endif %}">&laquo;</a>
                     </li>
                 {% endif %}
                 {% for num in entries_page.paginator.page_range %}
                     <li class="page-item {% if entries_page.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if search %}&q={{ search }}{% endif %}">{{ num }}</a>
                     </li>
                 {% endfor %}
                 {% if entries_page.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ entries_page.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}">&raquo;</a>
+                        <a class="page-link" href="?page={{ entries_page.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if search %}&q={{ search }}{% endif %}">&raquo;</a>
                     </li>
                 {% endif %}
             </ul>

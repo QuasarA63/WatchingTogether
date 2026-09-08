@@ -96,12 +96,16 @@ def group_detail(request, pk):
         tab = 'discussions'
         context['tab'] = tab
         genre_slug = request.GET.get('genre', '')
+        search = request.GET.get('q', '')
         context['genres'] = Genre.objects.all()
         context['current_genre'] = genre_slug
+        context['search'] = search
 
         discussions = UserContentItem.objects.filter(user__member_groups=group)
         if genre_slug:
             discussions = discussions.filter(content_item__genres__slug=genre_slug)
+        if search:
+            discussions = discussions.filter(content_item__title__icontains=search)
 
         discussions = (
             discussions

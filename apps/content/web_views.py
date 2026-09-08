@@ -297,6 +297,10 @@ def my_content_list(request):
     if status_filter:
         entries = entries.filter(status=status_filter)
 
+    search = request.GET.get('q', '')
+    if search:
+        entries = entries.filter(content_item__title__icontains=search)
+
     entries = entries.order_by('-created_at').distinct()
 
     paginator = Paginator(entries, 12)
@@ -375,6 +379,7 @@ def my_content_list(request):
         'current_category': category_slug,
         'current_genre': genre_slug,
         'current_status': status_filter,
+        'search': search,
         'search_configured': services.is_configured(),
         'season_ratings': season_ratings,
         'latest_episodes': latest_episodes,

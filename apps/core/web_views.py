@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db.models import Count, Max, Prefetch
 from apps.reviews.models import Review
 from apps.content.models import ContentItem, UserContentItem
 from apps.groups.models import Group
@@ -14,9 +15,18 @@ def home(request):
     Главная страница: последние отзывы, популярный контент
     и объекты с публичными комментариями.
     """
-    latest_reviews = Review.objects.select_related(
-        'user', 'content_item', 'group'
-    ).order_by('-created_at')[:10]
+    latest_reviewed_items = ContentItem.objects.filter(
+        is_active=True,
+        reviews__isnull=False,
+    ).select_related('category').annotate(
+        last_review_at=Max('reviews__created_at'),
+        reviews_count=Count('reviews'),
+    ).prefetch_related(
+        Prefetch(
+            'reviews',
+            queryset=Review.objects.select_related('user', 'group').order_by('-created_at'),
+        )
+    ).order_by('-last_review_at')[:8]
 
     popular_content = ContentItem.objects.filter(
         is_active=True,
@@ -33,7 +43,7 @@ def home(request):
     ).select_related('user', 'content_item', 'content_item__category').order_by('-updated_at')[:10]
 
     context = {
-        'latest_reviews': latest_reviews,
+        'latest_reviewed_items': latest_reviewed_items,
         'popular_content': popular_content,
         'public_entries': public_entries,
     }

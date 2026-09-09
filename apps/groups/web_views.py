@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Count, Q, OuterRef, Subquery
+from django.db.models import Count, Max, Q, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.utils import timezone
@@ -122,8 +122,15 @@ def group_detail(request, pk):
                     ),
                     0,
                 ),
+                last_comment_at=Subquery(
+                    GroupContentComment.objects
+                    .filter(group=group, content_item=OuterRef('content_item'))
+                    .values('content_item')
+                    .annotate(last=Max('created_at'))
+                    .values('last')
+                ),
             )
-            .order_by('-entries_count')
+            .order_by('-last_comment_at')
         )
         content_items = ContentItem.objects.filter(
             pk__in=[d['content_item'] for d in discussions]

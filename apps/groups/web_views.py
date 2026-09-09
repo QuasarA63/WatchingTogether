@@ -129,6 +129,12 @@ def group_detail(request, pk):
                     .annotate(last=Max('created_at'))
                     .values('last')
                 ),
+                last_comment_user=Subquery(
+                    GroupContentComment.objects
+                    .filter(group=group, content_item=OuterRef('content_item'))
+                    .order_by('-created_at')
+                    .values('user__username')[:1]
+                ),
             )
             .order_by('-last_comment_at')
         )
@@ -141,6 +147,8 @@ def group_detail(request, pk):
                 'content_item': items_by_pk[d['content_item']],
                 'entries_count': d['entries_count'],
                 'comments_count': d['comments_count'],
+                'last_comment_user': d.get('last_comment_user'),
+                'last_comment_at': d.get('last_comment_at'),
             }
             for d in discussions if d['content_item'] in items_by_pk
         ]

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from apps.content.models import ContentItem
 from .models import Review
 from .forms import ReviewForm, CommentForm
@@ -37,7 +38,7 @@ def review_create(request, content_pk):
 
     existing = Review.objects.filter(user=request.user, content_item=content_item).first()
     if existing:
-        messages.warning(request, 'Вы уже оставили отзыв на этот контент.')
+        messages.warning(request, _('Вы уже оставили отзыв на этот контент.'))
         return redirect('review_detail', pk=existing.pk)
 
     if request.method == 'POST':
@@ -47,7 +48,7 @@ def review_create(request, content_pk):
             review.user = request.user
             review.content_item = content_item
             review.save()
-            messages.success(request, 'Отзыв опубликован!')
+            messages.success(request, _('Отзыв опубликован!'))
             return redirect('content_detail', pk=content_item.pk)
     else:
         form = ReviewForm()
@@ -55,7 +56,7 @@ def review_create(request, content_pk):
     context = {
         'form': form,
         'content_item': content_item,
-        'title': f'Отзыв на «{content_item.title}»',
+        'title': _('Отзыв на «%(title)s»') % {'title': content_item.title},
     }
     return render(request, 'pages/review_form.html', context)
 
@@ -71,7 +72,7 @@ def review_edit(request, pk):
         form = ReviewForm(request.POST, instance=review)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Отзыв обновлён!')
+            messages.success(request, _('Отзыв обновлён!'))
             return redirect('review_detail', pk=review.pk)
     else:
         form = ReviewForm(instance=review)
@@ -79,7 +80,7 @@ def review_edit(request, pk):
     context = {
         'form': form,
         'content_item': review.content_item,
-        'title': f'Редактирование отзыва на «{review.content_item.title}»',
+        'title': _('Редактирование отзыва на «%(title)s»') % {'title': review.content_item.title},
     }
     return render(request, 'pages/review_form.html', context)
 
@@ -93,7 +94,7 @@ def review_delete(request, pk):
     content_pk = review.content_item.pk
     if request.method == 'POST':
         review.delete()
-        messages.info(request, 'Отзыв удалён.')
+        messages.info(request, _('Отзыв удалён.'))
         return redirect('content_detail', pk=content_pk)
     return render(request, 'pages/review_confirm_delete.html', {'review': review})
 
@@ -116,6 +117,6 @@ def comment_create(request, review_pk):
                 from .models import Comment
                 comment.parent = get_object_or_404(Comment, pk=parent_id)
             comment.save()
-            messages.success(request, 'Комментарий добавлен!')
+            messages.success(request, _('Комментарий добавлен!'))
 
     return redirect('review_detail', pk=review.pk)

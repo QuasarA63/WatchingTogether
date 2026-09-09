@@ -1,0 +1,1075 @@
+# Watching Together — English translations.
+msgid ""
+msgstr ""
+"Project-Id-Version: Watching Together 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-09 19:48+0300\n"
+"PO-Revision-Date: 2026-09-09 20:00+0300\n"
+"Last-Translator: Watching Together Team\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Название"
+msgstr "Title"
+
+msgid "Slug"
+msgstr "Slug"
+
+msgid "Описание"
+msgstr "Description"
+
+msgid "Иконка"
+msgstr "Icon"
+
+msgid "CSS класс иконки (например, bi-film)"
+msgstr "Icon CSS class (e.g. bi-film)"
+
+msgid "Порядок сортировки"
+msgstr "Sort order"
+
+msgid "Чем меньше число, тем выше категория в списках"
+msgstr "The lower the number, the higher the category in lists"
+
+msgid "Категория"
+msgstr "Category"
+
+msgid "Категории"
+msgstr "Categories"
+
+msgid "Жанр"
+msgstr "Genre"
+
+msgid "Жанры"
+msgstr "Genres"
+
+msgid "Родительский объект"
+msgstr "Parent object"
+
+msgid "Например, сериал для сезона"
+msgstr "For example, a series for a season"
+
+msgid "Оригинальное название"
+msgstr "Original title"
+
+msgid "Год выпуска"
+msgstr "Release year"
+
+msgid "Постер"
+msgstr "Poster"
+
+msgid "Внешний ID"
+msgstr "External ID"
+
+msgid "ID из внешних API (Kinopoisk, TMDB и т.д.)"
+msgstr "ID from external APIs (Kinopoisk, TMDB, etc.)"
+
+msgid "Метаданные"
+msgstr "Metadata"
+
+msgid "Дополнительные данные в формате JSON"
+msgstr "Additional data in JSON format"
+
+msgid "Внешний рейтинг"
+msgstr "External rating"
+
+msgid "Рейтинг из внешних источников (Кинопоиск, TMDB)"
+msgstr "Rating from external sources (Kinopoisk, TMDB)"
+
+msgid "Активен"
+msgstr "Active"
+
+msgid "Неактивные объекты скрыты из каталога (мягкое удаление)"
+msgstr "Inactive items are hidden from the catalog (soft delete)"
+
+msgid "Элемент контента"
+msgstr "Content item"
+
+msgid "Элементы контента"
+msgstr "Content items"
+
+msgid "Имя"
+msgstr "Name"
+
+msgid "ID из внешних API (Kinopoisk и т.д.)"
+msgstr "ID from external APIs (Kinopoisk, etc.)"
+
+msgid "Фото"
+msgstr "Photo"
+
+msgid "URL фотографии персоны"
+msgstr "Person's photo URL"
+
+msgid "Персона"
+msgstr "Person"
+
+msgid "Персоны"
+msgstr "People"
+
+msgid "Режиссёр"
+msgstr "Director"
+
+msgid "Актёр"
+msgstr "Actor"
+
+msgid "Исполнитель"
+msgstr "Artist"
+
+msgid "Участник группы"
+msgstr "Band member"
+
+msgid "Композитор"
+msgstr "Composer"
+
+msgid "Продюсер"
+msgstr "Producer"
+
+msgid "Сценарист"
+msgstr "Writer"
+
+msgid "Роль"
+msgstr "Role"
+
+msgid "Персона контента"
+msgstr "Content person"
+
+msgid "Персоны контента"
+msgstr "Content people"
+
+msgid "В планах"
+msgstr "Planned"
+
+msgid "Смотрю"
+msgstr "Watching"
+
+msgid "Отложил"
+msgstr "On hold"
+
+msgid "Посмотрел"
+msgstr "Completed"
+
+msgid "Пользователь"
+msgstr "User"
+
+msgid "Статус просмотра"
+msgstr "Watch status"
+
+msgid "Личная оценка"
+msgstr "Personal rating"
+
+msgid "Оценка от 1 до 10"
+msgstr "Rating from 1 to 10"
+
+msgid "Комментарий"
+msgstr "Comment"
+
+msgid "Публичный"
+msgstr "Public"
+
+msgid "Публичные комментарии видны всем на главной странице"
+msgstr "Public comments are visible to everyone on the home page"
+
+msgid "Объект пользователя"
+msgstr "User's item"
+
+msgid "Объекты пользователей"
+msgstr "Users' items"
+
+msgid "Кинопоиск API не настроен: задайте KINOPOISK_API_KEY в .env"
+msgstr "Kinopoisk API is not configured: set KINOPOISK_API_KEY in .env"
+
+#, python-format
+msgid "Ошибка при обращении к Кинопоиску: %(error)s"
+msgstr "Error accessing Kinopoisk: %(error)s"
+
+#, python-format
+msgid "через %(days)d день"
+msgid_plural "через %(days)d дней"
+msgstr[0] "in %(days)d day"
+msgstr[1] "in %(days)d days"
+
+msgid "Даты выхода можно обновлять только для сериала."
+msgstr "Release dates can only be updated for a series."
+
+msgid "Кинопоиск API не настроен: задайте KINOPOISK_API_KEY."
+msgstr "Kinopoisk API is not configured: set KINOPOISK_API_KEY."
+
+msgid "Даты выхода серий и статус сериала обновлены."
+msgstr "Episode release dates and series status updated."
+
+msgid "Не удалось обновить даты. Попробуйте позже."
+msgstr "Could not update the dates. Try again later."
+
+msgid "Некорректные данные объекта."
+msgstr "Invalid item data."
+
+msgid "Категория для этого типа контента не найдена в БД."
+msgstr "Category for this content type was not found in the database."
+
+#, python-format
+msgid "«%(title)s» добавлен в ваши объекты!"
+msgstr "«%(title)s» has been added to your items!"
+
+#, python-format
+msgid "«%(title)s» уже есть в ваших объектах."
+msgstr "«%(title)s» is already in your items."
+
+msgid "Комментарий обновлён."
+msgstr "Comment updated."
+
+#, python-format
+msgid "Статус изменён на «%(status)s»."
+msgstr "Status changed to «%(status)s»."
+
+#, python-format
+msgid "«%(title)s» удалён из ваших объектов."
+msgstr "«%(title)s» removed from your items."
+
+msgid "Дата создания"
+msgstr "Created at"
+
+msgid "Дата обновления"
+msgstr "Updated at"
+
+#, python-format
+msgid "Добро пожаловать, %(username)s! Регистрация прошла успешно."
+msgstr "Welcome, %(username)s! Registration was successful."
+
+msgid "Вы вышли из системы."
+msgstr "You have logged out."
+
+msgid "Пароль успешно изменён."
+msgstr "Password changed successfully."
+
+msgid "Профиль обновлён."
+msgstr "Profile updated."
+
+msgid "Название группы"
+msgstr "Group name"
+
+msgid "Аватар группы"
+msgstr "Group avatar"
+
+msgid "Приватная группа"
+msgstr "Private group"
+
+msgid "Описание группы"
+msgstr "Group description"
+
+msgid "Сообщение"
+msgstr "Message"
+
+msgid "Необязательное сообщение к приглашению"
+msgstr "Optional message for the invitation"
+
+msgid "Введите сообщение..."
+msgstr "Type a message..."
+
+msgid "Ваш комментарий..."
+msgstr "Your comment..."
+
+msgid "Ожидает ответа"
+msgstr "Pending"
+
+msgid "Принято"
+msgstr "Accepted"
+
+msgid "Отклонено"
+msgstr "Declined"
+
+msgid "Группа"
+msgstr "Group"
+
+msgid "Кто пригласил"
+msgstr "Invited by"
+
+msgid "Кого пригласили"
+msgstr "Invited user"
+
+msgid "Статус"
+msgstr "Status"
+
+msgid "Приглашение в группу"
+msgstr "Group invitation"
+
+msgid "Приглашения в группы"
+msgstr "Group invitations"
+
+msgid "Автор"
+msgstr "Author"
+
+msgid "Текст сообщения"
+msgstr "Message text"
+
+msgid "Сообщение группы"
+msgstr "Group message"
+
+msgid "Сообщения групп"
+msgstr "Group messages"
+
+msgid "Текст комментария"
+msgstr "Comment text"
+
+msgid "Родительский комментарий"
+msgstr "Parent comment"
+
+msgid "Комментарий обсуждения"
+msgstr "Discussion comment"
+
+msgid "Комментарии обсуждений"
+msgstr "Discussion comments"
+
+msgid "Владелец"
+msgstr "Owner"
+
+msgid "Участники"
+msgstr "Members"
+
+msgid "Группы"
+msgstr "Groups"
+
+msgid "Администратор"
+msgstr "Administrator"
+
+msgid "Участник"
+msgstr "Member"
+
+msgid "Дата вступления"
+msgstr "Joined at"
+
+msgid "Членство в группе"
+msgstr "Group membership"
+
+msgid "Членство в группах"
+msgstr "Group memberships"
+
+#, python-format
+msgid "Приглашение в группу «%(name)s»"
+msgstr "Invitation to group «%(name)s»"
+
+#, python-format
+msgid "%(username)s приглашает вас в группу «%(name)s»."
+msgstr "%(username)s invites you to group «%(name)s»."
+
+#, python-format
+msgid "Группа \"%(name)s\" создана!"
+msgstr "Group \"%(name)s\" has been created!"
+
+msgid "Создание группы"
+msgstr "Create group"
+
+msgid "Вступление в приватную группу возможно только по приглашению."
+msgstr "You can join a private group only by invitation."
+
+#, python-format
+msgid "Вы вступили в группу \"%(name)s\"!"
+msgstr "You have joined group \"%(name)s\"!"
+
+#, python-format
+msgid "Вы покинули группу \"%(name)s\"."
+msgstr "You have left group \"%(name)s\"."
+
+msgid "Владелец не может покинуть группу."
+msgstr "The owner cannot leave the group."
+
+msgid "Приглашать могут только владелец или администратор группы."
+msgstr "Only the owner or an administrator can invite."
+
+#, python-format
+msgid "Приглашение отправлено пользователю %(username)s."
+msgstr "Invitation sent to user %(username)s."
+
+msgid "Это приглашение уже обработано."
+msgstr "This invitation has already been processed."
+
+#, python-format
+msgid "%(username)s принял приглашение"
+msgstr "%(username)s accepted the invitation"
+
+#, python-format
+msgid "%(username)s вступил в группу «%(name)s»."
+msgstr "%(username)s joined group «%(name)s»."
+
+#, python-format
+msgid "%(username)s отклонил приглашение"
+msgstr "%(username)s declined the invitation"
+
+#, python-format
+msgid "%(username)s отклонил приглашение в группу «%(name)s»."
+msgstr "%(username)s declined the invitation to group «%(name)s»."
+
+#, python-format
+msgid "Вы отклонили приглашение в группу \"%(name)s\"."
+msgstr "You declined the invitation to group \"%(name)s\"."
+
+msgid "Комментировать могут только участники группы."
+msgstr "Only group members can comment."
+
+msgid "Комментарий добавлен."
+msgstr "Comment added."
+
+msgid "Комментарий не может быть пустым."
+msgstr "Comment cannot be empty."
+
+msgid "Брать объекты могут только участники группы."
+msgstr "Only group members can take items."
+
+#, python-format
+msgid "«%(title)s» добавлен в ваши объекты."
+msgstr "«%(title)s» added to your items."
+
+msgid "Чат доступен только участникам группы."
+msgstr "Chat is available only to group members."
+
+msgid "Пустое или слишком длинное сообщение."
+msgstr "Empty or too long message."
+
+msgid "Приглашение принято"
+msgstr "Invitation accepted"
+
+msgid "Приглашение отклонено"
+msgstr "Invitation declined"
+
+msgid "Новое сообщение в группе"
+msgstr "New message in group"
+
+msgid "Новая серия"
+msgstr "New episode"
+
+msgid "Новый сезон"
+msgstr "New season"
+
+msgid "Тип уведомления"
+msgstr "Notification type"
+
+msgid "Заголовок"
+msgstr "Title"
+
+msgid "Текст"
+msgstr "Text"
+
+msgid "Ссылка"
+msgstr "Link"
+
+msgid "URL, куда ведёт клик по уведомлению"
+msgstr "URL that the notification click leads to"
+
+msgid "Прочитано"
+msgstr "Read"
+
+msgid "Приглашение"
+msgstr "Invitation"
+
+msgid "Уведомление"
+msgstr "Notification"
+
+msgid "Уведомления"
+msgstr "Notifications"
+
+msgid "Оценка (1-10)"
+msgstr "Rating (1-10)"
+
+msgid "Заголовок отзыва"
+msgstr "Review title"
+
+msgid "Текст отзыва (необязательно)"
+msgstr "Review text (optional)"
+
+msgid "Содержит спойлеры"
+msgstr "Contains spoilers"
+
+msgid "Заголовок (необязательно)"
+msgstr "Title (optional)"
+
+msgid "Ваш отзыв... (необязательно)"
+msgstr "Your review... (optional)"
+
+msgid "Написать комментарий..."
+msgstr "Write a comment..."
+
+msgid "Группа, в контексте которой оставлен отзыв"
+msgstr "Group in whose context the review was left"
+
+msgid "Оценка"
+msgstr "Rating"
+
+msgid "Текст отзыва"
+msgstr "Review text"
+
+msgid "Отзыв"
+msgstr "Review"
+
+msgid "Отзывы"
+msgstr "Reviews"
+
+msgid "Комментарии"
+msgstr "Comments"
+
+msgid "Вы уже оставили отзыв на этот контент."
+msgstr "You have already reviewed this content."
+
+msgid "Отзыв опубликован!"
+msgstr "Review published!"
+
+#, python-format
+msgid "Отзыв на «%(title)s»"
+msgstr "Review of «%(title)s»"
+
+msgid "Отзыв обновлён!"
+msgstr "Review updated!"
+
+#, python-format
+msgid "Редактирование отзыва на «%(title)s»"
+msgstr "Editing review of «%(title)s»"
+
+msgid "Отзыв удалён."
+msgstr "Review deleted."
+
+msgid "Комментарий добавлен!"
+msgstr "Comment added!"
+
+msgid "Проверка защиты от ботов не пройдена. Попробуйте ещё раз."
+msgstr "Bot protection check failed. Please try again."
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Имя пользователя"
+msgstr "Username"
+
+msgid "Пароль"
+msgstr "Password"
+
+msgid "Подтверждение пароля"
+msgstr "Password confirmation"
+
+msgid "Фамилия"
+msgstr "Last name"
+
+msgid "О себе"
+msgstr "About"
+
+msgid "Аватар"
+msgstr "Avatar"
+
+msgid "Новый пароль"
+msgstr "New password"
+
+msgid "Оставьте пустым, если не меняете"
+msgstr "Leave blank if you don't change it"
+
+msgid "Минимум 8 символов"
+msgstr "Minimum 8 characters"
+
+msgid "Повторите новый пароль"
+msgstr "Repeat the new password"
+
+msgid "Пароли не совпадают."
+msgstr "Passwords do not match."
+
+msgid "Пользователи"
+msgstr "Users"
+
+msgid "Русский"
+msgstr "Russian"
+
+msgid "English"
+msgstr "English"
+
+msgid "Смотрим вместе"
+msgstr "Watching Together"
+
+msgid "Каталог"
+msgstr "Catalog"
+
+msgid "Мои объекты"
+msgstr "My items"
+
+msgid "Язык"
+msgstr "Language"
+
+msgid "непрочитанных уведомлений"
+msgstr "unread notifications"
+
+msgid "Выход"
+msgstr "Log out"
+
+msgid "Вход"
+msgstr "Log in"
+
+msgid "Регистрация"
+msgstr "Sign up"
+
+msgid "Обмен мнениями о фильмах, сериалах и музыке."
+msgstr "Share opinions about movies, series and music."
+
+msgid "Сериал завершён"
+msgstr "Series ended"
+
+msgid "Идёт — ожидаются новые сезоны"
+msgstr "Ongoing — new seasons expected"
+
+msgid "Вышла новая серия:"
+msgstr "New episode released:"
+
+#, python-format
+msgid "С%(s)sE%(e)s"
+msgstr "S%(s)sE%(e)s"
+
+msgid "Вышел новый сезон:"
+msgstr "New season released:"
+
+msgid "Кинопоиск"
+msgstr "Kinopoisk"
+
+#, python-format
+msgid "%(counter)s отзыв"
+msgid_plural "%(counter)s отзывов"
+msgstr[0] "%(counter)s review"
+msgstr[1] "%(counter)s reviews"
+
+msgid "Следующая серия:"
+msgstr "Next episode:"
+
+msgid "Обновить даты выхода с Кинопоиска"
+msgstr "Update release dates from Kinopoisk"
+
+msgid "Обновить даты выхода"
+msgstr "Update release dates"
+
+msgid "Сезон сериала"
+msgstr "Series season"
+
+msgid "Сезоны"
+msgstr "Seasons"
+
+#, python-format
+msgid "%(counter)s эпизод"
+msgid_plural "%(counter)s эпизодов"
+msgstr[0] "%(counter)s episode"
+msgstr[1] "%(counter)s episodes"
+
+msgid "Ваш отзыв"
+msgstr "Your review"
+
+msgid "Написать отзыв"
+msgstr "Write a review"
+
+msgid "Эпизоды"
+msgstr "Episodes"
+
+msgid "Дата выхода"
+msgstr "Release date"
+
+msgid "Серия ещё не вышла"
+msgstr "Episode has not been released yet"
+
+msgid "анонс"
+msgstr "announced"
+
+msgid "Вы уже оставили отзыв."
+msgstr "You have already left a review."
+
+msgid "Посмотреть"
+msgstr "View"
+
+msgid "Редактировать"
+msgstr "Edit"
+
+msgid "Войдите"
+msgstr "Log in"
+
+msgid "чтобы оставить отзыв."
+msgstr "to leave a review."
+
+msgid "Пока нет отзывов. Будьте первым!"
+msgstr "No reviews yet. Be the first!"
+
+msgid "Поиск..."
+msgstr "Search..."
+
+msgid "Все категории"
+msgstr "All categories"
+
+msgid "Все жанры"
+msgstr "All genres"
+
+msgid "Фильтр по завершённости сериала"
+msgstr "Filter by series status"
+
+msgid "Все"
+msgstr "All"
+
+msgid "Завершён"
+msgstr "Ended"
+
+msgid "Идёт"
+msgstr "Ongoing"
+
+msgid "Рейтинг Кинопоиска"
+msgstr "Kinopoisk rating"
+
+msgid "Оценка пользователей"
+msgstr "User rating"
+
+msgid "Нет оценок"
+msgstr "No ratings"
+
+msgid "Контент не найден."
+msgstr "No content found."
+
+msgid "Чат"
+msgstr "Chat"
+
+#, python-format
+msgid "Чат группы «%(name)s»"
+msgstr "Chat of group «%(name)s»"
+
+msgid "Сообщений пока нет. Напишите первым!"
+msgstr "No messages yet. Write the first one!"
+
+msgid "Отправить"
+msgstr "Send"
+
+#, python-format
+msgid "Участники (%(count)s)"
+msgstr "Members (%(count)s)"
+
+msgid "Страница в каталоге"
+msgstr "Catalog page"
+
+msgid "В ваших объектах"
+msgstr "In your items"
+
+msgid "Взять себе"
+msgstr "Take it"
+
+msgid "У участников группы"
+msgstr "Group members' entries"
+
+msgid "Обсуждение"
+msgstr "Discussion"
+
+msgid "Ответ для"
+msgstr "Reply to"
+
+msgid "Отмена"
+msgstr "Cancel"
+
+msgid "чтобы участвовать в обсуждении."
+msgstr "to join the discussion."
+
+msgid "Обсуждение доступно только участникам группы."
+msgstr "Discussion is available only to group members."
+
+msgid "Ответить"
+msgstr "Reply"
+
+msgid "Комментариев пока нет. Начните обсуждение!"
+msgstr "No comments yet. Start the discussion!"
+
+msgid "Отзывы группы на этот объект"
+msgstr "Group reviews of this item"
+
+msgid "Приватная"
+msgstr "Private"
+
+msgid "Пригласить"
+msgstr "Invite"
+
+msgid "Покинуть"
+msgstr "Leave"
+
+msgid "Вступить"
+msgstr "Join"
+
+msgid "Владелец:"
+msgstr "Owner:"
+
+#, python-format
+msgid "%(counter)s участник"
+msgid_plural "%(counter)s участников"
+msgstr[0] "%(counter)s member"
+msgstr[1] "%(counter)s members"
+
+msgid "Создана"
+msgstr "Created"
+
+msgid "Обсуждения"
+msgstr "Discussions"
+
+msgid "Поиск по названию..."
+msgstr "Search by title..."
+
+msgid "Сбросить фильтры"
+msgstr "Reset filters"
+
+#, python-format
+msgid "%(counter)s комментарий"
+msgid_plural "%(counter)s комментариев"
+msgstr[0] "%(counter)s comment"
+msgstr[1] "%(counter)s comments"
+
+msgid "Нет комментариев"
+msgstr "No comments"
+
+msgid "Участники группы пока не добавили ни одного объекта."
+msgstr "Group members have not added any items yet."
+
+msgid "в группе с"
+msgstr "in the group since"
+
+msgid "Сохранить"
+msgstr "Save"
+
+#, python-format
+msgid "Пригласить в %(name)s"
+msgstr "Invite to %(name)s"
+
+msgid "Поиск по имени пользователя..."
+msgstr "Search by username..."
+
+msgid "Нет пользователей, которых можно пригласить."
+msgstr "There are no users to invite."
+
+msgid "Отправить приглашение"
+msgstr "Send invitation"
+
+msgid "Создать группу"
+msgstr "Create group"
+
+msgid "Поиск групп..."
+msgstr "Search groups..."
+
+msgid "Мои группы"
+msgstr "My groups"
+
+msgid "Все публичные группы"
+msgstr "All public groups"
+
+msgid "Публичные группы не найдены."
+msgstr "No public groups found."
+
+msgid "Создайте первую группу!"
+msgstr "Create the first group!"
+
+msgid "Главная"
+msgstr "Home"
+
+msgid "Обменивайтесь мнениями о фильмах, сериалах и музыке с друзьями."
+msgstr "Share opinions about movies, series and music with friends."
+
+msgid "Создавайте группы, оставляйте отзывы и оценки."
+msgstr "Create groups, leave reviews and ratings."
+
+msgid "Последние отзывы"
+msgstr "Latest reviews"
+
+msgid "Недавно добавленное"
+msgstr "Recently added"
+
+msgid "Контент пока не добавлен."
+msgstr "No content added yet."
+
+msgid "Что смотрят пользователи"
+msgstr "What users are watching"
+
+msgid "Войти"
+msgstr "Log in"
+
+msgid "Нет аккаунта?"
+msgstr "Don't have an account?"
+
+msgid "Зарегистрироваться"
+msgstr "Sign up"
+
+msgid "Добавить"
+msgstr "Add"
+
+msgid ""
+"Поиск по внешним базам недоступен: не задан ключ KINOPOISK_API_KEY в "
+"настройках сервера."
+msgstr ""
+"External database search is unavailable: KINOPOISK_API_KEY is not set in the "
+"server settings."
+
+msgid "Все типы"
+msgstr "All types"
+
+msgid "Все статусы"
+msgstr "All statuses"
+
+msgid "Есть новости"
+msgstr "Has updates"
+
+msgid "Моя оценка"
+msgstr "My rating"
+
+#, python-format
+msgid "Сезон %(num)s — средняя оценка %(avg)s"
+msgstr "Season %(num)s — average rating %(avg)s"
+
+#, python-format
+msgid "С%(num)s:"
+msgstr "S%(num)s:"
+
+msgid "Следующая:"
+msgstr "Next:"
+
+msgid "Личный"
+msgstr "Private"
+
+msgid "Нет комментария"
+msgstr "No comment"
+
+msgid "Публичный (виден всем на главной)"
+msgstr "Public (visible to everyone on the home page)"
+
+#, python-format
+msgid "Удалить «%(title)s» из ваших объектов?"
+msgstr "Remove «%(title)s» from your items?"
+
+msgid "Удалить"
+msgstr "Delete"
+
+msgid "Объектов этой категории у вас пока нет."
+msgstr "You don't have any items in this category yet."
+
+msgid ""
+"У вас пока нет объектов. Нажмите «Добавить», чтобы найти фильм или сериал."
+msgstr ""
+"You don't have any items yet. Click \"Add\" to find a movie or series."
+
+msgid "Добавить объект"
+msgstr "Add item"
+
+msgid ""
+"Введите название фильма или сериала — мы найдём его в базе Кинопоиска и "
+"добавим со всеми доступными данными."
+msgstr ""
+"Enter the title of a movie or series — we will find it in the Kinopoisk "
+"database and add it with all available data."
+
+msgid "Название, напр. «Интерстеллар»..."
+msgstr "Title, e.g. \"Interstellar\"..."
+
+msgid "Найти"
+msgstr "Search"
+
+#, python-format
+msgid "Результаты поиска по запросу «%(query)s»:"
+msgstr "Search results for \"%(query)s\":"
+
+msgid "Фильм"
+msgstr "Movie"
+
+msgid "Сериал"
+msgstr "Series"
+
+msgid "Личный комментарий (необязательно)..."
+msgstr "Personal comment (optional)..."
+
+#, python-format
+msgid "По запросу «%(query)s» ничего не найдено."
+msgstr "Nothing found for \"%(query)s\"."
+
+msgid "К моим объектам"
+msgstr "Back to my items"
+
+msgid "Прочитать все"
+msgstr "Mark all as read"
+
+msgid "Новое"
+msgstr "New"
+
+msgid "Принять"
+msgstr "Accept"
+
+msgid "Отклонить"
+msgstr "Decline"
+
+msgid "Открыть"
+msgstr "Open"
+
+msgid "У вас пока нет уведомлений."
+msgstr "You have no notifications yet."
+
+msgid "Профиль"
+msgstr "Profile"
+
+msgid "На сайте с"
+msgstr "Member since"
+
+msgid "Редактировать профиль"
+msgstr "Edit profile"
+
+msgid "Перейти к моим объектам"
+msgstr "Go to my items"
+
+msgid "Вы пока не в группах"
+msgstr "You are not in any groups yet"
+
+msgid "Мои отзывы"
+msgstr "My reviews"
+
+msgid "У вас пока нет отзывов."
+msgstr "You have no reviews yet."
+
+msgid "Найти контент"
+msgstr "Find content"
+
+msgid "и оставить первый отзыв!"
+msgstr "and leave the first review!"
+
+msgid "Редактирование профиля"
+msgstr "Edit profile"
+
+msgid "Редактирование"
+msgstr "Editing"
+
+msgid "Личные данные"
+msgstr "Personal information"
+
+msgid "Учётные данные"
+msgstr "Account details"
+
+msgid "Смена пароля"
+msgstr "Change password"
+
+msgid "Оставьте поля пустыми, если не хотите менять пароль."
+msgstr "Leave the fields blank if you don't want to change the password."
+
+msgid "Уже есть аккаунт?"
+msgstr "Already have an account?"
+
+msgid "Удаление отзыва"
+msgstr "Delete review"
+
+msgid "Удаление"
+msgstr "Deleting"
+
+#, python-format
+msgid "Вы уверены, что хотите удалить отзыв на <strong>«%(title)s»</strong>?"
+msgstr "Are you sure you want to delete the review of <strong>«%(title)s»</strong>?"
+
+msgid "Оценка:"
+msgstr "Rating:"
+
+msgid "Да, удалить"
+msgstr "Yes, delete"
+
+msgid "Этот отзыв содержит спойлеры!"
+msgstr "This review contains spoilers!"
+
+#, python-format
+msgid "Комментарии (%(count)s)"
+msgstr "Comments (%(count)s)"
+
+msgid "чтобы оставить комментарий."
+msgstr "to leave a comment."
+
+msgid "Комментариев пока нет."
+msgstr "No comments yet."

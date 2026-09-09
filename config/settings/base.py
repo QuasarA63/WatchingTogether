@@ -4,6 +4,7 @@ Base settings for Watching Together project.
 
 from pathlib import Path
 from decouple import config
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -49,6 +50,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -68,10 +70,12 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.notifications.context_processors.notifications_context',
                 'apps.core.context_processors.turnstile_context',
+                'apps.core.context_processors.language_switch_context',
             ],
         },
     },
@@ -113,9 +117,9 @@ else:
 AUTH_USER_MODEL = 'users.User'
 
 # Auth redirects
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -138,7 +142,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGES = [
+    ('ru', _('Русский')),
+    ('en', _('English')),
+]
+
+LANGUAGE_CODE = 'ru'
+
+LOCALE_PATHS = [BASE_DIR / 'locale']
 
 TIME_ZONE = 'Europe/Moscow'
 

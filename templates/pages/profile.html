@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Профиль — Смотрим вместе{% endblock %}
+{% block title %}{% trans "Профиль" %} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item active" aria-current="page">Профиль</li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Профиль" %}</li>
     </ol>
 </nav>
 {% endblock %}
@@ -17,7 +18,7 @@
         <div class="card">
             <div class="card-body text-center">
                 {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" class="rounded-circle mb-3" width="120" height="120" alt="Аватар">
+                    <img src="{{ user.avatar.url }}" class="rounded-circle mb-3" width="120" height="120" alt="{% trans 'Аватар' %}">
                 {% else %}
                     <i class="bi bi-person-circle" style="font-size: 5rem;"></i>
                 {% endif %}
@@ -30,26 +31,26 @@
                     <p>{{ user.bio }}</p>
                 {% endif %}
                 <p class="text-muted small">
-                    <i class="bi bi-calendar"></i> На сайте с {{ user.date_joined|date:"d.m.Y" }}
+                    <i class="bi bi-calendar"></i> {% trans "На сайте с" %} {{ user.date_joined|date:"d.m.Y" }}
                 </p>
                 <a href="{% url 'profile_edit' %}" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-pencil"></i> Редактировать профиль
+                    <i class="bi bi-pencil"></i> {% trans "Редактировать профиль" %}
                 </a>
             </div>
         </div>
 
-        <!-- Группы пользователя -->
+        <!-- Объекты пользователя -->
         <div class="card mt-3">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-bookmark-star"></i> Мои объекты</span>
-                <a href="{% url 'my_content_list' %}" class="btn btn-sm btn-outline-primary">Все</a>
+                <span><i class="bi bi-bookmark-star"></i> {% trans "Мои объекты" %}</span>
+                <a href="{% url 'my_content_list' %}" class="btn btn-sm btn-outline-primary">{% trans "Все" %}</a>
             </div>
             <div class="card-body text-center">
                 <a href="{% url 'my_content_list' %}" class="btn btn-primary btn-sm">
-                    <i class="bi bi-collection"></i> Перейти к моим объектам
+                    <i class="bi bi-collection"></i> {% trans "Перейти к моим объектам" %}
                 </a>
                 <a href="{% url 'my_content_search' %}" class="btn btn-success btn-sm">
-                    <i class="bi bi-plus-lg"></i> Добавить
+                    <i class="bi bi-plus-lg"></i> {% trans "Добавить" %}
                 </a>
             </div>
         </div>
@@ -57,7 +58,7 @@
         <!-- Группы пользователя -->
         <div class="card mt-3">
             <div class="card-header">
-                <i class="bi bi-people"></i> Мои группы
+                <i class="bi bi-people"></i> {% trans "Мои группы" %}
             </div>
             <div class="list-group list-group-flush">
                 {% for group in user_groups %}
@@ -65,14 +66,14 @@
                         {{ group.name }}
                     </a>
                 {% empty %}
-                    <div class="list-group-item text-muted">Вы пока не в группах</div>
+                    <div class="list-group-item text-muted">{% trans "Вы пока не в группах" %}</div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
     <div class="col-md-8">
-        <h4><i class="bi bi-star"></i> Мои отзывы</h4>
+        <h4><i class="bi bi-star"></i> {% trans "Мои отзывы" %}</h4>
         {% if reviews_page %}
             {% for review in reviews_page %}
                 <div class="card mb-3">
@@ -81,7 +82,7 @@
                             <div>
                                 <h5 class="card-title mb-1">
                                     <a href="{% url 'review_detail' review.pk %}" class="text-decoration-none">
-                                        {% if review.title %}{{ review.title }}{% else %}Отзыв на «{{ review.content_item.title }}»{% endif %}
+                                        {% if review.title %}{{ review.title }}{% else %}{% blocktrans with title=review.content_item.title %}Отзыв на «{{ title }}»{% endblocktrans %}{% endif %}
                                     </a>
                                 </h5>
                                 <p class="text-muted small mb-2">
@@ -98,7 +99,7 @@
                         </div>
                         <p class="card-text">{{ review.text|truncatewords:30 }}</p>
                         <a href="{% url 'review_edit' review.pk %}" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-pencil"></i> Редактировать
+                            <i class="bi bi-pencil"></i> {% trans "Редактировать" %}
                         </a>
                     </div>
                 </div>
@@ -128,8 +129,8 @@
             {% endif %}
         {% else %}
             <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> У вас пока нет отзывов.
-                <a href="{% url 'content_list' %}">Найти контент</a> и оставить первый отзыв!
+                <i class="bi bi-info-circle"></i> {% trans "У вас пока нет отзывов." %}
+                <a href="{% url 'content_list' %}">{% trans "Найти контент" %}</a> {% trans "и оставить первый отзыв!" %}
             </div>
         {% endif %}
     </div>

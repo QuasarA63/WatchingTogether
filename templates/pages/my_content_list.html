@@ -1,29 +1,30 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load content_tags %}
 
-{% block title %}Мои объекты — Смотрим вместе{% endblock %}
+{% block title %}{% trans "Мои объекты" %} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item active" aria-current="page">Мои объекты</li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Мои объекты" %}</li>
     </ol>
 </nav>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0"><i class="bi bi-bookmark-star"></i> Мои объекты</h2>
+    <h2 class="mb-0"><i class="bi bi-bookmark-star"></i> {% trans "Мои объекты" %}</h2>
     <a href="{% url 'my_content_search' %}" class="btn btn-primary">
-        <i class="bi bi-plus-lg"></i> Добавить
+        <i class="bi bi-plus-lg"></i> {% trans "Добавить" %}
     </a>
 </div>
 
 {% if not search_configured %}
     <div class="alert alert-warning">
         <i class="bi bi-exclamation-triangle"></i>
-        Поиск по внешним базам недоступен: не задан ключ KINOPOISK_API_KEY в настройках сервера.
+        {% trans "Поиск по внешним базам недоступен: не задан ключ KINOPOISK_API_KEY в настройках сервера." %}
     </div>
 {% endif %}
 
@@ -31,9 +32,9 @@
 <div class="row mb-4">
     <div class="col-md-10">
         <form method="get" class="d-flex gap-2 flex-wrap">
-            <input type="text" name="q" class="form-control" placeholder="Поиск..." value="{{ search }}" style="max-width: 200px;">
+            <input type="text" name="q" class="form-control" placeholder="{% trans 'Поиск...' %}" value="{{ search }}" style="max-width: 200px;">
             <select name="category" class="form-select" style="max-width: 160px;" onchange="this.form.submit()">
-                <option value="">Все типы</option>
+                <option value="">{% trans "Все типы" %}</option>
                 {% for cat in categories %}
                     <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>
                         {{ cat.name }}
@@ -41,7 +42,7 @@
                 {% endfor %}
             </select>
             <select name="genre" class="form-select" style="max-width: 160px;" onchange="this.form.submit()">
-                <option value="">Все жанры</option>
+                <option value="">{% trans "Все жанры" %}</option>
                 {% for genre in genres %}
                     <option value="{{ genre.slug }}" {% if current_genre == genre.slug %}selected{% endif %}>
                         {{ genre.name }}
@@ -49,21 +50,21 @@
                 {% endfor %}
             </select>
             <select name="status" class="form-select" style="max-width: 160px;" onchange="this.form.submit()">
-                <option value="">Все статусы</option>
+                <option value="">{% trans "Все статусы" %}</option>
                 {% for value, label in status_choices %}
                     <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
                         {{ label }}
                     </option>
                 {% endfor %}
             </select>
-            <select name="ended" class="form-select" style="max-width: 150px;" onchange="this.form.submit()" title="Фильтр по завершённости сериала">
-                <option value="">Все</option>
-                <option value="ended" {% if current_ended == 'ended' %}selected{% endif %}>Завершён</option>
-                <option value="ongoing" {% if current_ended == 'ongoing' %}selected{% endif %}>Идёт</option>
+            <select name="ended" class="form-select" style="max-width: 150px;" onchange="this.form.submit()" title="{% trans 'Фильтр по завершённости сериала' %}">
+                <option value="">{% trans "Все" %}</option>
+                <option value="ended" {% if current_ended == 'ended' %}selected{% endif %}>{% trans "Завершён" %}</option>
+                <option value="ongoing" {% if current_ended == 'ongoing' %}selected{% endif %}>{% trans "Идёт" %}</option>
             </select>
             <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
             {% if current_category or current_genre or current_status or current_ended or search %}
-                <a href="{% url 'my_content_list' %}" class="btn btn-outline-secondary" title="Сбросить фильтры">
+                <a href="{% url 'my_content_list' %}" class="btn btn-outline-secondary" title="{% trans 'Сбросить фильтры' %}">
                     <i class="bi bi-x-lg"></i>
                 </a>
             {% endif %}
@@ -101,9 +102,9 @@
                                             </a>
                                             {% with nu=new_updates|get_item:item.pk %}
                                                 {% if nu %}
-                                                    <span class="badge bg-success ms-1" title="Есть новости">
+                                                    <span class="badge bg-success ms-1" title="{% trans 'Есть новости' %}">
                                                         <i class="bi bi-bell-fill"></i>
-                                                        {% if nu.episodes %}Новая серия{% else %}Новый сезон{% endif %}
+                                                        {% if nu.episodes %}{% trans "Новая серия" %}{% else %}{% trans "Новый сезон" %}{% endif %}
                                                     </span>
                                                 {% endif %}
                                             {% endwith %}
@@ -120,17 +121,17 @@
                                             </span>
                                             <!-- Личная оценка -->
                                             {% if entry.personal_rating %}
-                                                <span class="badge bg-success" title="Моя оценка">
+                                                <span class="badge bg-success" title="{% trans 'Моя оценка' %}">
                                                     <i class="bi bi-star-fill"></i> {{ entry.personal_rating|floatformat:1 }}
                                                 </span>
                                             {% endif %}
                                             {% if item.external_rating %}
-                                                <span class="badge bg-warning text-dark" title="Рейтинг Кинопоиска">
+                                                <span class="badge bg-warning text-dark" title="{% trans 'Рейтинг Кинопоиска' %}">
                                                     <i class="bi bi-star-fill"></i> {{ item.external_rating }}
                                                 </span>
                                             {% endif %}
                                             {% if item.average_rating %}
-                                                <span class="badge bg-primary" title="Оценка пользователей">
+                                                <span class="badge bg-primary" title="{% trans 'Оценка пользователей' %}">
                                                     <i class="bi bi-people-fill"></i> {{ item.average_rating }}
                                                 </span>
                                             {% endif %}
@@ -144,9 +145,9 @@
                                         {% if item.year %}&middot; <i class="bi bi-calendar"></i> {{ item.year }}{% endif %}
                                         {% if item.category.slug == 'series' %}
                                             {% if item.is_ended is True %}
-                                                <span class="badge bg-info text-dark"><i class="bi bi-check-circle"></i> Завершён</span>
+                                                <span class="badge bg-info text-dark"><i class="bi bi-check-circle"></i> {% trans "Завершён" %}</span>
                                             {% elif item.is_ended is False %}
-                                                <span class="badge bg-success"><i class="bi bi-hourglass-split"></i> Идёт</span>
+                                                <span class="badge bg-success"><i class="bi bi-hourglass-split"></i> {% trans "Идёт" %}</span>
                                             {% endif %}
                                         {% endif %}
                                     </p>
@@ -164,8 +165,8 @@
                                             {% if seasons %}
                                                 <div class="mb-2 d-flex gap-3 flex-wrap">
                                                     {% for s in seasons %}
-                                                        <span class="small" title="Сезон {{ s.number }} — средняя оценка {{ s.avg }}">
-                                                            <span class="text-muted">С{{ s.number }}:</span>
+                                                        <span class="small" title="{% blocktrans with num=s.number avg=s.avg %}Сезон {{ num }} — средняя оценка {{ avg }}{% endblocktrans %}">
+                                                            <span class="text-muted">{% blocktrans with num=s.number %}С{{ num }}:{% endblocktrans %}</span>
                                                             <i class="bi bi-star-fill" style="color: #ffc107;"></i> {{ s.avg }}
                                                         </span>
                                                     {% endfor %}
@@ -178,7 +179,7 @@
                                                 <div class="mb-2">
                                                     <small class="text-muted">
                                                         <i class="bi bi-calendar3"></i>
-                                                        С{{ last_ep.season }}E{{ last_ep.episode }}
+                                                        {% blocktrans with s=last_ep.season e=last_ep.episode %}С{{ s }}E{{ e }}{% endblocktrans %}
                                                         {% if last_ep.name %}«{{ last_ep.name }}»{% endif %}
                                                         — {{ last_ep.air_date|date:"d.m.Y" }}
                                                     </small>
@@ -191,11 +192,11 @@
                                                 <div class="mb-2">
                                                     <small>
                                                         <i class="bi bi-calendar-event"></i>
-                                                        <strong>Следующая:</strong>
-                                                        С{{ next_ep.season }}E{{ next_ep.episode }}
+                                                        <strong>{% trans "Следующая:" %}</strong>
+                                                        {% blocktrans with s=next_ep.season e=next_ep.episode %}С{{ s }}E{{ e }}{% endblocktrans %}
                                                         {% if next_ep.name %}«{{ next_ep.name }}»{% endif %}
                                                         — {{ next_ep.air_date|date:"d.m.Y" }}
-                                                        <span class="badge bg-warning text-dark">анонс</span>
+                                                        <span class="badge bg-warning text-dark">{% trans "анонс" %}</span>
                                                     </small>
                                                 </div>
                                             {% endif %}
@@ -206,7 +207,7 @@
                                     {% if item.description %}
                                         <details class="mb-2">
                                             <summary class="text-primary" style="cursor: pointer;">
-                                                <i class="bi bi-chevron-down"></i> Описание
+                                                <i class="bi bi-chevron-down"></i> {% trans "Описание" %}
                                             </summary>
                                             <p class="card-text small mt-2">{{ item.description }}</p>
                                         </details>
@@ -218,13 +219,13 @@
                                             <p class="card-text small fst-italic mb-1">
                                                 «{{ entry.comment }}»
                                                 {% if entry.is_public %}
-                                                    <span class="badge bg-success">Публичный</span>
+                                                    <span class="badge bg-success">{% trans "Публичный" %}</span>
                                                 {% else %}
-                                                    <span class="badge bg-secondary">Личный</span>
+                                                    <span class="badge bg-secondary">{% trans "Личный" %}</span>
                                                 {% endif %}
                                             </p>
                                         {% else %}
-                                            <p class="card-text small text-muted fst-italic mb-1">Нет комментария</p>
+                                            <p class="card-text small text-muted fst-italic mb-1">{% trans "Нет комментария" %}</p>
                                         {% endif %}
                                     </div>
 
@@ -249,7 +250,7 @@
                                                        onclick="setRating({{ entry.pk }}, {{ i }})"
                                                        style="cursor: pointer; font-size: 1.1rem; color: #ffc107;"></i>
                                                 {% endfor %}
-                                                <button type="submit" class="btn btn-sm btn-success ms-1" title="Сохранить">
+                                                <button type="submit" class="btn btn-sm btn-success ms-1" title="{% trans 'Сохранить' %}">
                                                     <i class="bi bi-check"></i>
                                                 </button>
                                             </div>
@@ -258,30 +259,30 @@
                                         <!-- Редактирование комментария -->
                                         <details>
                                             <summary class="btn btn-sm btn-outline-secondary">
-                                                <i class="bi bi-pencil"></i> Комментарий
-                                                {% if entry.is_public %}<span class="badge bg-success ms-1">Публичный</span>{% endif %}
+                                                <i class="bi bi-pencil"></i> {% trans "Комментарий" %}
+                                                {% if entry.is_public %}<span class="badge bg-success ms-1">{% trans "Публичный" %}</span>{% endif %}
                                             </summary>
                                             <form method="post" action="{% url 'my_content_edit_comment' entry.pk %}" class="mt-2">
                                                 {% csrf_token %}
                                                 <textarea name="comment" class="form-control mb-2"
-                                                          rows="4" placeholder="Ваш комментарий...">{{ entry.comment }}</textarea>
+                                                          rows="4" placeholder="{% trans 'Ваш комментарий...' %}">{{ entry.comment }}</textarea>
                                                 <div class="form-check mb-2">
                                                     <input type="checkbox" name="is_public" class="form-check-input" id="is_public_{{ entry.pk }}"
                                                            {% if entry.is_public %}checked{% endif %}>
                                                     <label class="form-check-label" for="is_public_{{ entry.pk }}">
-                                                        Публичный (виден всем на главной)
+                                                        {% trans "Публичный (виден всем на главной)" %}
                                                     </label>
                                                 </div>
-                                                <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                                                <button type="submit" class="btn btn-sm btn-primary">{% trans "Сохранить" %}</button>
                                             </form>
                                         </details>
 
                                         <!-- Удаление -->
                                         <form method="post" action="{% url 'my_content_remove' entry.pk %}"
-                                              onsubmit="return confirm('Удалить «{{ item.title }}» из ваших объектов?');">
+                                              onsubmit="return confirm('{% blocktrans with title=item.title %}Удалить «{{ title }}» из ваших объектов?{% endblocktrans %}');">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i> Удалить
+                                                <i class="bi bi-trash"></i> {% trans "Удалить" %}
                                             </button>
                                         </form>
                                     </div>
@@ -320,9 +321,9 @@
     <div class="alert alert-info">
         <i class="bi bi-info-circle"></i>
         {% if current_category %}
-            Объектов этой категории у вас пока нет.
+            {% trans "Объектов этой категории у вас пока нет." %}
         {% else %}
-            У вас пока нет объектов. Нажмите «Добавить», чтобы найти фильм или сериал.
+            {% trans "У вас пока нет объектов. Нажмите «Добавить», чтобы найти фильм или сериал." %}
         {% endif %}
     </div>
 {% endif %}

@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from .models import User
 from apps.core.turnstile import verify_turnstile
 
@@ -25,7 +26,7 @@ class TurnstileMixin:
             token = cleaned_data.get('turnstile_token', '')
             if not verify_turnstile(token):
                 raise ValidationError(
-                    'Проверка защиты от ботов не пройдена. Попробуйте ещё раз.'
+                    _('Проверка защиты от ботов не пройдена. Попробуйте ещё раз.')
                 )
         return cleaned_data
 
@@ -36,33 +37,33 @@ class RegisterForm(TurnstileMixin, UserCreationForm):
     """
     email = forms.EmailField(
         required=True,
-        label='Email',
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'})
+        label=_('Email'),
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': _('Email')})
     )
 
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
         labels = {
-            'username': 'Имя пользователя',
+            'username': _('Имя пользователя'),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Имя пользователя'
+            'placeholder': _('Имя пользователя')
         })
         self.fields['password1'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Пароль'
+            'placeholder': _('Пароль')
         })
         self.fields['password2'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Подтверждение пароля'
+            'placeholder': _('Подтверждение пароля')
         })
-        self.fields['password1'].label = 'Пароль'
-        self.fields['password2'].label = 'Подтверждение пароля'
+        self.fields['password1'].label = _('Пароль')
+        self.fields['password2'].label = _('Подтверждение пароля')
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -81,11 +82,11 @@ class LoginForm(TurnstileMixin, AuthenticationForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Имя пользователя'
+            'placeholder': _('Имя пользователя')
         })
         self.fields['password'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Пароль'
+            'placeholder': _('Пароль')
         })
 
 
@@ -97,11 +98,11 @@ class ProfileForm(forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'email', 'bio', 'avatar']
         labels = {
-            'first_name': 'Имя',
-            'last_name': 'Фамилия',
-            'email': 'Email',
-            'bio': 'О себе',
-            'avatar': 'Аватар',
+            'first_name': _('Имя'),
+            'last_name': _('Фамилия'),
+            'email': _('Email'),
+            'bio': _('О себе'),
+            'avatar': _('Аватар'),
         }
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -118,26 +119,26 @@ class AccountForm(forms.ModelForm):
     """
     new_password = forms.CharField(
         required=False,
-        label='Новый пароль',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Оставьте пустым, если не меняете'}),
-        help_text='Минимум 8 символов'
+        label=_('Новый пароль'),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': _('Оставьте пустым, если не меняете')}),
+        help_text=_('Минимум 8 символов')
     )
     confirm_password = forms.CharField(
         required=False,
-        label='Подтверждение пароля',
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Повторите новый пароль'})
+        label=_('Подтверждение пароля'),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': _('Повторите новый пароль')})
     )
 
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'bio', 'avatar']
         labels = {
-            'username': 'Имя пользователя',
-            'email': 'Email',
-            'first_name': 'Имя',
-            'last_name': 'Фамилия',
-            'bio': 'О себе',
-            'avatar': 'Аватар',
+            'username': _('Имя пользователя'),
+            'email': _('Email'),
+            'first_name': _('Имя'),
+            'last_name': _('Фамилия'),
+            'bio': _('О себе'),
+            'avatar': _('Аватар'),
         }
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
@@ -155,7 +156,7 @@ class AccountForm(forms.ModelForm):
 
         if new_password or confirm_password:
             if new_password != confirm_password:
-                raise ValidationError('Пароли не совпадают.')
+                raise ValidationError(_('Пароли не совпадают.'))
             if new_password:
                 validate_password(new_password, self.instance)
 

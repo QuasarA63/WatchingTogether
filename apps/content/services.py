@@ -15,6 +15,7 @@ import logging
 
 import requests
 from decouple import config
+from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ def is_configured():
 def _get(endpoint, params=None):
     """Выполнить GET-запрос к Кинопоиск API."""
     if not is_configured():
-        raise KinopoiskError('Кинопоиск API не настроен: задайте KINOPOISK_API_KEY в .env')
+        raise KinopoiskError(_('Кинопоиск API не настроен: задайте KINOPOISK_API_KEY в .env'))
 
     url = f'{KINOPOISK_BASE_URL}{endpoint}'
     headers = {'X-API-KEY': KINOPOISK_API_KEY}
@@ -56,7 +57,7 @@ def _get(endpoint, params=None):
         return response.json()
     except requests.RequestException as exc:
         logger.warning('Ошибка запроса к Кинопоиску: %s', exc)
-        raise KinopoiskError(f'Ошибка при обращении к Кинопоиску: {exc}') from exc
+        raise KinopoiskError(_('Ошибка при обращении к Кинопоиску: %(error)s') % {'error': exc}) from exc
 
 
 def _media_type_for(kp_type):

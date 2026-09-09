@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+{% load i18n %}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Смотрим вместе{% endblock %}</title>
+    <title>{% block title %}{% trans "Смотрим вместе" %}{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,8 +15,8 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-camera-reels"></i> Смотрим вместе
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="bi bi-camera-reels"></i> {% trans "Смотрим вместе" %}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -24,31 +25,47 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'content_list' %}">
-                            <i class="bi bi-collection-play"></i> Каталог
+                            <i class="bi bi-collection-play"></i> {% trans "Каталог" %}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'group_list' %}">
-                            <i class="bi bi-people"></i> Группы
+                            <i class="bi bi-people"></i> {% trans "Группы" %}
                         </a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'my_content_list' %}">
-                                <i class="bi bi-bookmark-star"></i> Мои объекты
+                                <i class="bi bi-bookmark-star"></i> {% trans "Мои объекты" %}
                             </a>
                         </li>
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item d-flex align-items-center me-3">
+                        <form action="{% url 'set_language' %}" method="post" class="d-flex align-items-center">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ language_switch_next }}">
+                            <select name="language" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="{% trans 'Язык' %}">
+                                {% get_current_language as LANGUAGE_CODE %}
+                                {% get_available_languages as LANGUAGES %}
+                                {% get_language_info_list for LANGUAGES as languages %}
+                                {% for language in languages %}
+                                    <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}selected{% endif %}>
+                                        {{ language.name_local }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link position-relative" href="{% url 'notification_list' %}" title="Уведомления">
+                            <a class="nav-link position-relative" href="{% url 'notification_list' %}" title="{% trans 'Уведомления' %}">
                                 <i class="bi bi-bell"></i>
                                 {% if unread_notifications_count %}
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                         {{ unread_notifications_count }}
-                                        <span class="visually-hidden">непрочитанных уведомлений</span>
+                                        <span class="visually-hidden">{% trans "непрочитанных уведомлений" %}</span>
                                     </span>
                                 {% endif %}
                             </a>
@@ -59,14 +76,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Выход</a>
+                            <a class="nav-link" href="{% url 'logout' %}">{% trans "Выход" %}</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Вход</a>
+                            <a class="nav-link" href="{% url 'login' %}">{% trans "Вход" %}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
+                            <a class="nav-link" href="{% url 'register' %}">{% trans "Регистрация" %}</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -91,7 +108,7 @@
 
     <footer class="bg-light text-center text-muted py-3 mt-5">
         <div class="container">
-            <p>&copy; 2026 Смотрим вместе. Обмен мнениями о фильмах, сериалах и музыке.</p>
+            <p>&copy; 2026 {% trans "Смотрим вместе" %}. {% trans "Обмен мнениями о фильмах, сериалах и музыке." %}</p>
         </div>
     </footer>
 

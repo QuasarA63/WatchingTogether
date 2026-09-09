@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}{{ content_item.title }} — {{ group.name }} — Смотрим вместе{% endblock %}
+{% block title %}{{ content_item.title }} — {{ group.name }} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item"><a href="{% url 'group_list' %}">Группы</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'group_list' %}">{% trans "Группы" %}</a></li>
         <li class="breadcrumb-item"><a href="{% url 'group_detail' group.pk %}">{{ group.name }}</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{ content_item.title }}</li>
     </ol>
@@ -22,18 +23,18 @@
         </h2>
         <p class="text-muted mb-0">
             <a href="{% url 'content_detail' content_item.pk %}" class="text-decoration-none">
-                <i class="bi bi-box-arrow-up-right"></i> Страница в каталоге
+                <i class="bi bi-box-arrow-up-right"></i> {% trans "Страница в каталоге" %}
             </a>
         </p>
     </div>
     {% if is_member %}
         {% if already_have %}
-            <span class="badge bg-success fs-6"><i class="bi bi-check-circle"></i> В ваших объектах</span>
+            <span class="badge bg-success fs-6"><i class="bi bi-check-circle"></i> {% trans "В ваших объектах" %}</span>
         {% else %}
             <form method="post" action="{% url 'group_content_take' group.pk content_item.pk %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-bookmark-plus"></i> Взять себе
+                    <i class="bi bi-bookmark-plus"></i> {% trans "Взять себе" %}
                 </button>
             </form>
         {% endif %}
@@ -47,7 +48,7 @@
 <!-- Сводка по участникам -->
 {% if entries %}
     <div class="card mb-4">
-        <div class="card-header"><i class="bi bi-people"></i> У участников группы</div>
+        <div class="card-header"><i class="bi bi-people"></i> {% trans "У участников группы" %}</div>
         <div class="list-group list-group-flush">
             {% for entry in entries %}
                 <div class="list-group-item d-flex align-items-center py-2">
@@ -74,7 +75,7 @@
 {% endif %}
 
 <!-- Обсуждение (форум) -->
-<h4 class="mb-3" id="discussion"><i class="bi bi-chat-left-text"></i> Обсуждение</h4>
+<h4 class="mb-3" id="discussion"><i class="bi bi-chat-left-text"></i> {% trans "Обсуждение" %}</h4>
 
 {% if comment_form %}
     <div class="card mb-3">
@@ -83,25 +84,25 @@
                 {% csrf_token %}
                 <input type="hidden" name="parent_id" id="parent_id" value="">
                 <div class="alert alert-secondary py-1 px-2 small d-none" id="reply-indicator">
-                    Ответ для <strong id="reply-to"></strong>
-                    <button type="button" class="btn-close btn-sm" id="reply-cancel" aria-label="Отмена"></button>
+                    {% trans "Ответ для" %} <strong id="reply-to"></strong>
+                    <button type="button" class="btn-close btn-sm" id="reply-cancel" aria-label="{% trans 'Отмена' %}"></button>
                 </div>
                 <div class="mb-2">
                     {{ comment_form.text }}
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm">
-                    <i class="bi bi-send"></i> Отправить
+                    <i class="bi bi-send"></i> {% trans "Отправить" %}
                 </button>
             </form>
         </div>
     </div>
 {% elif not user.is_authenticated %}
     <div class="alert alert-info mb-3">
-        <a href="{% url 'login' %}">Войдите</a>, чтобы участвовать в обсуждении.
+        <a href="{% url 'login' %}">{% trans "Войдите" %}</a>, {% trans "чтобы участвовать в обсуждении." %}
     </div>
 {% else %}
     <div class="alert alert-info mb-3">
-        Обсуждение доступно только участникам группы.
+        {% trans "Обсуждение доступно только участникам группы." %}
     </div>
 {% endif %}
 
@@ -117,7 +118,7 @@
                     {% if comment_form %}
                         <button type="button" class="btn btn-sm btn-outline-secondary reply-btn"
                                 data-comment-id="{{ comment.pk }}" data-username="{{ comment.user.username }}">
-                            <i class="bi bi-reply"></i> Ответить
+                            <i class="bi bi-reply"></i> {% trans "Ответить" %}
                         </button>
                     {% endif %}
                 </div>
@@ -133,7 +134,7 @@
                             {% if comment_form %}
                                 <button type="button" class="btn btn-sm btn-outline-secondary reply-btn"
                                         data-comment-id="{{ comment.pk }}" data-username="{{ reply.user.username }}">
-                                    <i class="bi bi-reply"></i> Ответить
+                                    <i class="bi bi-reply"></i> {% trans "Ответить" %}
                                 </button>
                             {% endif %}
                         </div>
@@ -144,11 +145,11 @@
         </div>
     {% endfor %}
 {% else %}
-    <p class="text-muted">Комментариев пока нет. Начните обсуждение!</p>
+    <p class="text-muted">{% trans "Комментариев пока нет. Начните обсуждение!" %}</p>
 {% endif %}
 
 {% if reviews %}
-    <h4 class="mb-3 mt-4"><i class="bi bi-chat-square-text"></i> Отзывы группы на этот объект</h4>
+    <h4 class="mb-3 mt-4"><i class="bi bi-chat-square-text"></i> {% trans "Отзывы группы на этот объект" %}</h4>
     {% for review in reviews %}
         <div class="card mb-3">
             <div class="card-body">
@@ -156,7 +157,7 @@
                     <div>
                         <h5 class="card-title mb-1">
                             <a href="{% url 'review_detail' review.pk %}" class="text-decoration-none">
-                                {% if review.title %}{{ review.title }}{% else %}Отзыв{% endif %}
+                                {% if review.title %}{{ review.title }}{% else %}{% trans "Отзыв" %}{% endif %}
                             </a>
                         </h5>
                         <p class="text-muted small mb-2">

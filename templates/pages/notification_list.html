@@ -1,24 +1,25 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Уведомления — Смотрим вместе{% endblock %}
+{% block title %}{% trans "Уведомления" %} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item active" aria-current="page">Уведомления</li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Уведомления" %}</li>
     </ol>
 </nav>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-bell"></i> Уведомления</h2>
+    <h2><i class="bi bi-bell"></i> {% trans "Уведомления" %}</h2>
     {% if unread_notifications_count %}
         <form method="post" action="{% url 'notification_mark_all_read' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-check2-all"></i> Прочитать все
+                <i class="bi bi-check2-all"></i> {% trans "Прочитать все" %}
             </button>
         </form>
     {% endif %}
@@ -46,7 +47,7 @@
                             {% endif %}
                             <strong>{{ notification.title }}</strong>
                             {% if not notification.is_read %}
-                                <span class="badge bg-danger ms-2">Новое</span>
+                                <span class="badge bg-danger ms-2">{% trans "Новое" %}</span>
                             {% endif %}
                         </div>
                         {% if notification.message %}
@@ -59,18 +60,18 @@
                             <form method="post" action="{% url 'invitation_accept' notification.invitation.pk %}" class="d-inline">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-success btn-sm">
-                                    <i class="bi bi-check-lg"></i> Принять
+                                    <i class="bi bi-check-lg"></i> {% trans "Принять" %}
                                 </button>
                             </form>
                             <form method="post" action="{% url 'invitation_decline' notification.invitation.pk %}" class="d-inline">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    <i class="bi bi-x-lg"></i> Отклонить
+                                    <i class="bi bi-x-lg"></i> {% trans "Отклонить" %}
                                 </button>
                             </form>
                         {% elif notification.link %}
                             <a href="{% url 'notification_open' notification.pk %}" class="btn btn-outline-primary btn-sm">
-                                Открыть <i class="bi bi-arrow-right"></i>
+                                {% trans "Открыть" %} <i class="bi bi-arrow-right"></i>
                             </a>
                         {% endif %}
                     </div>
@@ -102,7 +103,7 @@
     {% endif %}
 {% else %}
     <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> У вас пока нет уведомлений.
+        <i class="bi bi-info-circle"></i> {% trans "У вас пока нет уведомлений." %}
     </div>
 {% endif %}
 {% endblock %}

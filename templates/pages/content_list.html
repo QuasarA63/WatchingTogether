@@ -1,26 +1,27 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Каталог — Смотрим вместе{% endblock %}
+{% block title %}{% trans "Каталог" %} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item active" aria-current="page">Каталог</li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Каталог" %}</li>
     </ol>
 </nav>
 {% endblock %}
 
 {% block content %}
-<h2 class="mb-4"><i class="bi bi-collection-play"></i> Каталог</h2>
+<h2 class="mb-4"><i class="bi bi-collection-play"></i> {% trans "Каталог" %}</h2>
 
 <!-- Фильтры -->
 <div class="row mb-4">
     <div class="col-md-10">
         <form method="get" class="d-flex gap-2 flex-wrap">
-            <input type="text" name="q" class="form-control" placeholder="Поиск..." value="{{ search }}" style="max-width: 200px;">
+            <input type="text" name="q" class="form-control" placeholder="{% trans 'Поиск...' %}" value="{{ search }}" style="max-width: 200px;">
             <select name="category" class="form-select" style="max-width: 180px;">
-                <option value="">Все категории</option>
+                <option value="">{% trans "Все категории" %}</option>
                 {% for cat in categories %}
                     <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>
                         {{ cat.name }}
@@ -28,17 +29,17 @@
                 {% endfor %}
             </select>
             <select name="genre" class="form-select" style="max-width: 180px;">
-                <option value="">Все жанры</option>
+                <option value="">{% trans "Все жанры" %}</option>
                 {% for genre in genres %}
                     <option value="{{ genre.slug }}" {% if current_genre == genre.slug %}selected{% endif %}>
                         {{ genre.name }}
                     </option>
                 {% endfor %}
             </select>
-            <select name="ended" class="form-select" style="max-width: 150px;" title="Фильтр по завершённости сериала">
-                <option value="">Все</option>
-                <option value="ended" {% if current_ended == 'ended' %}selected{% endif %}>Завершён</option>
-                <option value="ongoing" {% if current_ended == 'ongoing' %}selected{% endif %}>Идёт</option>
+            <select name="ended" class="form-select" style="max-width: 150px;" title="{% trans 'Фильтр по завершённости сериала' %}">
+                <option value="">{% trans "Все" %}</option>
+                <option value="ended" {% if current_ended == 'ended' %}selected{% endif %}>{% trans "Завершён" %}</option>
+                <option value="ongoing" {% if current_ended == 'ongoing' %}selected{% endif %}>{% trans "Идёт" %}</option>
             </select>
             <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
         </form>
@@ -77,9 +78,9 @@
                             {% if item.year %}&middot; {{ item.year }}{% endif %}
                             {% if item.category.slug == 'series' %}
                                 {% if item.is_ended is True %}
-                                    <span class="badge bg-info text-dark"><i class="bi bi-check-circle"></i> Завершён</span>
+                                    <span class="badge bg-info text-dark"><i class="bi bi-check-circle"></i> {% trans "Завершён" %}</span>
                                 {% elif item.is_ended is False %}
-                                    <span class="badge bg-success"><i class="bi bi-hourglass-split"></i> Идёт</span>
+                                    <span class="badge bg-success"><i class="bi bi-hourglass-split"></i> {% trans "Идёт" %}</span>
                                 {% endif %}
                             {% endif %}
                         </p>
@@ -92,18 +93,18 @@
                         {% endif %}
                         <div class="d-flex gap-2 align-items-center flex-wrap">
                             {% if item.external_rating %}
-                                <span class="badge bg-warning text-dark" title="Рейтинг Кинопоиска">
+                                <span class="badge bg-warning text-dark" title="{% trans 'Рейтинг Кинопоиска' %}">
                                     <i class="bi bi-star-fill"></i> {{ item.external_rating }}
                                 </span>
                             {% endif %}
                             {% if item.avg_rating %}
-                                <span class="badge bg-primary" title="Оценка пользователей">
+                                <span class="badge bg-primary" title="{% trans 'Оценка пользователей' %}">
                                     <i class="bi bi-people-fill"></i> {{ item.avg_rating|floatformat:1 }}
                                 </span>
                                 <small class="text-muted">({{ item.reviews_count }})</small>
                             {% endif %}
                             {% if not item.external_rating and not item.avg_rating %}
-                                <small class="text-muted">Нет оценок</small>
+                                <small class="text-muted">{% trans "Нет оценок" %}</small>
                             {% endif %}
                         </div>
                             </div>
@@ -138,7 +139,7 @@
     {% endif %}
 {% else %}
     <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> Контент не найден.
+        <i class="bi bi-info-circle"></i> {% trans "Контент не найден." %}
     </div>
 {% endif %}
 {% endblock %}

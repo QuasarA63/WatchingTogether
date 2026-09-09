@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count
 from django.utils.text import slugify
+from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 from datetime import date, datetime, timedelta, timezone
 from .models import Category, Genre, ContentItem, UserContentItem, Person, ContentItemPerson
 from . import services
@@ -55,16 +57,6 @@ def _find_next_episode(seasons, today=None):
     if not upcoming:
         return None
     return min(upcoming, key=lambda e: e['air_date'])
-
-
-def _plural_days(n):
-    """Русское склонение слова «день» по числу n."""
-    n = int(n)
-    if n % 10 == 1 and n % 100 != 11:
-        return 'день'
-    if 2 <= n % 10 <= 4 and (n % 100 < 10 or n % 100 >= 20):
-        return 'дня'
-    return 'дней'
 
 
 def item_new_updates(item, max_age_days=30):
@@ -293,7 +285,11 @@ def content_detail(request, pk):
         if next_episode:
             days_left = (next_episode['air_date'] - today).days
             next_episode['days_left'] = days_left
-            next_episode['days_label'] = f'через {days_left} {_plural_days(days_left)}'
+            next_episode['days_label'] = ngettext(
+                'через %(days)d день',
+                'через %(days)d дней',
+                days_left,
+            ) % {'days': days_left}
 
     # Свежие сведения о новых сериях и сезонах (для сериала)
     new_episodes, new_seasons = item_new_updates(item) if not item.is_season else ([], [])
@@ -337,19 +333,19 @@ def content_refresh_dates(request, pk):
         return redirect('content_detail', pk=pk)
 
     if item.is_season or item.category.slug != 'series' or not item.external_id:
-        messages.error(request, 'Даты выхода можно обновлять только для сериала.')
+        messages.error(request, _('Даты выхода можно обновлять только для сериала.'))
         return redirect('content_detail', pk=pk)
 
     if not services.is_configured():
-        messages.error(request, 'Кинопоиск API не настроен: задайте KINOPOISK_API_KEY.')
+        messages.error(request, _('Кинопоиск API не настроен: задайте KINOPOISK_API_KEY.'))
         return redirect('content_detail', pk=pk)
 
     seasons_ok = _import_seasons(item, item.external_id)
     _refresh_ended_flag(item)
     if seasons_ok:
-        messages.success(request, 'Даты выхода серий и статус сериала обновлены.')
+        messages.success(request, _('Даты выхода серий и статус сериала обновлены.'))
     else:
-        messages.error(request, 'Не удалось обновить даты. Попробуйте позже.')
+        messages.error(request, _('Не удалось обновить даты. Попробуйте позже.'))
 
     return redirect('content_detail', pk=pk)
 
@@ -683,7 +679,7 @@ def my_content_add(request):
     comment = request.POST.get('comment', '').strip()
 
     if not external_id or media_type not in ('movie', 'tv'):
-        messages.error(request, 'Некорректные данные объекта.')
+        messages.error(request, _('Некорректные данные объекта.'))
         return redirect('my_content_search')
 
     # Логирование для отладки
@@ -693,7 +689,7 @@ def my_content_add(request):
 
     category = _category_for_media_type(media_type)
     if category is None:
-        messages.error(request, 'Категория для этого типа контента не найдена в БД.')
+        messages.error(request, _('Категория для этого типа контента не найдена в БД.'))
         return redirect('my_content_search')
 
     # Если объект уже есть в нашей БД — просто привязываем к пользователю
@@ -763,9 +759,9 @@ def my_content_add(request):
         entry.save(update_fields=['comment', 'updated_at'])
 
     if created:
-        messages.success(request, f'«{content_item.title}» добавлен в ваши объекты!')
+        messages.success(request, _('«%(title)s» добавлен в ваши объекты!') % {'title': content_item.title})
     else:
-        messages.info(request, f'«{content_item.title}» уже есть в ваших объектах.')
+        messages.info(request, _('«%(title)s» уже есть в ваших объектах.') % {'title': content_item.title})
     return redirect('my_content_list')
 
 
@@ -780,7 +776,7 @@ def my_content_edit_comment(request, pk):
         entry.comment = request.POST.get('comment', '').strip()
         entry.is_public = request.POST.get('is_public') == 'on'
         entry.save(update_fields=['comment', 'is_public', 'updated_at'])
-        messages.success(request, 'Комментарий обновлён.')
+        messages.success(request, _('Комментарий обновлён.'))
     return redirect('my_content_list')
 
 
@@ -803,7 +799,7 @@ def my_content_edit_status(request, pk):
                     if 1 <= rating <= 10:
                         entry.personal_rating = rating
             entry.save(update_fields=['status', 'personal_rating', 'updated_at'])
-            messages.success(request, f'Статус изменён на «{entry.get_status_display()}».')
+            messages.success(request, _('Статус изменён на «%(status)s».') % {'status': entry.get_status_display()})
     return redirect('my_content_list')
 
 
@@ -827,5 +823,5 @@ def my_content_remove(request, pk):
             content_item.is_active = False
             content_item.save(update_fields=['is_active', 'updated_at'])
 
-        messages.info(request, f'«{title}» удалён из ваших объектов.')
+        messages.info(request, _('«%(title)s» удалён из ваших объектов.') % {'title': title})
     return redirect('my_content_list')

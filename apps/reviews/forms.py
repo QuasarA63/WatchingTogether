@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import Review, Comment
 
 
@@ -10,15 +11,15 @@ class ReviewForm(forms.ModelForm):
         model = Review
         fields = ['rating', 'title', 'text', 'is_spoiler']
         labels = {
-            'rating': 'Оценка (1-10)',
-            'title': 'Заголовок отзыва',
-            'text': 'Текст отзыва (необязательно)',
-            'is_spoiler': 'Содержит спойлеры',
+            'rating': _('Оценка (1-10)'),
+            'title': _('Заголовок отзыва'),
+            'text': _('Текст отзыва (необязательно)'),
+            'is_spoiler': _('Содержит спойлеры'),
         }
         widgets = {
             'rating': forms.Select(attrs={'class': 'form-select'}),
-            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Заголовок (необязательно)'}),
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Ваш отзыв... (необязательно)'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Заголовок (необязательно)')}),
+            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': _('Ваш отзыв... (необязательно)')}),
             'is_spoiler': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
@@ -31,12 +32,12 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ['text']
         labels = {
-            'text': 'Комментарий',
+            'text': _('Комментарий'),
         }
         widgets = {
             'text': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Написать комментарий...'
+                'placeholder': _('Написать комментарий...')
             }),
         }

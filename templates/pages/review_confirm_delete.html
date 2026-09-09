@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Удаление отзыва — Смотрим вместе{% endblock %}
+{% block title %}{% trans "Удаление отзыва" %} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item"><a href="{% url 'content_list' %}">Каталог</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'content_list' %}">{% trans "Каталог" %}</a></li>
         <li class="breadcrumb-item"><a href="{% url 'content_detail' review.content_item.pk %}">{{ review.content_item.title }}</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'review_detail' review.pk %}">Отзыв</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Удаление</li>
+        <li class="breadcrumb-item"><a href="{% url 'review_detail' review.pk %}">{% trans "Отзыв" %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Удаление" %}</li>
     </ol>
 </nav>
 {% endblock %}
@@ -19,19 +20,19 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-danger text-white">
-                <h4 class="mb-0"><i class="bi bi-trash"></i> Удаление отзыва</h4>
+                <h4 class="mb-0"><i class="bi bi-trash"></i> {% trans "Удаление отзыва" %}</h4>
             </div>
             <div class="card-body">
-                <p>Вы уверены, что хотите удалить отзыв на <strong>«{{ review.content_item.title }}»</strong>?</p>
-                <p class="text-muted">Оценка: {{ review.rating }}/10</p>
+                <p>{% blocktrans with title=review.content_item.title %}Вы уверены, что хотите удалить отзыв на <strong>«{{ title }}»</strong>?{% endblocktrans %}</p>
+                <p class="text-muted">{% trans "Оценка:" %} {{ review.rating }}/10</p>
                 <p class="text-muted">{{ review.text|truncatewords:20 }}</p>
 
                 <form method="post">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-trash"></i> Да, удалить
+                        <i class="bi bi-trash"></i> {% trans "Да, удалить" %}
                     </button>
-                    <a href="{% url 'review_detail' review.pk %}" class="btn btn-outline-secondary">Отмена</a>
+                    <a href="{% url 'review_detail' review.pk %}" class="btn btn-outline-secondary">{% trans "Отмена" %}</a>
                 </form>
             </div>
         </div>

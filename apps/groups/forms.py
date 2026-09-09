@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
 from .models import Group
 
 User = get_user_model()
@@ -13,14 +14,14 @@ class GroupForm(forms.ModelForm):
         model = Group
         fields = ['name', 'description', 'avatar', 'is_private']
         labels = {
-            'name': 'Название группы',
-            'description': 'Описание',
-            'avatar': 'Аватар группы',
-            'is_private': 'Приватная группа',
+            'name': _('Название группы'),
+            'description': _('Описание'),
+            'avatar': _('Аватар группы'),
+            'is_private': _('Приватная группа'),
         }
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Название группы'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Описание группы'}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Название группы')}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': _('Описание группы')}),
             'avatar': forms.FileInput(attrs={'class': 'form-control'}),
             'is_private': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
@@ -32,16 +33,16 @@ class GroupInviteForm(forms.Form):
     """
     user = forms.ModelChoiceField(
         queryset=User.objects.none(),
-        label='Пользователь',
+        label=_('Пользователь'),
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
     message = forms.CharField(
         required=False,
-        label='Сообщение',
+        label=_('Сообщение'),
         widget=forms.Textarea(attrs={
             'class': 'form-control',
             'rows': 3,
-            'placeholder': 'Необязательное сообщение к приглашению'
+            'placeholder': _('Необязательное сообщение к приглашению')
         }),
     )
 
@@ -56,12 +57,12 @@ class GroupMessageForm(forms.Form):
     Форма сообщения в групповой чат.
     """
     text = forms.CharField(
-        label='Сообщение',
+        label=_('Сообщение'),
         max_length=2000,
         widget=forms.Textarea(attrs={
             'class': 'form-control',
             'rows': 2,
-            'placeholder': 'Введите сообщение...'
+            'placeholder': _('Введите сообщение...')
         }),
     )
 
@@ -71,11 +72,11 @@ class GroupContentCommentForm(forms.Form):
     Форма комментария к обсуждению объекта в группе.
     """
     text = forms.CharField(
-        label='Комментарий',
+        label=_('Комментарий'),
         max_length=2000,
         widget=forms.Textarea(attrs={
             'class': 'form-control',
             'rows': 3,
-            'placeholder': 'Ваш комментарий...'
+            'placeholder': _('Ваш комментарий...')
         }),
     )

@@ -1,14 +1,15 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Пригласить в {{ group.name }} — Смотрим вместе{% endblock %}
+{% block title %}{% blocktrans with name=group.name %}Пригласить в {{ name }}{% endblocktrans %} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item"><a href="{% url 'group_list' %}">Группы</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'group_list' %}">{% trans "Группы" %}</a></li>
         <li class="breadcrumb-item"><a href="{% url 'group_detail' group.pk %}">{{ group.name }}</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Пригласить</li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Пригласить" %}</li>
     </ol>
 </nav>
 {% endblock %}
@@ -16,11 +17,11 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <h2 class="mb-3"><i class="bi bi-person-plus"></i> Приглашение в группу «{{ group.name }}»</h2>
+        <h2 class="mb-3"><i class="bi bi-person-plus"></i> {% blocktrans with name=group.name %}Приглашение в группу «{{ name }}»{% endblocktrans %}</h2>
 
         <form method="get" class="mb-3">
             <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Поиск по имени пользователя..." value="{{ search }}">
+                <input type="text" name="q" class="form-control" placeholder="{% trans 'Поиск по имени пользователя...' %}" value="{{ search }}">
                 <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
             </div>
         </form>
@@ -34,7 +35,7 @@
                     <div class="text-danger small">{{ form.user.errors }}</div>
                 {% endif %}
                 {% if not form.user.field.queryset %}
-                    <div class="form-text">Нет пользователей, которых можно пригласить.</div>
+                    <div class="form-text">{% trans "Нет пользователей, которых можно пригласить." %}</div>
                 {% endif %}
             </div>
             <div class="mb-3">
@@ -45,9 +46,9 @@
                 {% endif %}
             </div>
             <button type="submit" class="btn btn-primary">
-                <i class="bi bi-send"></i> Отправить приглашение
+                <i class="bi bi-send"></i> {% trans "Отправить приглашение" %}
             </button>
-            <a href="{% url 'group_detail' group.pk %}" class="btn btn-outline-secondary">Отмена</a>
+            <a href="{% url 'group_detail' group.pk %}" class="btn btn-outline-secondary">{% trans "Отмена" %}</a>
         </form>
     </div>
 </div>

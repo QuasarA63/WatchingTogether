@@ -1,13 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Редактирование профиля — Смотрим вместе{% endblock %}
+{% block title %}{% trans "Редактирование профиля" %} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item"><a href="{% url 'profile' %}">Профиль</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Редактирование</li>
+        <li class="breadcrumb-item"><a href="{% url 'profile' %}">{% trans "Профиль" %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Редактирование" %}</li>
     </ol>
 </nav>
 {% endblock %}
@@ -17,7 +18,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h4 class="mb-0"><i class="bi bi-person-gear"></i> Редактирование профиля</h4>
+                <h4 class="mb-0"><i class="bi bi-person-gear"></i> {% trans "Редактирование профиля" %}</h4>
             </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
@@ -34,11 +35,11 @@
                     <!-- Аватар -->
                     <div class="mb-3 text-center">
                         {% if form.instance.avatar %}
-                            <img src="{{ form.instance.avatar.url }}" class="rounded-circle mb-2" width="100" height="100" alt="Аватар" id="avatar-preview">
+                            <img src="{{ form.instance.avatar.url }}" class="rounded-circle mb-2" width="100" height="100" alt="{% trans 'Аватар' %}" id="avatar-preview">
                         {% else %}
                             <div class="mb-2">
                                 <i class="bi bi-person-circle" style="font-size: 4rem;" id="avatar-preview-icon"></i>
-                                <img src="" class="rounded-circle mb-2 d-none" width="100" height="100" alt="Аватар" id="avatar-preview">
+                                <img src="" class="rounded-circle mb-2 d-none" width="100" height="100" alt="{% trans 'Аватар' %}" id="avatar-preview">
                             </div>
                         {% endif %}
                         <label for="{{ form.avatar.id_for_label }}" class="form-label d-block">{{ form.avatar.label }}</label>
@@ -49,7 +50,7 @@
                     </div>
 
                     <hr>
-                    <h5 class="mb-3"><i class="bi bi-person"></i> Личные данные</h5>
+                    <h5 class="mb-3"><i class="bi bi-person"></i> {% trans "Личные данные" %}</h5>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -77,7 +78,7 @@
                     </div>
 
                     <hr>
-                    <h5 class="mb-3"><i class="bi bi-shield-lock"></i> Учётные данные</h5>
+                    <h5 class="mb-3"><i class="bi bi-shield-lock"></i> {% trans "Учётные данные" %}</h5>
 
                     <div class="mb-3">
                         <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
@@ -96,8 +97,8 @@
                     </div>
 
                     <hr>
-                    <h5 class="mb-3"><i class="bi bi-key"></i> Смена пароля</h5>
-                    <p class="text-muted small">Оставьте поля пустыми, если не хотите менять пароль.</p>
+                    <h5 class="mb-3"><i class="bi bi-key"></i> {% trans "Смена пароля" %}</h5>
+                    <p class="text-muted small">{% trans "Оставьте поля пустыми, если не хотите менять пароль." %}</p>
 
                     <div class="mb-3">
                         <label for="{{ form.new_password.id_for_label }}" class="form-label">{{ form.new_password.label }}</label>
@@ -120,10 +121,10 @@
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-lg"></i> Сохранить
+                            <i class="bi bi-check-lg"></i> {% trans "Сохранить" %}
                         </button>
                         <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-lg"></i> Отмена
+                            <i class="bi bi-x-lg"></i> {% trans "Отмена" %}
                         </a>
                     </div>
                 </form>

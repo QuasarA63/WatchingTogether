@@ -1,0 +1,1521 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Watching Together 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-09 19:48+0300\n"
+"PO-Revision-Date: 2026-09-09 20:00+0300\n"
+"Last-Translator: Watching Together Team\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: .\apps\content\models.py:13 .\apps\content\models.py:51
+#: .\apps\content\models.py:97 .\apps\groups\models.py:148
+#: .\templates\pages\content_detail.html:218
+msgid "Название"
+msgstr ""
+
+#: .\apps\content\models.py:17 .\apps\content\models.py:55
+msgid "Slug"
+msgstr ""
+
+#: .\apps\content\models.py:21 .\apps\content\models.py:106
+#: .\apps\groups\forms.py:18 .\apps\groups\models.py:152
+#: .\templates\pages\my_content_list.html:210
+msgid "Описание"
+msgstr ""
+
+#: .\apps\content\models.py:26
+msgid "Иконка"
+msgstr ""
+
+#: .\apps\content\models.py:27
+msgid "CSS класс иконки (например, bi-film)"
+msgstr ""
+
+#: .\apps\content\models.py:31
+msgid "Порядок сортировки"
+msgstr ""
+
+#: .\apps\content\models.py:32
+msgid "Чем меньше число, тем выше категория в списках"
+msgstr ""
+
+#: .\apps\content\models.py:36 .\apps\content\models.py:87
+msgid "Категория"
+msgstr ""
+
+#: .\apps\content\models.py:37
+msgid "Категории"
+msgstr ""
+
+#: .\apps\content\models.py:59
+msgid "Жанр"
+msgstr ""
+
+#: .\apps\content\models.py:60 .\apps\content\models.py:93
+msgid "Жанры"
+msgstr ""
+
+#: .\apps\content\models.py:80
+msgid "Родительский объект"
+msgstr ""
+
+#: .\apps\content\models.py:81
+msgid "Например, сериал для сезона"
+msgstr ""
+
+#: .\apps\content\models.py:102
+msgid "Оригинальное название"
+msgstr ""
+
+#: .\apps\content\models.py:111
+msgid "Год выпуска"
+msgstr ""
+
+#: .\apps\content\models.py:116
+msgid "Постер"
+msgstr ""
+
+#: .\apps\content\models.py:121 .\apps\content\models.py:200
+msgid "Внешний ID"
+msgstr ""
+
+#: .\apps\content\models.py:122
+msgid "ID из внешних API (Kinopoisk, TMDB и т.д.)"
+msgstr ""
+
+#: .\apps\content\models.py:127
+msgid "Метаданные"
+msgstr ""
+
+#: .\apps\content\models.py:128
+msgid "Дополнительные данные в формате JSON"
+msgstr ""
+
+#: .\apps\content\models.py:135
+msgid "Внешний рейтинг"
+msgstr ""
+
+#: .\apps\content\models.py:136
+msgid "Рейтинг из внешних источников (Кинопоиск, TMDB)"
+msgstr ""
+
+#: .\apps\content\models.py:140
+msgid "Активен"
+msgstr ""
+
+#: .\apps\content\models.py:141
+msgid "Неактивные объекты скрыты из каталога (мягкое удаление)"
+msgstr ""
+
+#: .\apps\content\models.py:145 .\apps\content\models.py:236
+#: .\apps\content\models.py:287 .\apps\groups\models.py:109
+#: .\apps\reviews\models.py:25
+msgid "Элемент контента"
+msgstr ""
+
+#: .\apps\content\models.py:146
+msgid "Элементы контента"
+msgstr ""
+
+#: .\apps\content\models.py:195 .\apps\users\forms.py:101
+#: .\apps\users\forms.py:138
+msgid "Имя"
+msgstr ""
+
+#: .\apps\content\models.py:201
+msgid "ID из внешних API (Kinopoisk и т.д.)"
+msgstr ""
+
+#: .\apps\content\models.py:205
+msgid "Фото"
+msgstr ""
+
+#: .\apps\content\models.py:206
+msgid "URL фотографии персоны"
+msgstr ""
+
+#: .\apps\content\models.py:210 .\apps\content\models.py:242
+msgid "Персона"
+msgstr ""
+
+#: .\apps\content\models.py:211
+msgid "Персоны"
+msgstr ""
+
+#: .\apps\content\models.py:224
+msgid "Режиссёр"
+msgstr ""
+
+#: .\apps\content\models.py:225
+msgid "Актёр"
+msgstr ""
+
+#: .\apps\content\models.py:226
+msgid "Исполнитель"
+msgstr ""
+
+#: .\apps\content\models.py:227
+msgid "Участник группы"
+msgstr ""
+
+#: .\apps\content\models.py:228
+msgid "Композитор"
+msgstr ""
+
+#: .\apps\content\models.py:229
+msgid "Продюсер"
+msgstr ""
+
+#: .\apps\content\models.py:230
+msgid "Сценарист"
+msgstr ""
+
+#: .\apps\content\models.py:247 .\apps\groups\models.py:209
+msgid "Роль"
+msgstr ""
+
+#: .\apps\content\models.py:251
+msgid "Персона контента"
+msgstr ""
+
+#: .\apps\content\models.py:252
+msgid "Персоны контента"
+msgstr ""
+
+#: .\apps\content\models.py:272
+msgid "В планах"
+msgstr ""
+
+#: .\apps\content\models.py:273
+msgid "Смотрю"
+msgstr ""
+
+#: .\apps\content\models.py:274
+msgid "Отложил"
+msgstr ""
+
+#: .\apps\content\models.py:275
+msgid "Посмотрел"
+msgstr ""
+
+#: .\apps\content\models.py:281 .\apps\groups\forms.py:36
+#: .\apps\groups\models.py:198 .\apps\notifications\models.py:24
+#: .\apps\reviews\models.py:19 .\apps\reviews\models.py:82
+#: .\apps\users\models.py:22
+msgid "Пользователь"
+msgstr ""
+
+#: .\apps\content\models.py:293
+msgid "Статус просмотра"
+msgstr ""
+
+#: .\apps\content\models.py:299
+msgid "Личная оценка"
+msgstr ""
+
+#: .\apps\content\models.py:300 .\apps\reviews\models.py:39
+msgid "Оценка от 1 до 10"
+msgstr ""
+
+#: .\apps\content\models.py:304 .\apps\groups\forms.py:75
+#: .\apps\reviews\forms.py:35 .\apps\reviews\models.py:97
+#: .\templates\pages\my_content_list.html:262
+msgid "Комментарий"
+msgstr ""
+
+#: .\apps\content\models.py:308 .\templates\pages\my_content_list.html:222
+#: .\templates\pages\my_content_list.html:263
+msgid "Публичный"
+msgstr ""
+
+#: .\apps\content\models.py:309
+msgid "Публичные комментарии видны всем на главной странице"
+msgstr ""
+
+#: .\apps\content\models.py:313
+msgid "Объект пользователя"
+msgstr ""
+
+#: .\apps\content\models.py:314
+msgid "Объекты пользователей"
+msgstr ""
+
+#: .\apps\content\services.py:49
+msgid "Кинопоиск API не настроен: задайте KINOPOISK_API_KEY в .env"
+msgstr ""
+
+#: .\apps\content\services.py:60
+#, python-format
+msgid "Ошибка при обращении к Кинопоиску: %(error)s"
+msgstr ""
+
+#: .\apps\content\web_views.py:289
+#, python-format
+msgid "через %(days)d день"
+msgid_plural "через %(days)d дней"
+msgstr[0] "через %(days)d день"
+msgstr[1] "через %(days)d дня"
+msgstr[2] "через %(days)d дней"
+
+#: .\apps\content\web_views.py:336
+msgid "Даты выхода можно обновлять только для сериала."
+msgstr ""
+
+#: .\apps\content\web_views.py:340
+msgid "Кинопоиск API не настроен: задайте KINOPOISK_API_KEY."
+msgstr ""
+
+#: .\apps\content\web_views.py:346
+msgid "Даты выхода серий и статус сериала обновлены."
+msgstr ""
+
+#: .\apps\content\web_views.py:348
+msgid "Не удалось обновить даты. Попробуйте позже."
+msgstr ""
+
+#: .\apps\content\web_views.py:682
+msgid "Некорректные данные объекта."
+msgstr ""
+
+#: .\apps\content\web_views.py:692
+msgid "Категория для этого типа контента не найдена в БД."
+msgstr ""
+
+#: .\apps\content\web_views.py:762
+#, python-format
+msgid "«%(title)s» добавлен в ваши объекты!"
+msgstr ""
+
+#: .\apps\content\web_views.py:764 .\apps\groups\web_views.py:420
+#, python-format
+msgid "«%(title)s» уже есть в ваших объектах."
+msgstr ""
+
+#: .\apps\content\web_views.py:779
+msgid "Комментарий обновлён."
+msgstr ""
+
+#: .\apps\content\web_views.py:802
+#, python-format
+msgid "Статус изменён на «%(status)s»."
+msgstr ""
+
+#: .\apps\content\web_views.py:826
+#, python-format
+msgid "«%(title)s» удалён из ваших объектов."
+msgstr ""
+
+#: .\apps\core\models.py:9
+msgid "Дата создания"
+msgstr ""
+
+#: .\apps\core\models.py:10
+msgid "Дата обновления"
+msgstr ""
+
+#: .\apps\core\web_views.py:66
+#, python-format
+msgid "Добро пожаловать, %(username)s! Регистрация прошла успешно."
+msgstr ""
+
+#: .\apps\core\web_views.py:79
+msgid "Вы вышли из системы."
+msgstr ""
+
+#: .\apps\core\web_views.py:117
+msgid "Пароль успешно изменён."
+msgstr ""
+
+#: .\apps\core\web_views.py:119
+msgid "Профиль обновлён."
+msgstr ""
+
+#: .\apps\groups\forms.py:17 .\apps\groups\forms.py:23
+msgid "Название группы"
+msgstr ""
+
+#: .\apps\groups\forms.py:19 .\apps\groups\models.py:157
+msgid "Аватар группы"
+msgstr ""
+
+#: .\apps\groups\forms.py:20 .\apps\groups\models.py:173
+msgid "Приватная группа"
+msgstr ""
+
+#: .\apps\groups\forms.py:24
+msgid "Описание группы"
+msgstr ""
+
+#: .\apps\groups\forms.py:41 .\apps\groups\forms.py:60
+#: .\apps\groups\models.py:43
+msgid "Сообщение"
+msgstr ""
+
+#: .\apps\groups\forms.py:45
+msgid "Необязательное сообщение к приглашению"
+msgstr ""
+
+#: .\apps\groups\forms.py:65 .\templates\pages\group_chat.html:78
+msgid "Введите сообщение..."
+msgstr ""
+
+#: .\apps\groups\forms.py:80 .\templates\pages\my_content_list.html:268
+msgid "Ваш комментарий..."
+msgstr ""
+
+#: .\apps\groups\models.py:12
+msgid "Ожидает ответа"
+msgstr ""
+
+#: .\apps\groups\models.py:13
+msgid "Принято"
+msgstr ""
+
+#: .\apps\groups\models.py:14
+msgid "Отклонено"
+msgstr ""
+
+#: .\apps\groups\models.py:21 .\apps\groups\models.py:70
+#: .\apps\groups\models.py:103 .\apps\groups\models.py:177
+#: .\apps\groups\models.py:203 .\apps\reviews\models.py:33
+msgid "Группа"
+msgstr ""
+
+#: .\apps\groups\models.py:27
+msgid "Кто пригласил"
+msgstr ""
+
+#: .\apps\groups\models.py:33
+msgid "Кого пригласили"
+msgstr ""
+
+#: .\apps\groups\models.py:39
+msgid "Статус"
+msgstr ""
+
+#: .\apps\groups\models.py:47 .\apps\notifications\models.py:12
+msgid "Приглашение в группу"
+msgstr ""
+
+#: .\apps\groups\models.py:48
+msgid "Приглашения в группы"
+msgstr ""
+
+#: .\apps\groups\models.py:76 .\apps\groups\models.py:115
+msgid "Автор"
+msgstr ""
+
+#: .\apps\groups\models.py:80
+msgid "Текст сообщения"
+msgstr ""
+
+#: .\apps\groups\models.py:84
+msgid "Сообщение группы"
+msgstr ""
+
+#: .\apps\groups\models.py:85
+msgid "Сообщения групп"
+msgstr ""
+
+#: .\apps\groups\models.py:119 .\apps\reviews\models.py:85
+msgid "Текст комментария"
+msgstr ""
+
+#: .\apps\groups\models.py:127 .\apps\reviews\models.py:93
+msgid "Родительский комментарий"
+msgstr ""
+
+#: .\apps\groups\models.py:131
+msgid "Комментарий обсуждения"
+msgstr ""
+
+#: .\apps\groups\models.py:132
+msgid "Комментарии обсуждений"
+msgstr ""
+
+#: .\apps\groups\models.py:163 .\apps\groups\models.py:190
+msgid "Владелец"
+msgstr ""
+
+#: .\apps\groups\models.py:169 .\templates\pages\group_detail.html:71
+msgid "Участники"
+msgstr ""
+
+#: .\apps\groups\models.py:178 .\templates\base.html:33
+#: .\templates\pages\group_chat.html:11
+#: .\templates\pages\group_content_detail.html:10
+#: .\templates\pages\group_detail.html:10 .\templates\pages\group_form.html:10
+#: .\templates\pages\group_invite.html:10 .\templates\pages\group_list.html:4
+#: .\templates\pages\group_list.html:10 .\templates\pages\group_list.html:17
+#: .\templates\pages\home.html:28 .\templates\pages\review_detail.html:11
+msgid "Группы"
+msgstr ""
+
+#: .\apps\groups\models.py:191
+msgid "Администратор"
+msgstr ""
+
+#: .\apps\groups\models.py:192
+msgid "Участник"
+msgstr ""
+
+#: .\apps\groups\models.py:213
+msgid "Дата вступления"
+msgstr ""
+
+#: .\apps\groups\models.py:217
+msgid "Членство в группе"
+msgstr ""
+
+#: .\apps\groups\models.py:218
+msgid "Членство в группах"
+msgstr ""
+
+#: .\apps\groups\web_views.py:33 .\templates\pages\group_invite.html:20
+#, python-format
+msgid "Приглашение в группу «%(name)s»"
+msgstr ""
+
+#: .\apps\groups\web_views.py:35
+#, python-format
+msgid "%(username)s приглашает вас в группу «%(name)s»."
+msgstr ""
+
+#: .\apps\groups\web_views.py:181
+#, python-format
+msgid "Группа \"%(name)s\" создана!"
+msgstr ""
+
+#: .\apps\groups\web_views.py:186
+msgid "Создание группы"
+msgstr ""
+
+#: .\apps\groups\web_views.py:199
+msgid "Вступление в приватную группу возможно только по приглашению."
+msgstr ""
+
+#: .\apps\groups\web_views.py:202 .\apps\groups\web_views.py:292
+#, python-format
+msgid "Вы вступили в группу \"%(name)s\"!"
+msgstr ""
+
+#: .\apps\groups\web_views.py:216
+#, python-format
+msgid "Вы покинули группу \"%(name)s\"."
+msgstr ""
+
+#: .\apps\groups\web_views.py:218
+msgid "Владелец не может покинуть группу."
+msgstr ""
+
+#: .\apps\groups\web_views.py:230
+msgid "Приглашать могут только владелец или администратор группы."
+msgstr ""
+
+#: .\apps\groups\web_views.py:255
+#, python-format
+msgid "Приглашение отправлено пользователю %(username)s."
+msgstr ""
+
+#: .\apps\groups\web_views.py:276 .\apps\groups\web_views.py:304
+msgid "Это приглашение уже обработано."
+msgstr ""
+
+#: .\apps\groups\web_views.py:288
+#, python-format
+msgid "%(username)s принял приглашение"
+msgstr ""
+
+#: .\apps\groups\web_views.py:289
+#, python-format
+msgid "%(username)s вступил в группу «%(name)s»."
+msgstr ""
+
+#: .\apps\groups\web_views.py:313
+#, python-format
+msgid "%(username)s отклонил приглашение"
+msgstr ""
+
+#: .\apps\groups\web_views.py:314
+#, python-format
+msgid "%(username)s отклонил приглашение в группу «%(name)s»."
+msgstr ""
+
+#: .\apps\groups\web_views.py:317
+#, python-format
+msgid "Вы отклонили приглашение в группу \"%(name)s\"."
+msgstr ""
+
+#: .\apps\groups\web_views.py:375
+msgid "Комментировать могут только участники группы."
+msgstr ""
+
+#: .\apps\groups\web_views.py:394
+msgid "Комментарий добавлен."
+msgstr ""
+
+#: .\apps\groups\web_views.py:396
+msgid "Комментарий не может быть пустым."
+msgstr ""
+
+#: .\apps\groups\web_views.py:409
+msgid "Брать объекты могут только участники группы."
+msgstr ""
+
+#: .\apps\groups\web_views.py:418
+#, python-format
+msgid "«%(title)s» добавлен в ваши объекты."
+msgstr ""
+
+#: .\apps\groups\web_views.py:431 .\apps\groups\web_views.py:464
+msgid "Чат доступен только участникам группы."
+msgstr ""
+
+#: .\apps\groups\web_views.py:469
+msgid "Пустое или слишком длинное сообщение."
+msgstr ""
+
+#: .\apps\notifications\models.py:13
+msgid "Приглашение принято"
+msgstr ""
+
+#: .\apps\notifications\models.py:14
+msgid "Приглашение отклонено"
+msgstr ""
+
+#: .\apps\notifications\models.py:15
+msgid "Новое сообщение в группе"
+msgstr ""
+
+#: .\apps\notifications\models.py:16 .\templates\pages\my_content_list.html:107
+msgid "Новая серия"
+msgstr ""
+
+#: .\apps\notifications\models.py:17 .\templates\pages\my_content_list.html:107
+msgid "Новый сезон"
+msgstr ""
+
+#: .\apps\notifications\models.py:29
+msgid "Тип уведомления"
+msgstr ""
+
+#: .\apps\notifications\models.py:33
+msgid "Заголовок"
+msgstr ""
+
+#: .\apps\notifications\models.py:37
+msgid "Текст"
+msgstr ""
+
+#: .\apps\notifications\models.py:42
+msgid "Ссылка"
+msgstr ""
+
+#: .\apps\notifications\models.py:43
+msgid "URL, куда ведёт клик по уведомлению"
+msgstr ""
+
+#: .\apps\notifications\models.py:47
+msgid "Прочитано"
+msgstr ""
+
+#: .\apps\notifications\models.py:55
+msgid "Приглашение"
+msgstr ""
+
+#: .\apps\notifications\models.py:59
+msgid "Уведомление"
+msgstr ""
+
+#: .\apps\notifications\models.py:60 .\templates\base.html:63
+#: .\templates\pages\notification_list.html:4
+#: .\templates\pages\notification_list.html:10
+#: .\templates\pages\notification_list.html:17
+msgid "Уведомления"
+msgstr ""
+
+#: .\apps\reviews\forms.py:14
+msgid "Оценка (1-10)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:15 .\apps\reviews\models.py:44
+msgid "Заголовок отзыва"
+msgstr ""
+
+#: .\apps\reviews\forms.py:16
+msgid "Текст отзыва (необязательно)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:17 .\apps\reviews\models.py:52
+msgid "Содержит спойлеры"
+msgstr ""
+
+#: .\apps\reviews\forms.py:21
+msgid "Заголовок (необязательно)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:22
+msgid "Ваш отзыв... (необязательно)"
+msgstr ""
+
+#: .\apps\reviews\forms.py:41
+msgid "Написать комментарий..."
+msgstr ""
+
+#: .\apps\reviews\models.py:34
+msgid "Группа, в контексте которой оставлен отзыв"
+msgstr ""
+
+#: .\apps\reviews\models.py:38
+msgid "Оценка"
+msgstr ""
+
+#: .\apps\reviews\models.py:48
+msgid "Текст отзыва"
+msgstr ""
+
+#: .\apps\reviews\models.py:56 .\apps\reviews\models.py:77
+#: .\templates\pages\content_detail.html:279
+#: .\templates\pages\group_content_detail.html:160
+#: .\templates\pages\review_confirm_delete.html:12
+#: .\templates\pages\review_detail.html:4
+#: .\templates\pages\review_detail.html:18
+msgid "Отзыв"
+msgstr ""
+
+#: .\apps\reviews\models.py:57 .\templates\pages\content_detail.html:270
+msgid "Отзывы"
+msgstr ""
+
+#: .\apps\reviews\models.py:98
+msgid "Комментарии"
+msgstr ""
+
+#: .\apps\reviews\web_views.py:41
+msgid "Вы уже оставили отзыв на этот контент."
+msgstr ""
+
+#: .\apps\reviews\web_views.py:51
+msgid "Отзыв опубликован!"
+msgstr ""
+
+#: .\apps\reviews\web_views.py:59 .\templates\pages\profile.html:85
+#: .\templates\pages\review_detail.html:32
+#, python-format
+msgid "Отзыв на «%(title)s»"
+msgstr ""
+
+#: .\apps\reviews\web_views.py:75
+msgid "Отзыв обновлён!"
+msgstr ""
+
+#: .\apps\reviews\web_views.py:83
+#, python-format
+msgid "Редактирование отзыва на «%(title)s»"
+msgstr ""
+
+#: .\apps\reviews\web_views.py:97
+msgid "Отзыв удалён."
+msgstr ""
+
+#: .\apps\reviews\web_views.py:120
+msgid "Комментарий добавлен!"
+msgstr ""
+
+#: .\apps\users\forms.py:29
+msgid "Проверка защиты от ботов не пройдена. Попробуйте ещё раз."
+msgstr ""
+
+#: .\apps\users\forms.py:40 .\apps\users\forms.py:41 .\apps\users\forms.py:103
+#: .\apps\users\forms.py:137
+msgid "Email"
+msgstr ""
+
+#: .\apps\users\forms.py:48 .\apps\users\forms.py:55 .\apps\users\forms.py:85
+#: .\apps\users\forms.py:136 .\templates\pages\login.html:21
+#: .\templates\pages\login.html:23
+msgid "Имя пользователя"
+msgstr ""
+
+#: .\apps\users\forms.py:59 .\apps\users\forms.py:65 .\apps\users\forms.py:89
+#: .\templates\pages\login.html:27 .\templates\pages\login.html:29
+msgid "Пароль"
+msgstr ""
+
+#: .\apps\users\forms.py:63 .\apps\users\forms.py:66 .\apps\users\forms.py:128
+msgid "Подтверждение пароля"
+msgstr ""
+
+#: .\apps\users\forms.py:102 .\apps\users\forms.py:139
+msgid "Фамилия"
+msgstr ""
+
+#: .\apps\users\forms.py:104 .\apps\users\forms.py:140
+#: .\apps\users\models.py:18
+msgid "О себе"
+msgstr ""
+
+#: .\apps\users\forms.py:105 .\apps\users\forms.py:141
+#: .\apps\users\models.py:14 .\templates\pages\profile.html:21
+#: .\templates\pages\profile_edit.html:38
+#: .\templates\pages\profile_edit.html:42
+msgid "Аватар"
+msgstr ""
+
+#: .\apps\users\forms.py:122
+msgid "Новый пароль"
+msgstr ""
+
+#: .\apps\users\forms.py:123
+msgid "Оставьте пустым, если не меняете"
+msgstr ""
+
+#: .\apps\users\forms.py:124
+msgid "Минимум 8 символов"
+msgstr ""
+
+#: .\apps\users\forms.py:129
+msgid "Повторите новый пароль"
+msgstr ""
+
+#: .\apps\users\forms.py:159
+msgid "Пароли не совпадают."
+msgstr ""
+
+#: .\apps\users\models.py:23
+msgid "Пользователи"
+msgstr ""
+
+#: .\config\settings\base.py:145
+msgid "Русский"
+msgstr ""
+
+#: .\config\settings\base.py:146
+msgid "English"
+msgstr ""
+
+#: .\templates\base.html:7 .\templates\base.html:19 .\templates\base.html:111
+#: .\templates\pages\content_detail.html:5
+#: .\templates\pages\content_list.html:4 .\templates\pages\group_chat.html:5
+#: .\templates\pages\group_content_detail.html:4
+#: .\templates\pages\group_detail.html:4 .\templates\pages\group_form.html:4
+#: .\templates\pages\group_invite.html:4 .\templates\pages\group_list.html:4
+#: .\templates\pages\home.html:4 .\templates\pages\home.html:12
+#: .\templates\pages\login.html:4 .\templates\pages\my_content_list.html:5
+#: .\templates\pages\my_content_search.html:4
+#: .\templates\pages\notification_list.html:4 .\templates\pages\profile.html:4
+#: .\templates\pages\profile_edit.html:4 .\templates\pages\register.html:4
+#: .\templates\pages\review_confirm_delete.html:4
+#: .\templates\pages\review_detail.html:4 .\templates\pages\review_form.html:5
+msgid "Смотрим вместе"
+msgstr ""
+
+#: .\templates\base.html:28 .\templates\pages\content_detail.html:11
+#: .\templates\pages\content_list.html:4 .\templates\pages\content_list.html:10
+#: .\templates\pages\content_list.html:16 .\templates\pages\home.html:25
+#: .\templates\pages\review_confirm_delete.html:10
+#: .\templates\pages\review_detail.html:15
+#: .\templates\pages\review_form.html:11
+msgid "Каталог"
+msgstr ""
+
+#: .\templates\base.html:39 .\templates\pages\my_content_list.html:5
+#: .\templates\pages\my_content_list.html:11
+#: .\templates\pages\my_content_list.html:18
+#: .\templates\pages\my_content_search.html:10
+#: .\templates\pages\profile.html:45
+msgid "Мои объекты"
+msgstr ""
+
+#: .\templates\base.html:49
+msgid "Язык"
+msgstr ""
+
+#: .\templates\base.html:68
+msgid "непрочитанных уведомлений"
+msgstr ""
+
+#: .\templates\base.html:79
+msgid "Выход"
+msgstr ""
+
+#: .\templates\base.html:83 .\templates\pages\home.html:22
+#: .\templates\pages\login.html:4 .\templates\pages\login.html:11
+msgid "Вход"
+msgstr ""
+
+#: .\templates\base.html:86 .\templates\pages\home.html:20
+#: .\templates\pages\register.html:4 .\templates\pages\register.html:11
+msgid "Регистрация"
+msgstr ""
+
+#: .\templates\base.html:111
+msgid "Обмен мнениями о фильмах, сериалах и музыке."
+msgstr ""
+
+#: .\templates\pages\content_detail.html:38
+msgid "Сериал завершён"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:40
+msgid "Идёт — ожидаются новые сезоны"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:50
+msgid "Вышла новая серия:"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:54
+#: .\templates\pages\content_detail.html:120
+#: .\templates\pages\my_content_list.html:182
+#: .\templates\pages\my_content_list.html:196
+#, python-format
+msgid "С%(s)sE%(e)s"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:62
+msgid "Вышел новый сезон:"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:97
+msgid "Кинопоиск"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:105 .\templates\pages\home.html:68
+#, python-format
+msgid "%(counter)s отзыв"
+msgid_plural "%(counter)s отзывов"
+msgstr[0] "%(counter)s отзыв"
+msgstr[1] "%(counter)s отзыва"
+msgstr[2] "%(counter)s отзывов"
+
+#: .\templates\pages\content_detail.html:119
+msgid "Следующая серия:"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:133
+msgid "Обновить даты выхода с Кинопоиска"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:134
+msgid "Обновить даты выхода"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:144
+msgid "Сезон сериала"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:151
+msgid "Сезоны"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:166
+#, python-format
+msgid "%(counter)s эпизод"
+msgid_plural "%(counter)s эпизодов"
+msgstr[0] "%(counter)s эпизод"
+msgstr[1] "%(counter)s эпизода"
+msgstr[2] "%(counter)s эпизодов"
+
+#: .\templates\pages\content_detail.html:191
+msgid "Ваш отзыв"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:195
+#: .\templates\pages\content_detail.html:259
+msgid "Написать отзыв"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:212
+msgid "Эпизоды"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:219
+msgid "Дата выхода"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:236
+msgid "Серия ещё не вышла"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:236
+#: .\templates\pages\my_content_list.html:199
+msgid "анонс"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:253
+msgid "Вы уже оставили отзыв."
+msgstr ""
+
+#: .\templates\pages\content_detail.html:254
+msgid "Посмотреть"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:255 .\templates\pages\profile.html:102
+#: .\templates\pages\review_detail.html:61
+msgid "Редактировать"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:264
+#: .\templates\pages\group_content_detail.html:101
+#: .\templates\pages\review_detail.html:90
+msgid "Войдите"
+msgstr ""
+
+#: .\templates\pages\content_detail.html:264
+msgid "чтобы оставить отзыв."
+msgstr ""
+
+#: .\templates\pages\content_detail.html:320 .\templates\pages\home.html:91
+msgid "Пока нет отзывов. Будьте первым!"
+msgstr ""
+
+#: .\templates\pages\content_list.html:22
+#: .\templates\pages\my_content_list.html:35
+msgid "Поиск..."
+msgstr ""
+
+#: .\templates\pages\content_list.html:24
+msgid "Все категории"
+msgstr ""
+
+#: .\templates\pages\content_list.html:32
+#: .\templates\pages\group_detail.html:82
+#: .\templates\pages\my_content_list.html:45
+msgid "Все жанры"
+msgstr ""
+
+#: .\templates\pages\content_list.html:39
+#: .\templates\pages\my_content_list.html:60
+msgid "Фильтр по завершённости сериала"
+msgstr ""
+
+#: .\templates\pages\content_list.html:40
+#: .\templates\pages\my_content_list.html:61 .\templates\pages\profile.html:46
+msgid "Все"
+msgstr ""
+
+#: .\templates\pages\content_list.html:41
+#: .\templates\pages\content_list.html:81
+#: .\templates\pages\my_content_list.html:62
+#: .\templates\pages\my_content_list.html:148
+msgid "Завершён"
+msgstr ""
+
+#: .\templates\pages\content_list.html:42
+#: .\templates\pages\content_list.html:83
+#: .\templates\pages\my_content_list.html:63
+#: .\templates\pages\my_content_list.html:150
+msgid "Идёт"
+msgstr ""
+
+#: .\templates\pages\content_list.html:96
+#: .\templates\pages\my_content_list.html:129
+msgid "Рейтинг Кинопоиска"
+msgstr ""
+
+#: .\templates\pages\content_list.html:101
+#: .\templates\pages\my_content_list.html:134
+msgid "Оценка пользователей"
+msgstr ""
+
+#: .\templates\pages\content_list.html:107
+msgid "Нет оценок"
+msgstr ""
+
+#: .\templates\pages\content_list.html:142
+msgid "Контент не найден."
+msgstr ""
+
+#: .\templates\pages\group_chat.html:5 .\templates\pages\group_chat.html:13
+#: .\templates\pages\group_detail.html:33
+msgid "Чат"
+msgstr ""
+
+#: .\templates\pages\group_chat.html:39
+#, python-format
+msgid "Чат группы «%(name)s»"
+msgstr ""
+
+#: .\templates\pages\group_chat.html:70
+msgid "Сообщений пока нет. Напишите первым!"
+msgstr ""
+
+#: .\templates\pages\group_chat.html:80
+#: .\templates\pages\group_content_detail.html:94
+#: .\templates\pages\review_detail.html:83
+msgid "Отправить"
+msgstr ""
+
+#: .\templates\pages\group_chat.html:92
+#, python-format
+msgid "Участники (%(count)s)"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:26
+msgid "Страница в каталоге"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:32
+msgid "В ваших объектах"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:37
+msgid "Взять себе"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:51
+msgid "У участников группы"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:78
+#: .\templates\pages\group_detail.html:137
+msgid "Обсуждение"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:87
+msgid "Ответ для"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:88
+#: .\templates\pages\group_form.html:45 .\templates\pages\group_invite.html:51
+#: .\templates\pages\profile_edit.html:127
+#: .\templates\pages\review_confirm_delete.html:35
+#: .\templates\pages\review_form.html:62
+msgid "Отмена"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:101
+msgid "чтобы участвовать в обсуждении."
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:105
+msgid "Обсуждение доступно только участникам группы."
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:121
+#: .\templates\pages\group_content_detail.html:137
+msgid "Ответить"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:148
+msgid "Комментариев пока нет. Начните обсуждение!"
+msgstr ""
+
+#: .\templates\pages\group_content_detail.html:152
+msgid "Отзывы группы на этот объект"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:21
+msgid "Приватная"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:28
+#: .\templates\pages\group_invite.html:12
+msgid "Пригласить"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:38
+msgid "Покинуть"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:45
+msgid "Вступить"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:58
+msgid "Владелец:"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:59 .\templates\pages\group_list.html:51
+#: .\templates\pages\group_list.html:75
+#, python-format
+msgid "%(counter)s участник"
+msgid_plural "%(counter)s участников"
+msgstr[0] "%(counter)s участник"
+msgstr[1] "%(counter)s участника"
+msgstr[2] "%(counter)s участников"
+
+#: .\templates\pages\group_detail.html:60
+msgid "Создана"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:66
+msgid "Обсуждения"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:80
+msgid "Поиск по названию..."
+msgstr ""
+
+#: .\templates\pages\group_detail.html:91
+#: .\templates\pages\my_content_list.html:67
+msgid "Сбросить фильтры"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:124
+#, python-format
+msgid "%(counter)s комментарий"
+msgid_plural "%(counter)s комментариев"
+msgstr[0] "%(counter)s комментарий"
+msgstr[1] "%(counter)s комментария"
+msgstr[2] "%(counter)s комментариев"
+
+#: .\templates\pages\group_detail.html:126
+msgid "Нет комментариев"
+msgstr ""
+
+#: .\templates\pages\group_detail.html:166
+msgid "Участники группы пока не добавили ни одного объекта."
+msgstr ""
+
+#: .\templates\pages\group_detail.html:184
+msgid "в группе с"
+msgstr ""
+
+#: .\templates\pages\group_form.html:43
+#: .\templates\pages\my_content_list.html:253
+#: .\templates\pages\my_content_list.html:276
+#: .\templates\pages\profile_edit.html:124
+#: .\templates\pages\review_form.html:60
+msgid "Сохранить"
+msgstr ""
+
+#: .\templates\pages\group_invite.html:4
+#, python-format
+msgid "Пригласить в %(name)s"
+msgstr ""
+
+#: .\templates\pages\group_invite.html:24
+msgid "Поиск по имени пользователя..."
+msgstr ""
+
+#: .\templates\pages\group_invite.html:38
+msgid "Нет пользователей, которых можно пригласить."
+msgstr ""
+
+#: .\templates\pages\group_invite.html:49
+msgid "Отправить приглашение"
+msgstr ""
+
+#: .\templates\pages\group_list.html:20
+msgid "Создать группу"
+msgstr ""
+
+#: .\templates\pages\group_list.html:28
+msgid "Поиск групп..."
+msgstr ""
+
+#: .\templates\pages\group_list.html:34 .\templates\pages\profile.html:61
+msgid "Мои группы"
+msgstr ""
+
+#: .\templates\pages\group_list.html:58
+msgid "Все публичные группы"
+msgstr ""
+
+#: .\templates\pages\group_list.html:107
+msgid "Публичные группы не найдены."
+msgstr ""
+
+#: .\templates\pages\group_list.html:109
+msgid "Создайте первую группу!"
+msgstr ""
+
+#: .\templates\pages\home.html:4
+msgid "Главная"
+msgstr ""
+
+#: .\templates\pages\home.html:15
+msgid "Обменивайтесь мнениями о фильмах, сериалах и музыке с друзьями."
+msgstr ""
+
+#: .\templates\pages\home.html:16
+msgid "Создавайте группы, оставляйте отзывы и оценки."
+msgstr ""
+
+#: .\templates\pages\home.html:39
+msgid "Последние отзывы"
+msgstr ""
+
+#: .\templates\pages\home.html:98
+msgid "Недавно добавленное"
+msgstr ""
+
+#: .\templates\pages\home.html:130
+msgid "Контент пока не добавлен."
+msgstr ""
+
+#: .\templates\pages\home.html:140
+msgid "Что смотрят пользователи"
+msgstr ""
+
+#: .\templates\pages\login.html:42 .\templates\pages\register.html:50
+msgid "Войти"
+msgstr ""
+
+#: .\templates\pages\login.html:47
+msgid "Нет аккаунта?"
+msgstr ""
+
+#: .\templates\pages\login.html:47 .\templates\pages\register.html:45
+msgid "Зарегистрироваться"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:20
+#: .\templates\pages\my_content_search.html:100
+#: .\templates\pages\profile.html:53
+msgid "Добавить"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:27
+msgid ""
+"Поиск по внешним базам недоступен: не задан ключ KINOPOISK_API_KEY в "
+"настройках сервера."
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:37
+#: .\templates\pages\my_content_search.html:30
+msgid "Все типы"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:53
+msgid "Все статусы"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:105
+msgid "Есть новости"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:124
+msgid "Моя оценка"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:168
+#, python-format
+msgid "Сезон %(num)s — средняя оценка %(avg)s"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:169
+#, python-format
+msgid "С%(num)s:"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:195
+msgid "Следующая:"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:224
+msgid "Личный"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:228
+msgid "Нет комментария"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:273
+msgid "Публичный (виден всем на главной)"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:282
+#, python-format
+msgid "Удалить «%(title)s» из ваших объектов?"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:285
+#: .\templates\pages\review_detail.html:64
+msgid "Удалить"
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:324
+msgid "Объектов этой категории у вас пока нет."
+msgstr ""
+
+#: .\templates\pages\my_content_list.html:326
+msgid ""
+"У вас пока нет объектов. Нажмите «Добавить», чтобы найти фильм или сериал."
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:4
+#: .\templates\pages\my_content_search.html:11
+#: .\templates\pages\my_content_search.html:17
+msgid "Добавить объект"
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:20
+msgid ""
+"Введите название фильма или сериала — мы найдём его в базе Кинопоиска и "
+"добавим со всеми доступными данными."
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:27
+msgid "Название, напр. «Интерстеллар»..."
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:37
+msgid "Найти"
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:50
+#, python-format
+msgid "Результаты поиска по запросу «%(query)s»:"
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:76
+msgid "Фильм"
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:78
+msgid "Сериал"
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:98
+msgid "Личный комментарий (необязательно)..."
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:113
+#, python-format
+msgid "По запросу «%(query)s» ничего не найдено."
+msgstr ""
+
+#: .\templates\pages\my_content_search.html:120
+msgid "К моим объектам"
+msgstr ""
+
+#: .\templates\pages\notification_list.html:22
+msgid "Прочитать все"
+msgstr ""
+
+#: .\templates\pages\notification_list.html:50
+msgid "Новое"
+msgstr ""
+
+#: .\templates\pages\notification_list.html:63
+msgid "Принять"
+msgstr ""
+
+#: .\templates\pages\notification_list.html:69
+msgid "Отклонить"
+msgstr ""
+
+#: .\templates\pages\notification_list.html:74
+msgid "Открыть"
+msgstr ""
+
+#: .\templates\pages\notification_list.html:106
+msgid "У вас пока нет уведомлений."
+msgstr ""
+
+#: .\templates\pages\profile.html:4 .\templates\pages\profile.html:10
+#: .\templates\pages\profile_edit.html:10
+msgid "Профиль"
+msgstr ""
+
+#: .\templates\pages\profile.html:34
+msgid "На сайте с"
+msgstr ""
+
+#: .\templates\pages\profile.html:37
+msgid "Редактировать профиль"
+msgstr ""
+
+#: .\templates\pages\profile.html:50
+msgid "Перейти к моим объектам"
+msgstr ""
+
+#: .\templates\pages\profile.html:69
+msgid "Вы пока не в группах"
+msgstr ""
+
+#: .\templates\pages\profile.html:76
+msgid "Мои отзывы"
+msgstr ""
+
+#: .\templates\pages\profile.html:132
+msgid "У вас пока нет отзывов."
+msgstr ""
+
+#: .\templates\pages\profile.html:133
+msgid "Найти контент"
+msgstr ""
+
+#: .\templates\pages\profile.html:133
+msgid "и оставить первый отзыв!"
+msgstr ""
+
+#: .\templates\pages\profile_edit.html:4 .\templates\pages\profile_edit.html:21
+msgid "Редактирование профиля"
+msgstr ""
+
+#: .\templates\pages\profile_edit.html:11
+msgid "Редактирование"
+msgstr ""
+
+#: .\templates\pages\profile_edit.html:53
+msgid "Личные данные"
+msgstr ""
+
+#: .\templates\pages\profile_edit.html:81
+msgid "Учётные данные"
+msgstr ""
+
+#: .\templates\pages\profile_edit.html:100
+msgid "Смена пароля"
+msgstr ""
+
+#: .\templates\pages\profile_edit.html:101
+msgid "Оставьте поля пустыми, если не хотите менять пароль."
+msgstr ""
+
+#: .\templates\pages\register.html:50
+msgid "Уже есть аккаунт?"
+msgstr ""
+
+#: .\templates\pages\review_confirm_delete.html:4
+#: .\templates\pages\review_confirm_delete.html:23
+msgid "Удаление отзыва"
+msgstr ""
+
+#: .\templates\pages\review_confirm_delete.html:13
+msgid "Удаление"
+msgstr ""
+
+#: .\templates\pages\review_confirm_delete.html:26
+#, python-format
+msgid "Вы уверены, что хотите удалить отзыв на <strong>«%(title)s»</strong>?"
+msgstr ""
+
+#: .\templates\pages\review_confirm_delete.html:27
+msgid "Оценка:"
+msgstr ""
+
+#: .\templates\pages\review_confirm_delete.html:33
+msgid "Да, удалить"
+msgstr ""
+
+#: .\templates\pages\review_detail.html:52
+msgid "Этот отзыв содержит спойлеры!"
+msgstr ""
+
+#: .\templates\pages\review_detail.html:72
+#, python-format
+msgid "Комментарии (%(count)s)"
+msgstr ""
+
+#: .\templates\pages\review_detail.html:90
+msgid "чтобы оставить комментарий."
+msgstr ""
+
+#: .\templates\pages\review_detail.html:116
+msgid "Комментариев пока нет."
+msgstr ""

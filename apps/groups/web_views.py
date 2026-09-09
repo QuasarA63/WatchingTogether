@@ -6,7 +6,9 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Max, Q, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 from .models import Group, GroupMembership, GroupInvitation, GroupMessage, GroupContentComment
 from .forms import GroupForm, GroupInviteForm, GroupMessageForm, GroupContentCommentForm
@@ -28,10 +30,12 @@ def _notify_invitation(invitation):
     Notification.objects.create(
         user=invitation.to_user,
         notification_type='group_invite',
-        title=f'Приглашение в группу «{invitation.group.name}»',
+        title=_('Приглашение в группу «%(name)s»') % {'name': invitation.group.name},
         message=(
-            f'{invitation.from_user.username} приглашает вас в группу '
-            f'«{invitation.group.name}».'
+            _('%(username)s приглашает вас в группу «%(name)s».') % {
+                'username': invitation.from_user.username,
+                'name': invitation.group.name,
+            }
             + (f'\n{invitation.message}' if invitation.message else '')
         ),
         link='/notifications/',
@@ -174,12 +178,12 @@ def group_create(request):
                 group=group,
                 role='owner'
             )
-            messages.success(request, f'Группа "{group.name}" создана!')
+            messages.success(request, _('Группа "%(name)s" создана!') % {'name': group.name})
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupForm()
 
-    return render(request, 'pages/group_form.html', {'form': form, 'title': 'Создание группы'})
+    return render(request, 'pages/group_form.html', {'form': form, 'title': _('Создание группы')})
 
 
 @login_required
@@ -192,10 +196,10 @@ def group_join(request, pk):
     if group.members.filter(pk=request.user.pk).exists():
         return redirect('group_detail', pk=pk)
     if group.is_private:
-        messages.warning(request, 'Вступление в приватную группу возможно только по приглашению.')
+        messages.warning(request, _('Вступление в приватную группу возможно только по приглашению.'))
         return redirect('group_detail', pk=pk)
     GroupMembership.objects.create(user=request.user, group=group, role='member')
-    messages.success(request, f'Вы вступили в группу "{group.name}"!')
+    messages.success(request, _('Вы вступили в группу "%(name)s"!') % {'name': group.name})
     return redirect('group_detail', pk=pk)
 
 
@@ -209,9 +213,9 @@ def group_leave(request, pk):
     membership = GroupMembership.objects.filter(user=request.user, group=group).first()
     if membership and membership.role != 'owner':
         membership.delete()
-        messages.info(request, f'Вы покинули группу "{group.name}".')
+        messages.info(request, _('Вы покинули группу "%(name)s".') % {'name': group.name})
     elif membership and membership.role == 'owner':
-        messages.warning(request, 'Владелец не может покинуть группу.')
+        messages.warning(request, _('Владелец не может покинуть группу.'))
     return redirect('group_detail', pk=pk)
 
 
@@ -223,7 +227,7 @@ def group_invite(request, pk):
     group = get_object_or_404(Group, pk=pk)
     membership = _get_membership(request.user, group)
     if not membership or membership.role not in ('owner', 'admin'):
-        messages.error(request, 'Приглашать могут только владелец или администратор группы.')
+        messages.error(request, _('Приглашать могут только владелец или администратор группы.'))
         return redirect('group_detail', pk=pk)
 
     # Кандидаты: не участники группы и без активного приглашения
@@ -248,7 +252,7 @@ def group_invite(request, pk):
             _notify_invitation(invitation)
             messages.success(
                 request,
-                f'Приглашение отправлено пользователю {invitation.to_user.username}.'
+                _('Приглашение отправлено пользователю %(username)s.') % {'username': invitation.to_user.username}
             )
             return redirect('group_detail', pk=pk)
     else:
@@ -269,7 +273,7 @@ def invitation_accept(request, pk):
     """
     invitation = get_object_or_404(GroupInvitation, pk=pk, to_user=request.user)
     if invitation.status != 'pending':
-        messages.info(request, 'Это приглашение уже обработано.')
+        messages.info(request, _('Это приглашение уже обработано.'))
         return redirect('notification_list')
 
     invitation.status = 'accepted'
@@ -281,11 +285,11 @@ def invitation_accept(request, pk):
     Notification.objects.create(
         user=invitation.from_user,
         notification_type='group_invite_accepted',
-        title=f'{request.user.username} принял приглашение',
-        message=f'{request.user.username} вступил в группу «{invitation.group.name}».',
+        title=_('%(username)s принял приглашение') % {'username': request.user.username},
+        message=_('%(username)s вступил в группу «%(name)s».') % {'username': request.user.username, 'name': invitation.group.name},
         link=f'/groups/{invitation.group.pk}/',
     )
-    messages.success(request, f'Вы вступили в группу "{invitation.group.name}"!')
+    messages.success(request, _('Вы вступили в группу "%(name)s"!') % {'name': invitation.group.name})
     return redirect('group_detail', pk=invitation.group.pk)
 
 
@@ -297,7 +301,7 @@ def invitation_decline(request, pk):
     """
     invitation = get_object_or_404(GroupInvitation, pk=pk, to_user=request.user)
     if invitation.status != 'pending':
-        messages.info(request, 'Это приглашение уже обработано.')
+        messages.info(request, _('Это приглашение уже обработано.'))
         return redirect('notification_list')
 
     invitation.status = 'declined'
@@ -306,11 +310,11 @@ def invitation_decline(request, pk):
     Notification.objects.create(
         user=invitation.from_user,
         notification_type='group_invite_declined',
-        title=f'{request.user.username} отклонил приглашение',
-        message=f'{request.user.username} отклонил приглашение в группу «{invitation.group.name}».',
+        title=_('%(username)s отклонил приглашение') % {'username': request.user.username},
+        message=_('%(username)s отклонил приглашение в группу «%(name)s».') % {'username': request.user.username, 'name': invitation.group.name},
         link=f'/groups/{invitation.group.pk}/',
     )
-    messages.info(request, f'Вы отклонили приглашение в группу "{invitation.group.name}".')
+    messages.info(request, _('Вы отклонили приглашение в группу "%(name)s".') % {'name': invitation.group.name})
     return redirect('notification_list')
 
 
@@ -368,7 +372,7 @@ def group_content_comment_add(request, pk, content_pk):
     group = get_object_or_404(Group, pk=pk)
     content_item = get_object_or_404(ContentItem, pk=content_pk)
     if not _get_membership(request.user, group):
-        messages.error(request, 'Комментировать могут только участники группы.')
+        messages.error(request, _('Комментировать могут только участники группы.'))
         return redirect('group_content_detail', pk=pk, content_pk=content_pk)
 
     form = GroupContentCommentForm(request.POST)
@@ -387,10 +391,10 @@ def group_content_comment_add(request, pk, content_pk):
             if parent:
                 comment.parent = parent
         comment.save()
-        messages.success(request, 'Комментарий добавлен.')
+        messages.success(request, _('Комментарий добавлен.'))
     else:
-        messages.error(request, 'Комментарий не может быть пустым.')
-    return redirect(f'/groups/{pk}/content/{content_pk}/#discussion')
+        messages.error(request, _('Комментарий не может быть пустым.'))
+    return redirect(reverse('group_content_detail', args=[pk, content_pk]) + '#discussion')
 
 
 @login_required
@@ -402,7 +406,7 @@ def group_content_take(request, pk, content_pk):
     group = get_object_or_404(Group, pk=pk)
     content_item = get_object_or_404(ContentItem, pk=content_pk)
     if not _get_membership(request.user, group):
-        messages.error(request, 'Брать объекты могут только участники группы.')
+        messages.error(request, _('Брать объекты могут только участники группы.'))
         return redirect('group_content_detail', pk=pk, content_pk=content_pk)
 
     _, created = UserContentItem.objects.get_or_create(
@@ -411,9 +415,9 @@ def group_content_take(request, pk, content_pk):
         defaults={'status': UserContentItem.Status.PLANNED},
     )
     if created:
-        messages.success(request, f'«{content_item.title}» добавлен в ваши объекты.')
+        messages.success(request, _('«%(title)s» добавлен в ваши объекты.') % {'title': content_item.title})
     else:
-        messages.info(request, f'«{content_item.title}» уже есть в ваших объектах.')
+        messages.info(request, _('«%(title)s» уже есть в ваших объектах.') % {'title': content_item.title})
     return redirect('group_content_detail', pk=pk, content_pk=content_pk)
 
 
@@ -424,7 +428,7 @@ def group_chat(request, pk):
     """
     group = get_object_or_404(Group, pk=pk)
     if not _get_membership(request.user, group):
-        messages.warning(request, 'Чат доступен только участникам группы.')
+        messages.warning(request, _('Чат доступен только участникам группы.'))
         return redirect('group_detail', pk=pk)
 
     chat_messages = (
@@ -457,12 +461,12 @@ def group_chat_messages(request, pk):
     """
     group = get_object_or_404(Group, pk=pk)
     if not _get_membership(request.user, group):
-        return JsonResponse({'detail': 'Чат доступен только участникам группы.'}, status=403)
+        return JsonResponse({'detail': _('Чат доступен только участникам группы.')}, status=403)
 
     if request.method == 'POST':
         form = GroupMessageForm(request.POST)
         if not form.is_valid():
-            return JsonResponse({'detail': 'Пустое или слишком длинное сообщение.'}, status=400)
+            return JsonResponse({'detail': _('Пустое или слишком длинное сообщение.')}, status=400)
         message = GroupMessage.objects.create(
             group=group, user=request.user, text=form.cleaned_data['text']
         )

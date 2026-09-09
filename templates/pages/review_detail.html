@@ -1,20 +1,21 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}{% if review.title %}{{ review.title }}{% else %}Отзыв{% endif %} — Смотрим вместе{% endblock %}
+{% block title %}{% if review.title %}{{ review.title }}{% else %}{% trans "Отзыв" %}{% endif %} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
         {% if review.group %}
-            <li class="breadcrumb-item"><a href="{% url 'group_list' %}">Группы</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'group_list' %}">{% trans "Группы" %}</a></li>
             <li class="breadcrumb-item"><a href="{% url 'group_detail' review.group.pk %}">{{ review.group.name }}</a></li>
             <li class="breadcrumb-item"><a href="{% url 'group_content_detail' review.group.pk review.content_item.pk %}">{{ review.content_item.title }}</a></li>
         {% else %}
-            <li class="breadcrumb-item"><a href="{% url 'content_list' %}">Каталог</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'content_list' %}">{% trans "Каталог" %}</a></li>
             <li class="breadcrumb-item"><a href="{% url 'content_detail' review.content_item.pk %}">{{ review.content_item.title }}</a></li>
         {% endif %}
-        <li class="breadcrumb-item active" aria-current="page">Отзыв</li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans "Отзыв" %}</li>
     </ol>
 </nav>
 {% endblock %}
@@ -28,7 +29,7 @@
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <h3>
-                            {% if review.title %}{{ review.title }}{% else %}Отзыв на «{{ review.content_item.title }}»{% endif %}
+                            {% if review.title %}{{ review.title }}{% else %}{% blocktrans with title=review.content_item.title %}Отзыв на «{{ title }}»{% endblocktrans %}{% endif %}
                         </h3>
                         <p class="text-muted mb-0">
                             <i class="bi bi-person"></i> {{ review.user.username }}
@@ -48,7 +49,7 @@
 
                 {% if review.is_spoiler %}
                     <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle"></i> Этот отзыв содержит спойлеры!
+                        <i class="bi bi-exclamation-triangle"></i> {% trans "Этот отзыв содержит спойлеры!" %}
                     </div>
                 {% endif %}
 
@@ -57,10 +58,10 @@
                 {% if user == review.user %}
                     <div class="mt-3">
                         <a href="{% url 'review_edit' review.pk %}" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-pencil"></i> Редактировать
+                            <i class="bi bi-pencil"></i> {% trans "Редактировать" %}
                         </a>
                         <a href="{% url 'review_delete' review.pk %}" class="btn btn-sm btn-outline-danger">
-                            <i class="bi bi-trash"></i> Удалить
+                            <i class="bi bi-trash"></i> {% trans "Удалить" %}
                         </a>
                     </div>
                 {% endif %}
@@ -68,7 +69,7 @@
         </div>
 
         <!-- Комментарии -->
-        <h4 class="mb-3"><i class="bi bi-chat"></i> Комментарии ({{ comments.count }})</h4>
+        <h4 class="mb-3"><i class="bi bi-chat"></i> {% blocktrans with count=comments.count %}Комментарии ({{ count }}){% endblocktrans %}</h4>
 
         {% if comment_form %}
             <div class="card mb-3">
@@ -79,14 +80,14 @@
                             {{ comment_form.text }}
                         </div>
                         <button type="submit" class="btn btn-primary btn-sm">
-                            <i class="bi bi-send"></i> Отправить
+                            <i class="bi bi-send"></i> {% trans "Отправить" %}
                         </button>
                     </form>
                 </div>
             </div>
         {% else %}
             <div class="alert alert-info mb-3">
-                <a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.
+                <a href="{% url 'login' %}">{% trans "Войдите" %}</a>, {% trans "чтобы оставить комментарий." %}
             </div>
         {% endif %}
 
@@ -112,7 +113,7 @@
                 </div>
             </div>
         {% empty %}
-            <p class="text-muted">Комментариев пока нет.</p>
+            <p class="text-muted">{% trans "Комментариев пока нет." %}</p>
         {% endfor %}
     </div>
 </div>

@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}{{ group.name }} — Смотрим вместе{% endblock %}
+{% block title %}{{ group.name }} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item"><a href="{% url 'group_list' %}">Группы</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'group_list' %}">{% trans "Группы" %}</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{ group.name }}</li>
     </ol>
 </nav>
@@ -17,31 +18,31 @@
     <div>
         <h2><i class="bi bi-people"></i> {{ group.name }}</h2>
         {% if group.is_private %}
-            <span class="badge bg-warning text-dark"><i class="bi bi-lock"></i> Приватная</span>
+            <span class="badge bg-warning text-dark"><i class="bi bi-lock"></i> {% trans "Приватная" %}</span>
         {% endif %}
     </div>
     <div class="d-flex gap-2">
         {% if user.is_authenticated %}
             {% if can_invite %}
                 <a href="{% url 'group_invite' group.pk %}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-person-plus"></i> Пригласить
+                    <i class="bi bi-person-plus"></i> {% trans "Пригласить" %}
                 </a>
             {% endif %}
             {% if is_member %}
                 <a href="{% url 'group_chat' group.pk %}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-chat-dots"></i> Чат
+                    <i class="bi bi-chat-dots"></i> {% trans "Чат" %}
                 </a>
                 <form method="post" action="{% url 'group_leave' group.pk %}" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-box-arrow-left"></i> Покинуть
+                        <i class="bi bi-box-arrow-left"></i> {% trans "Покинуть" %}
                     </button>
                 </form>
             {% else %}
                 <form method="post" action="{% url 'group_join' group.pk %}" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle"></i> Вступить
+                        <i class="bi bi-plus-circle"></i> {% trans "Вступить" %}
                     </button>
                 </form>
             {% endif %}
@@ -54,20 +55,20 @@
 {% endif %}
 
 <p class="text-muted">
-    <i class="bi bi-person"></i> Владелец: {{ group.owner.username }}
-    &middot; <i class="bi bi-people-fill"></i> {{ members_count }} участн.
-    &middot; <i class="bi bi-calendar"></i> Создана {{ group.created_at|date:"d.m.Y" }}
+    <i class="bi bi-person"></i> {% trans "Владелец:" %} {{ group.owner.username }}
+    &middot; <i class="bi bi-people-fill"></i> {% blocktrans count counter=members_count %}{{ counter }} участник{% plural %}{{ counter }} участников{% endblocktrans %}
+    &middot; <i class="bi bi-calendar"></i> {% trans "Создана" %} {{ group.created_at|date:"d.m.Y" }}
 </p>
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
         <a class="nav-link {% if tab == 'discussions' %}active{% endif %}" href="?tab=discussions">
-            <i class="bi bi-collection-play"></i> Обсуждения
+            <i class="bi bi-collection-play"></i> {% trans "Обсуждения" %}
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if tab == 'members' %}active{% endif %}" href="?tab=members">
-            <i class="bi bi-people-fill"></i> Участники
+            <i class="bi bi-people-fill"></i> {% trans "Участники" %}
         </a>
     </li>
 </ul>
@@ -76,9 +77,9 @@
     <div class="mb-3">
         <form method="get" class="d-flex gap-2 flex-wrap">
             <input type="hidden" name="tab" value="discussions">
-            <input type="text" name="q" class="form-control" placeholder="Поиск по названию..." value="{{ search }}" style="max-width: 200px;">
+            <input type="text" name="q" class="form-control" placeholder="{% trans 'Поиск по названию...' %}" value="{{ search }}" style="max-width: 200px;">
             <select name="genre" class="form-select" style="max-width: 200px;" onchange="this.form.submit()">
-                <option value="">Все жанры</option>
+                <option value="">{% trans "Все жанры" %}</option>
                 {% for genre in genres %}
                     <option value="{{ genre.slug }}" {% if current_genre == genre.slug %}selected{% endif %}>
                         {{ genre.name }}
@@ -87,7 +88,7 @@
             </select>
             <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
             {% if current_genre or search %}
-                <a href="?tab=discussions" class="btn btn-outline-secondary" title="Сбросить фильтры">
+                <a href="?tab=discussions" class="btn btn-outline-secondary" title="{% trans 'Сбросить фильтры' %}">
                     <i class="bi bi-x-lg"></i>
                 </a>
             {% endif %}
@@ -120,9 +121,9 @@
                         <p class="text-muted small mb-0">
                             <i class="bi bi-chat-left-text"></i>
                             {% if discussion.comments_count %}
-                                {{ discussion.comments_count }} коммент.
+                                {% blocktrans count counter=discussion.comments_count %}{{ counter }} комментарий{% plural %}{{ counter }} комментариев{% endblocktrans %}
                             {% else %}
-                                Нет комментариев
+                                {% trans "Нет комментариев" %}
                             {% endif %}
                         </p>
                         {% if discussion.last_comment_user %}
@@ -133,7 +134,7 @@
                         {% endif %}
                     </div>
                     <a href="{% url 'group_content_detail' group.pk discussion.content_item.pk %}" class="btn btn-outline-primary btn-sm ms-3">
-                        Обсуждение <i class="bi bi-arrow-right"></i>
+                        {% trans "Обсуждение" %} <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
             </div>
@@ -162,7 +163,7 @@
         {% endif %}
     {% else %}
         <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> Участники группы пока не добавили ни одного объекта.
+            <i class="bi bi-info-circle"></i> {% trans "Участники группы пока не добавили ни одного объекта." %}
         </div>
     {% endif %}
 
@@ -180,7 +181,7 @@
                     <div>
                         <strong>{{ membership.user.username }}</strong>
                         <span class="badge bg-secondary ms-2">{{ membership.get_role_display }}</span>
-                        <div class="text-muted small">в группе с {{ membership.joined_at|date:"d.m.Y" }}</div>
+                        <div class="text-muted small">{% trans "в группе с" %} {{ membership.joined_at|date:"d.m.Y" }}</div>
                     </div>
                 </div>
             {% endfor %}

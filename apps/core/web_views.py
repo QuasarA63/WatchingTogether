@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Prefetch
+from django.utils.translation import gettext as _
 from apps.reviews.models import Review
 from apps.content.models import ContentItem, UserContentItem
 from apps.groups.models import Group
@@ -62,7 +63,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, f'Добро пожаловать, {user.username}! Регистрация прошла успешно.')
+            messages.success(request, _('Добро пожаловать, %(username)s! Регистрация прошла успешно.') % {'username': user.username})
             return redirect('home')
     else:
         form = RegisterForm()
@@ -75,7 +76,7 @@ def logout_view(request):
     Выход из системы (GET и POST).
     """
     logout(request)
-    messages.info(request, 'Вы вышли из системы.')
+    messages.info(request, _('Вы вышли из системы.'))
     return redirect('home')
 
 
@@ -113,9 +114,9 @@ def profile_edit_view(request):
             # Если пароль был изменён, обновляем сессию, чтобы не разлогинило
             if form.cleaned_data.get('new_password'):
                 update_session_auth_hash(request, user)
-                messages.success(request, 'Пароль успешно изменён.')
+                messages.success(request, _('Пароль успешно изменён.'))
             else:
-                messages.success(request, 'Профиль обновлён.')
+                messages.success(request, _('Профиль обновлён.'))
             return redirect('profile')
     else:
         form = AccountForm(instance=request.user)

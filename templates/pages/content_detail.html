@@ -1,13 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load content_tags %}
 
-{% block title %}{{ item.title }} — Смотрим вместе{% endblock %}
+{% block title %}{{ item.title }} — {% trans "Смотрим вместе" %}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}"><i class="bi bi-house"></i></a></li>
-        <li class="breadcrumb-item"><a href="{% url 'content_list' %}">Каталог</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'content_list' %}">{% trans "Каталог" %}</a></li>
         {% if item.parent %}
             <li class="breadcrumb-item"><a href="{% url 'content_detail' item.parent.pk %}">{{ item.parent.title }}</a></li>
         {% endif %}
@@ -34,9 +35,9 @@
 
         {% if not item.is_season and item.category.slug == 'series' %}
             {% if item.is_ended is True %}
-                <span class="badge bg-info text-dark"><i class="bi bi-check-circle"></i> Сериал завершён</span>
+                <span class="badge bg-info text-dark"><i class="bi bi-check-circle"></i> {% trans "Сериал завершён" %}</span>
             {% elif item.is_ended is False %}
-                <span class="badge bg-success"><i class="bi bi-hourglass-split"></i> Идёт — ожидаются новые сезоны</span>
+                <span class="badge bg-success"><i class="bi bi-hourglass-split"></i> {% trans "Идёт — ожидаются новые сезоны" %}</span>
             {% endif %}
         {% endif %}
 
@@ -46,11 +47,11 @@
                 <i class="bi bi-bell-fill me-2 fs-4"></i>
                 <div>
                     {% if new_episodes %}
-                        <div class="fw-bold">Вышла новая серия:</div>
+                        <div class="fw-bold">{% trans "Вышла новая серия:" %}</div>
                         <ul class="mb-1 ps-3">
                             {% for ep in new_episodes %}
                                 <li>
-                                    С{{ ep.season }}E{{ ep.episode }}
+                                    {% blocktrans with s=ep.season e=ep.episode %}С{{ s }}E{{ e }}{% endblocktrans %}
                                     {% if ep.name %}«{{ ep.name }}»{% endif %}
                                     {% if ep.air_date %}— {{ ep.air_date|date:"d.m.Y" }}{% endif %}
                                 </li>
@@ -58,7 +59,7 @@
                         </ul>
                     {% endif %}
                     {% if new_seasons %}
-                        <div class="fw-bold">Вышел новый сезон:
+                        <div class="fw-bold">{% trans "Вышел новый сезон:" %}
                             {% for n in new_seasons %}{% if not forloop.first %}, {% endif %}{{ n }}{% endfor %}
                         </div>
                     {% endif %}
@@ -93,7 +94,7 @@
                     <span class="badge bg-warning text-dark fs-5">
                         <i class="bi bi-star-fill"></i> {{ item.external_rating }}/10
                     </span>
-                    <small class="text-muted d-block">Кинопоиск</small>
+                    <small class="text-muted d-block">{% trans "Кинопоиск" %}</small>
                 </div>
             {% endif %}
             {% if item.avg_rating %}
@@ -101,7 +102,7 @@
                     <span class="badge bg-primary fs-5">
                         <i class="bi bi-people-fill"></i> {{ item.avg_rating|floatformat:1 }}/10
                     </span>
-                    <small class="text-muted d-block">{{ item.reviews_count }} отзыв{{ item.reviews_count|pluralize:"ов,а,ов" }}</small>
+                    <small class="text-muted d-block">{% blocktrans count counter=item.reviews_count %}{{ counter }} отзыв{% plural %}{{ counter }} отзывов{% endblocktrans %}</small>
                 </div>
             {% endif %}
         </div>
@@ -115,8 +116,8 @@
             <div class="alert alert-warning d-flex align-items-center" role="alert">
                 <i class="bi bi-calendar-event me-2 fs-4"></i>
                 <div>
-                    <strong>Следующая серия:</strong>
-                    С{{ next_episode.season }}E{{ next_episode.episode }}
+                    <strong>{% trans "Следующая серия:" %}</strong>
+                    {% blocktrans with s=next_episode.season e=next_episode.episode %}С{{ s }}E{{ e }}{% endblocktrans %}
                     {% if next_episode.name %}«{{ next_episode.name }}»{% endif %}
                     — {{ next_episode.air_date|date:"d.m.Y" }}
                     <span class="badge bg-warning text-dark ms-1">{{ next_episode.days_label }}</span>
@@ -129,8 +130,8 @@
             <div class="mb-3">
                 <form method="post" action="{% url 'content_refresh_dates' item.pk %}" class="d-inline">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Обновить даты выхода с Кинопоиска">
-                        <i class="bi bi-arrow-clockwise"></i> Обновить даты выхода
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="{% trans 'Обновить даты выхода с Кинопоиска' %}">
+                        <i class="bi bi-arrow-clockwise"></i> {% trans "Обновить даты выхода" %}
                     </button>
                 </form>
             </div>
@@ -140,14 +141,14 @@
         {% if item.parent %}
             <div class="alert alert-secondary">
                 <i class="bi bi-arrow-up"></i>
-                Сезон сериала <a href="{% url 'content_detail' item.parent.pk %}">{{ item.parent.title }}</a>
+                {% trans "Сезон сериала" %} <a href="{% url 'content_detail' item.parent.pk %}">{{ item.parent.title }}</a>
             </div>
         {% endif %}
 
         <!-- Сезоны сериала -->
         {% if seasons %}
             <div class="mb-4">
-                <h4 class="mb-3"><i class="bi bi-collection-play"></i> Сезоны</h4>
+                <h4 class="mb-3"><i class="bi bi-collection-play"></i> {% trans "Сезоны" %}</h4>
                 {% for season in seasons %}
                     <div class="card mb-2">
                         <div class="card-body py-2">
@@ -162,7 +163,7 @@
                                         {% endif %}
                                     {% endwith %}
                                     {% if season.metadata.episodes_count %}
-                                        <small class="text-muted ms-2">{{ season.metadata.episodes_count }} эпизод{{ season.metadata.episodes_count|pluralize:"ов,а,ов" }}</small>
+                                        <small class="text-muted ms-2">{% blocktrans count counter=season.metadata.episodes_count %}{{ counter }} эпизод{% plural %}{{ counter }} эпизодов{% endblocktrans %}</small>
                                     {% endif %}
                                     {% with dates=season_air_dates|get_item:season.pk %}
                                         {% if dates %}
@@ -187,11 +188,11 @@
                                     {% if user.is_authenticated %}
                                         {% with review_obj=user_season_reviews|get_item:season.pk %}
                                             {% if review_obj %}
-                                                <a href="{% url 'review_detail' review_obj.pk %}" class="btn btn-sm btn-outline-success" title="Ваш отзыв">
+                                                <a href="{% url 'review_detail' review_obj.pk %}" class="btn btn-sm btn-outline-success" title="{% trans 'Ваш отзыв' %}">
                                                     <i class="bi bi-check-circle"></i>
                                                 </a>
                                             {% else %}
-                                                <a href="{% url 'review_create' season.pk %}" class="btn btn-sm btn-outline-primary" title="Написать отзыв">
+                                                <a href="{% url 'review_create' season.pk %}" class="btn btn-sm btn-outline-primary" title="{% trans 'Написать отзыв' %}">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
                                             {% endif %}
@@ -208,14 +209,14 @@
         <!-- Эпизоды сезона с датами выхода -->
         {% if episodes_with_dates %}
             <div class="mb-4">
-                <h4 class="mb-3"><i class="bi bi-list-ol"></i> Эпизоды</h4>
+                <h4 class="mb-3"><i class="bi bi-list-ol"></i> {% trans "Эпизоды" %}</h4>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover">
                         <thead>
                             <tr>
                                 <th style="width: 50px;">№</th>
-                                <th>Название</th>
-                                <th style="width: 120px;">Дата выхода</th>
+                                <th>{% trans "Название" %}</th>
+                                <th style="width: 120px;">{% trans "Дата выхода" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -232,7 +233,7 @@
                                         {% if ep.air_date %}
                                             <i class="bi bi-calendar3"></i> {{ ep.air_date|date:"d.m.Y" }}
                                             {% if ep.is_upcoming %}
-                                                <span class="badge bg-warning text-dark ms-1" title="Серия ещё не вышла">анонс</span>
+                                                <span class="badge bg-warning text-dark ms-1" title="{% trans 'Серия ещё не вышла' %}">{% trans "анонс" %}</span>
                                             {% endif %}
                                         {% else %}
                                             <span class="text-muted">—</span>
@@ -249,24 +250,24 @@
         {% if user.is_authenticated %}
             {% if user_review %}
                 <div class="alert alert-success">
-                    <i class="bi bi-check-circle"></i> Вы уже оставили отзыв.
-                    <a href="{% url 'review_detail' user_review.pk %}">Посмотреть</a>
-                    <a href="{% url 'review_edit' user_review.pk %}" class="ms-2">Редактировать</a>
+                    <i class="bi bi-check-circle"></i> {% trans "Вы уже оставили отзыв." %}
+                    <a href="{% url 'review_detail' user_review.pk %}">{% trans "Посмотреть" %}</a>
+                    <a href="{% url 'review_edit' user_review.pk %}" class="ms-2">{% trans "Редактировать" %}</a>
                 </div>
             {% else %}
                 <a href="{% url 'review_create' item.pk %}" class="btn btn-primary mb-3">
-                    <i class="bi bi-pencil-square"></i> Написать отзыв
+                    <i class="bi bi-pencil-square"></i> {% trans "Написать отзыв" %}
                 </a>
             {% endif %}
         {% else %}
             <div class="alert alert-info">
-                <a href="{% url 'login' %}">Войдите</a>, чтобы оставить отзыв.
+                <a href="{% url 'login' %}">{% trans "Войдите" %}</a>, {% trans "чтобы оставить отзыв." %}
             </div>
         {% endif %}
 
         <hr>
 
-        <h4 class="mb-3"><i class="bi bi-chat-square-text"></i> Отзывы</h4>
+        <h4 class="mb-3"><i class="bi bi-chat-square-text"></i> {% trans "Отзывы" %}</h4>
         {% if reviews_page %}
             {% for review in reviews_page %}
                 <div class="card mb-3">
@@ -275,7 +276,7 @@
                             <div>
                                 <h6 class="card-title mb-1">
                                     <a href="{% url 'review_detail' review.pk %}" class="text-decoration-none">
-                                        {% if review.title %}{{ review.title }}{% else %}Отзыв{% endif %}
+                                        {% if review.title %}{{ review.title }}{% else %}{% trans "Отзыв" %}{% endif %}
                                     </a>
                                 </h6>
                                 <p class="text-muted small mb-2">
@@ -316,7 +317,7 @@
             {% endif %}
         {% else %}
             <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> Пока нет отзывов. Будьте первым!
+                <i class="bi bi-info-circle"></i> {% trans "Пока нет отзывов. Будьте первым!" %}
             </div>
         {% endif %}
     </div>

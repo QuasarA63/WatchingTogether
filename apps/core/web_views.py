@@ -18,7 +18,7 @@ def home(request):
     latest_reviewed_items = ContentItem.objects.filter(
         is_active=True,
         reviews__isnull=False,
-    ).select_related('category').annotate(
+    ).select_related('category', 'parent').annotate(
         last_review_at=Max('reviews__created_at'),
         reviews_count=Count('reviews'),
     ).prefetch_related(

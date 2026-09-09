@@ -128,7 +128,7 @@
                         {% if discussion.last_comment_user %}
                             <p class="text-muted small mb-0">
                                 <strong>{{ discussion.last_comment_user }}</strong>
-                                {{ discussion.last_comment_at|date:"d.m.Y H:i" }}
+                                <em>{{ discussion.last_comment_at|date:"d.m.Y H:i" }}</em>
                             </p>
                         {% endif %}
                     </div>

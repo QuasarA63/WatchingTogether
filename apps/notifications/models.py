@@ -12,6 +12,8 @@ class Notification(TimeStampedModel):
         ('group_invite_accepted', 'Приглашение принято'),
         ('group_invite_declined', 'Приглашение отклонено'),
         ('group_new_message', 'Новое сообщение в группе'),
+        ('new_episode', 'Новая серия'),
+        ('new_season', 'Новый сезон'),
     ]
 
     user = models.ForeignKey(

@@ -37,6 +37,10 @@
                                 <i class="bi bi-check-circle me-2 text-success"></i>
                             {% elif notification.notification_type == 'group_invite_declined' %}
                                 <i class="bi bi-x-circle me-2 text-danger"></i>
+                            {% elif notification.notification_type == 'new_episode' %}
+                                <i class="bi bi-play-circle me-2 text-success"></i>
+                            {% elif notification.notification_type == 'new_season' %}
+                                <i class="bi bi-collection-play me-2 text-success"></i>
                             {% else %}
                                 <i class="bi bi-chat-dots me-2"></i>
                             {% endif %}

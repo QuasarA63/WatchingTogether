@@ -99,6 +99,14 @@
                                             <a href="{% url 'content_detail' item.pk %}" class="text-decoration-none">
                                                 {{ item.title }}
                                             </a>
+                                            {% with nu=new_updates|get_item:item.pk %}
+                                                {% if nu %}
+                                                    <span class="badge bg-success ms-1" title="Есть новости">
+                                                        <i class="bi bi-bell-fill"></i>
+                                                        {% if nu.episodes %}Новая серия{% else %}Новый сезон{% endif %}
+                                                    </span>
+                                                {% endif %}
+                                            {% endwith %}
                                         </h5>
                                         <div class="d-flex gap-2 align-items-center">
                                             <!-- Статус просмотра -->

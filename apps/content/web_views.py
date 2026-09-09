@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count
 from django.utils.text import slugify
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from .models import Category, Genre, ContentItem, UserContentItem, Person, ContentItemPerson
 from . import services
 
@@ -65,6 +65,64 @@ def _plural_days(n):
     if 2 <= n % 10 <= 4 and (n % 100 < 10 or n % 100 >= 20):
         return 'дня'
     return 'дней'
+
+
+def item_new_updates(item, max_age_days=30):
+    """
+    Свежие сведения о новых сериях и сезонах объекта.
+
+    Возвращает (new_episodes, new_seasons) из metadata объекта,
+    если сведения ещё актуальны (не старше max_age_days), иначе ([], []).
+    """
+    meta = item.metadata or {}
+    new_episodes = meta.get('new_episodes') or []
+    new_seasons = meta.get('new_seasons') or []
+    if not (new_episodes or new_seasons):
+        return [], []
+    updates_at = meta.get('new_updates_at')
+    if updates_at:
+        try:
+            dt = datetime.fromisoformat(updates_at)
+        except (ValueError, TypeError):
+            dt = None
+        if dt is not None:
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            if datetime.now(timezone.utc) - dt > timedelta(days=max_age_days):
+                return [], []
+
+    # Приводим air_date к объектам date для форматирования в шаблонах
+    display_episodes = []
+    for ep in new_episodes:
+        ep = dict(ep)
+        try:
+            ep['air_date'] = date.fromisoformat(ep.get('air_date', ''))
+        except (ValueError, TypeError):
+            pass
+        display_episodes.append(ep)
+    return display_episodes, new_seasons
+
+
+def released_episode_keys(seasons, today=None):
+    """
+    Ключи (season, episode) эпизодов, уже вышедших (air_date <= сегодня).
+
+    seasons — список словарей из services.get_seasons.
+    """
+    today = today or date.today()
+    keys = set()
+    for season in seasons:
+        season_num = season.get('number')
+        for ep in season.get('episodes', []) or []:
+            air_date = _parse_air_date(ep.get('air_date'))
+            if air_date and air_date <= today:
+                keys.add((season_num, ep.get('number')))
+    return keys
+
+
+def season_numbers(seasons):
+    """Номера сезонов из списка словарей services.get_seasons."""
+    return {s.get('number') for s in seasons}
 
 
 # Транслитерация кириллицы для slug
@@ -237,6 +295,18 @@ def content_detail(request, pk):
             next_episode['days_left'] = days_left
             next_episode['days_label'] = f'через {days_left} {_plural_days(days_left)}'
 
+    # Свежие сведения о новых сериях и сезонах (для сериала)
+    new_episodes, new_seasons = item_new_updates(item) if not item.is_season else ([], [])
+    new_episode_seasons = {e.get('season') for e in new_episodes}
+    new_season_numbers = set(new_seasons)
+    season_badges = {}
+    for season in seasons:
+        season_num = season.metadata.get('season_number')
+        if season_num in new_season_numbers:
+            season_badges[season.pk] = 'Новый сезон'
+        elif season_num in new_episode_seasons:
+            season_badges[season.pk] = 'Новая серия'
+
     context = {
         'item': item,
         'reviews_page': reviews_page,
@@ -247,6 +317,11 @@ def content_detail(request, pk):
         'season_air_dates': season_air_dates,
         'episodes_with_dates': episodes_with_dates,
         'next_episode': next_episode,
+        'new_episodes': new_episodes,
+        'new_seasons': new_seasons,
+        'new_episode_seasons': new_episode_seasons,
+        'new_season_numbers': new_season_numbers,
+        'season_badges': season_badges,
     }
     return render(request, 'pages/content_detail.html', context)
 
@@ -381,6 +456,18 @@ def my_content_list(request):
         if upcoming:
             next_episodes[parent_id] = min(upcoming, key=lambda e: e['air_date'])
 
+    # Свежие сведения о новых сериях и сезонах для каждого объекта
+    new_updates = {}
+    for entry in entries_page:
+        eps, seasons = item_new_updates(entry.content_item)
+        if eps or seasons:
+            new_updates[entry.content_item.pk] = {
+                'episodes': eps,
+                'seasons': seasons,
+                'episode_seasons': {e.get('season') for e in eps},
+                'season_numbers': set(seasons),
+            }
+
     categories = Category.objects.all()
     genres = Genre.objects.all()
     status_choices = UserContentItem.Status.choices
@@ -399,6 +486,7 @@ def my_content_list(request):
         'season_ratings': season_ratings,
         'latest_episodes': latest_episodes,
         'next_episodes': next_episodes,
+        'new_updates': new_updates,
     }
     return render(request, 'pages/my_content_list.html', context)
 
@@ -498,21 +586,27 @@ def _get_or_create_persons(persons_data):
     return results
 
 
-def _import_seasons(series_item, external_id):
+def _import_seasons(series_item, external_id, seasons_data=None):
     """
     Импортировать сезоны сериала с Кинопоиска.
 
     Создаёт дочерние ContentItem для каждого сезона и обновляет
     даты выхода у уже существующих. Возвращает True при успехе.
+
+    Аргумент seasons_data позволяет передать уже полученный список
+    сезонов (чтобы не делать повторный запрос к API).
     """
     import logging
     logger = logging.getLogger(__name__)
 
-    try:
-        seasons = services.get_seasons(external_id)
-    except services.KinopoiskError as exc:
-        logger.warning('Не удалось получить сезоны для %s: %s', external_id, exc)
-        return False
+    if seasons_data is None:
+        try:
+            seasons = services.get_seasons(external_id)
+        except services.KinopoiskError as exc:
+            logger.warning('Не удалось получить сезоны для %s: %s', external_id, exc)
+            return False
+    else:
+        seasons = seasons_data
 
     for season_data in seasons:
         season_num = season_data['number']

@@ -40,6 +40,32 @@
             {% endif %}
         {% endif %}
 
+        <!-- Новые серии и сезоны -->
+        {% if new_episodes or new_seasons %}
+            <div class="alert alert-success d-flex align-items-start mt-2" role="alert">
+                <i class="bi bi-bell-fill me-2 fs-4"></i>
+                <div>
+                    {% if new_episodes %}
+                        <div class="fw-bold">Вышла новая серия:</div>
+                        <ul class="mb-1 ps-3">
+                            {% for ep in new_episodes %}
+                                <li>
+                                    С{{ ep.season }}E{{ ep.episode }}
+                                    {% if ep.name %}«{{ ep.name }}»{% endif %}
+                                    {% if ep.air_date %}— {{ ep.air_date|date:"d.m.Y" }}{% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if new_seasons %}
+                        <div class="fw-bold">Вышел новый сезон:
+                            {% for n in new_seasons %}{% if not forloop.first %}, {% endif %}{{ n }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
         {% if item.genres.all %}
             <div class="mb-3">
                 {% for genre in item.genres.all %}
@@ -130,6 +156,11 @@
                                     <a href="{% url 'content_detail' season.pk %}" class="text-decoration-none fw-bold">
                                         {{ season.metadata.season_number }}. {{ season.title }}
                                     </a>
+                                    {% with badge=season_badges|get_item:season.pk %}
+                                        {% if badge %}
+                                            <span class="badge bg-success ms-1"><i class="bi bi-bell"></i> {{ badge }}</span>
+                                        {% endif %}
+                                    {% endwith %}
                                     {% if season.metadata.episodes_count %}
                                         <small class="text-muted ms-2">{{ season.metadata.episodes_count }} эпизод{{ season.metadata.episodes_count|pluralize:"ов,а,ов" }}</small>
                                     {% endif %}

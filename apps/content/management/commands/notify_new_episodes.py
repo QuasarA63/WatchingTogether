@@ -128,6 +128,7 @@ class Command(BaseCommand):
             # Рассылка уведомлений заинтересованным пользователям
             link = reverse('content_detail', args=[item.pk])
             recipient_statuses = [
+                UserContentItem.Status.PLANNED,
                 UserContentItem.Status.WATCHING,
                 UserContentItem.Status.ON_HOLD,
                 UserContentItem.Status.COMPLETED,

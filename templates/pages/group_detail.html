@@ -124,11 +124,13 @@
                             {% else %}
                                 Нет комментариев
                             {% endif %}
-                            {% if discussion.last_comment_user %}
-                                &middot; последний: <strong>{{ discussion.last_comment_user }}</strong>
-                                {{ discussion.last_comment_at|date:"d.m.Y H:i" }}
-                            {% endif %}
                         </p>
+                        {% if discussion.last_comment_user %}
+                            <p class="text-muted small mb-0">
+                                <strong>{{ discussion.last_comment_user }}</strong>
+                                {{ discussion.last_comment_at|date:"d.m.Y H:i" }}
+                            </p>
+                        {% endif %}
                     </div>
                     <a href="{% url 'group_content_detail' group.pk discussion.content_item.pk %}" class="btn btn-outline-primary btn-sm ms-3">
                         Обсуждение <i class="bi bi-arrow-right"></i>
